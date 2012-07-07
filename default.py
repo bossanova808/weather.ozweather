@@ -21,7 +21,6 @@ import re
 import ftplib
 import shutil
 import time
-#from PIL import Image
 
 # plugin constants
 #create an add on instation and store the reference
