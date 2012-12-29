@@ -248,14 +248,6 @@ def forecast(url, radarCode):
 def downloadBackground(radarCode, fileName):
     global radarBackgroundsPath, loopImagesPath
 
-    #import PIL only if we need it so the add on can be run for data only
-    #on platforms without PIL
-    log("Importing PIL as extra features are activated.")
-    from PIL import Image
-
-    #ok get ready to retrieve some images
-    image = urllib.URLopener()
-
     outFileName = fileName
 
     #the legend file doesn't have the radar code int he filename
@@ -271,9 +263,9 @@ def downloadBackground(radarCode, fileName):
     if xbmcvfs.exists( radarBackgroundsPath + outFileName ):
       fileCreation = os.path.getmtime( radarBackgroundsPath + outFileName)
       now = time.time()
-      dayAgo = now - 60*60*24 # Number of seconds in a day
+      weekAgo = now - 7*60*60*24 # Number of seconds in a week
       #log ("filec " + str(fileCreation) + " dayAgo " + str(dayAgo))
-      if fileCreation < dayAgo:
+      if fileCreation < weekAgo:
         log("Background older than one day - let's refresh - " + outFileName)
         os.remove(radarBackgroundsPath + outFileName)
 
@@ -282,6 +274,14 @@ def downloadBackground(radarCode, fileName):
     if not xbmcvfs.exists( radarBackgroundsPath + outFileName ):
 
         log("....Yep!")
+
+        #import PIL only if we need it so the add on can be run for data only
+        #on platforms without PIL
+        log("Importing PIL as extra features are activated.")
+        from PIL import Image
+        #ok get ready to retrieve some images
+        image = urllib.URLopener()
+
         #the legend image showing the rain scale
         try:
           imageFileIndexed = radarBackgroundsPath + "idx." + fileName
