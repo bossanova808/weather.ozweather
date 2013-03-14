@@ -505,7 +505,7 @@ if sys.argv[1].startswith('Location'):
 
         log("Doing locations search for " + text)
         #need to submit the postcode to the weatherzone search
-        searchURL = 'http://weatherzone.com.au/search/'
+        searchURL = 'http://www.weatherzone.com.au/search/'
         user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
         host = 'www.weatherzone.com.au'
         headers = { 'User-Agent' : user_agent, 'Host' : host }
