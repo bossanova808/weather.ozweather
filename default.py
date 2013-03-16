@@ -505,7 +505,7 @@ if sys.argv[1].startswith('Location'):
 
         log("Doing locations search for " + text)
         #need to submit the postcode to the weatherzone search
-        searchURL = 'http://www.weatherzone.com.au/search/'
+        searchURL = WEATHERZONE_URL + '/search/'
         user_agent = 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)'
         host = 'www.weatherzone.com.au'
         headers = { 'User-Agent' : user_agent, 'Host' : host }
@@ -535,7 +535,7 @@ if sys.argv[1].startswith('Location'):
             #build the full urls
             locationids = []
             for count, loc in enumerate(templocs):
-                locationids.append(WeatherZoneURL + loc)
+                locationids.append(WEATHERZONE_URL + '/' + loc)
             #if we did not get enough data back there are no locations with this postcode
             if len(locations)<=1:
                 log("No locations found with this postcode")
