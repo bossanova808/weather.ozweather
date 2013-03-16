@@ -1,4 +1,7 @@
-V0.6.2
+V0.6.3
+- Can now search by suburb name not just postcode
+
+V0.6.1
 - Bump for Frodo
 - Cleanup, better logging (in debug mode)
 - Refactor & incorporate b808 common code (0.0.8)
