@@ -1,4 +1,4 @@
-Script for XBMC for Australian weather.
+Script for XBMC for Australian weather.  Available from XBMC master repository.
 
 Uses BOM data and retrieves current conditions, 7 day forecast, and radar images.
 
