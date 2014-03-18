@@ -15,7 +15,7 @@ import os
 import platform
 import socket
 
-from traceback import print_exc
+from traceback import format_exc
 
 ################################################################################
 ################################################################################
@@ -33,7 +33,6 @@ def log(message, inst=None, level=xbmc.LOGDEBUG):
       xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### " + str(message), level )
     else:
       xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### " + str(message), level )
-      xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### Exception:", level )
       xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### Exception:" + format_exc(inst), level )
 
 #log something even if debug logging is off - for important stuff!
