@@ -15,6 +15,6 @@
 		<forum>http://forum.xbmc.org/showthread.php?tid=116905</forum>
 		<website>http://wiki.xbmc.org/index.php?title=Add-on:Oz_Weather</website>
 		<email></email>
-		<source></source>
+		<source>https://github.com/bossanova808/weather.ozweather</source>
 	</extension>
 </addon>
