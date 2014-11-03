@@ -320,7 +320,7 @@ def downloadBackground(radarCode, fileName):
         #import PIL only if we need it so the add on can be run for data only
         #on platforms without PIL
         log("Importing PIL as extra features are activated.")
-        from PIL import Image
+        #from PIL import Image
         #ok get ready to retrieve some images
         image = urllib.URLopener()
 
