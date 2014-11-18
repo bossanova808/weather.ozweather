@@ -167,6 +167,7 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Current.Sunset')
         setProperty(WEATHER_WINDOW, 'Today.Sunrise')
         setProperty(WEATHER_WINDOW, 'Today.Sunset')
+        setProperty(WEATHER_WINDOW, 'Today.moonphase')
         setProperty(WEATHER_WINDOW, 'Current.RainSince9')
         setProperty(WEATHER_WINDOW, 'Current.RainLastHr')
         setProperty(WEATHER_WINDOW, 'Current.Precipitation')
@@ -332,7 +333,7 @@ def downloadBackground(radarCode, fileName):
         #import PIL only if we need it so the add on can be run for data only
         #on platforms without PIL
         #log("Importing PIL as extra features are activated.")
-        #from PIL import Image
+        from PIL import Image
         #ok get ready to retrieve some images
         image = urllib.URLopener()
 
@@ -527,9 +528,8 @@ def propertiesPDOM(page, extendedFeatures):
         log("Astrological Retrieved: " + str(observations))
         sunrise = str(observations[0])
         sunset = str(observations[1])
-    except:
+    except Exception as inst:
         log("********** OzWeather Couldn't Parse Astrological Data, sorry!!", inst)
-
 
     ####FORECAST DATA
     try:
@@ -611,6 +611,22 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, "Weather.IsFetched", "false")
     #END FORECAST DATA
 
+
+   #moonphase
+    try:
+            ret = common.parseDOM(page, "div", attrs = { "class": "boxed_blue_nopad" })
+            #create lists of each of the maxes, mins, and descriptions
+            #Get the days UV in text form like 'Extreme' and number '11'
+            moonChunk = common.parseDOM(ret, "td", attrs = { "class": "bg_yellow" , "align":"center", "valign":"middle"})
+            moonPhase = common.parseDOM(moonChunk, "img", ret="title")[0]
+            #log("&&&&& " + str(moonChunk))
+            log("Moonphase is: " + str(moonPhase[0]))
+
+    except Exception as inst:
+        log("OzWeather Couldn't Find a Moonphase, sorry!", inst)
+
+
+
     #ABC VIDEO URL
     # note date and quality level variables...
     #view source on http://www.abc.net.au/news/abcnews24/weather-in-90-seconds/ and find mp4 to see this list, 
@@ -671,6 +687,7 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, 'Current.Sunset'        , sunset)
         setProperty(WEATHER_WINDOW, 'Today.Sunrise'         , sunrise)
         setProperty(WEATHER_WINDOW, 'Today.Sunset'          , sunset)
+        setProperty(WEATHER_WINDOW, 'Today.moonphase'       , moonPhase)
         setProperty(WEATHER_WINDOW, 'Current.Precipitation' , rainSince9)
         setProperty(WEATHER_WINDOW, 'Current.RainSince9'    , rainSince9)
         setProperty(WEATHER_WINDOW, 'Current.RainLastHr'    , rainLastHr)

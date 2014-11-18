@@ -1,6 +1,7 @@
 V0.7.7
 - Bugfix for below, Day is not the same as Daily!
 - add Longdescription new style for one day as that's all we've got
+- added moonphase text
 
 V0.7.6
 - Set some more properties with standardised names for better non confluence skin support
