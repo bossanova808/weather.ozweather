@@ -677,6 +677,8 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, 'Current.OutlookIcon'   , '%s.png' % weathercode)
         setProperty(WEATHER_WINDOW, 'Current.FanartCode'    , weathercode)
         setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'   , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
+        #we only have one long description available so set it here instead of in the loop
+        setProperty(WEATHER_WINDOW, 'Daily.0.LongOutlookDay', longDayCast)
 
         #and all the properties for the forecast
         for count, desc in enumerate(shortDesc):
@@ -694,11 +696,11 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Day%i.Title'                       % count, day)
             setProperty(WEATHER_WINDOW, 'Day%i.ChancePrecipitation'         % count, rainChanceList[count])
             setProperty(WEATHER_WINDOW, 'Day%i.RainChance'                  % count, rainChanceList[count])
-            setProperty(WEATHER_WINDOW, 'Day%i.Precipitation'               % count, common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Day%i.RainChanceAmount'            % count, common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Day%i.HighTemperature'             % count, maxList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'             % count, common.replaceHTMLCodes(rainAmountList[count]))
+            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'          % count, common.replaceHTMLCodes(rainAmountList[count]))
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'           % count, maxList[count])
             setProperty(WEATHER_WINDOW, 'Day%i.HighTemp'                    % count, maxList[count])
-            setProperty(WEATHER_WINDOW, 'Day%i.LowTemperature'              % count, minList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'            % count, minList[count])
             setProperty(WEATHER_WINDOW, 'Day%i.LowTemp'                     % count, minList[count])
             setProperty(WEATHER_WINDOW, 'Day%i.Outlook'                     % count, desc)
             setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                 % count, '%s.png' % weathercode)
