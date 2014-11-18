@@ -1,3 +1,7 @@
+V0.7.6
+- Set some more properties with standardised names for better non confluence skin support
+- Add support for banner.png WeatherProviderLogo
+
 V0.7.5
 - Updates to scraper due to frickin' reverted Weatherzone changes
 - Should cope with both old and new website versions with some luck
