@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 # *  This Program is free software; you can redistribute it and/or modify
 # *  it under the terms of the GNU General Public License as published by
 # *  the Free Software Foundation; either version 2, or (at your option)
@@ -48,6 +50,7 @@ FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/rada
 HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
 RADAR_BACKGROUNDS_PATH = ""
 LOOP_IMAGES_PATH = ""
+TEMPUNIT = unicode(xbmc.getRegion('tempunit'),encoding='utf-8')
 
 # this is fetchpage from parseDOM...
 # added emergency latin 1 decoding for wierd char issues on Weatherzone
@@ -146,6 +149,9 @@ def clearProperties():
     log("Clearing Properties")
     try:
         setProperty(WEATHER_WINDOW, 'Weather.IsFetched',"false")
+        setProperty(WEATHER_WINDOW, 'Current.IsFetched',"false")
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched',"false")
+        setProperty(WEATHER_WINDOW, 'Daily.IsFetched',"false")
         setProperty(WEATHER_WINDOW, 'Radar')
         setProperty(WEATHER_WINDOW, 'Video.1')
 
@@ -754,6 +760,9 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'   , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
         #we only have one long description available so set it here instead of in the loop
         setProperty(WEATHER_WINDOW, 'Daily.0.LongOutlookDay', longDayCast)
+        setProperty(WEATHER_WINDOW, 'Current.IsFetched'     , "true")
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched'     , "true")
+
 
         #and all the properties for the forecast
         for count, desc in enumerate(shortDesc):
@@ -794,14 +803,17 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'               % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
             setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                  % (count + 1), rainChanceList[count])
             setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'            % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % (count + 1), maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % (count + 1), maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % (count + 1), maxList[count] + TEMPUNIT)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % (count + 1), maxList[count] + TEMPUNIT)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count] + TEMPUNIT)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count] + TEMPUNIT)
             setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % (count + 1), desc)
             setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % (count + 1), '%s.png' % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), '%s.png' % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % (count + 1), weathercode)
+
+        setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'     , "true")
+        setProperty(WEATHER_WINDOW, 'Daily.IsFetched'     , "true")
 
     except Exception as inst:
         log("********** OzWeather Couldn't set all the properties, sorry!!", inst)
