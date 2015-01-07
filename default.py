@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # *  This Program is free software; you can redistribute it and/or modify
 # *  it under the terms of the GNU General Public License as published by
 # *  the Free Software Foundation; either version 2, or (at your option)
@@ -181,7 +182,7 @@ def clearProperties():
 
 
         #and all the properties for the forecast
-        for count in range(0,7):
+        for count in range(0,8):
             setProperty(WEATHER_WINDOW, 'Day%i.Title'                       % count)
             setProperty(WEATHER_WINDOW, 'Day%i.RainChance'                  % count)
             setProperty(WEATHER_WINDOW, 'Day%i.RainChanceAmount'            % count)
@@ -767,6 +768,9 @@ def propertiesPDOM(page, extendedFeatures):
             futureDate = tdate + datetime.timedelta(days=count) #establishs the future dates one at a time
             newdatetuple = time.strptime(str(futureDate),'%Y-%m-%d')#creates a time tuple of that future date
             goodshortDate = time.strftime('%d %b', newdatetuple) #sets the format of the time tuple, taken from this table http://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
+            #trim off the decimal padded date
+            if goodshortDate.startswith("0"):
+                goodshortDate = goodshortDate[1:]
             shortDay = str(time.strftime('%a', newdatetuple)).upper()
 
             #these are the old style labels, use a range of 0 to 6
@@ -794,10 +798,10 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'               % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
             setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                  % (count + 1), rainChanceList[count])
             setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'            % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % (count + 1), maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % (count + 1), maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % (count + 1), maxList[count] +  "°C")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % (count + 1), maxList[count] +  "°C")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count] +  "°C")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count] +  "°C")
             setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % (count + 1), desc)
             setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % (count + 1), '%s.png' % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), '%s.png' % weathercode)
