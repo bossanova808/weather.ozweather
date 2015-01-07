@@ -196,7 +196,7 @@ def clearProperties():
             setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                 % count)
             setProperty(WEATHER_WINDOW, 'Day%i.FanartCode'                  % count)
             setProperty(WEATHER_WINDOW, 'Day.%i.ShortDate'                  % count)
-            setProperty(WEATHER_WINDOW, 'Day.%i.ShortDay'                  % count)
+            setProperty(WEATHER_WINDOW, 'Day.%i.ShortDay'                   % count)
             
             setProperty(WEATHER_WINDOW, 'Daily.%i.Title'                       % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                  % count)
@@ -212,7 +212,7 @@ def clearProperties():
             setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate'                   % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                   % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                    % count)
 
     except Exception as inst:
         log("********** OzWeather Couldn't clear all the properties, sorry!!", inst)
@@ -749,7 +749,7 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, 'Current.RainSince9'    , rainSince9)
         setProperty(WEATHER_WINDOW, 'Current.RainLastHr'    , rainLastHr)
         setProperty(WEATHER_WINDOW, 'Current.OutlookIcon'   , '%s.png' % weathercode)
-        setProperty(WEATHER_WINDOW, 'Current.ConditionIcon'   , '%s.png' % weathercode)
+        setProperty(WEATHER_WINDOW, 'Current.ConditionIcon' , '%s.png' % weathercode)
         setProperty(WEATHER_WINDOW, 'Current.FanartCode'    , weathercode)
         setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'   , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
         #we only have one long description available so set it here instead of in the loop
@@ -766,9 +766,10 @@ def propertiesPDOM(page, extendedFeatures):
             tdate = datetime.date.today() #establishes current date
             futureDate = tdate + datetime.timedelta(days=count) #establishs the future dates one at a time
             newdatetuple = time.strptime(str(futureDate),'%Y-%m-%d')#creates a time tuple of that future date
-            goodshortDate = time.strftime('%d %b %a', newdatetuple) #sets the format of the time tuple, taken from this table http://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
+            goodshortDate = time.strftime('%d %b', newdatetuple) #sets the format of the time tuple, taken from this table http://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
             shortDay = str(time.strftime('%a', newdatetuple)).upper()
 
+            #these are the old style labels, use a range of 0 to 6
             setProperty(WEATHER_WINDOW, 'Day%i.ShortDate'                   % count, str(goodshortDate))
             setProperty(WEATHER_WINDOW, 'Day%i.ShortDay'                    % count, shortDay)
             setProperty(WEATHER_WINDOW, 'Day%i.Title'                       % count, day)
@@ -782,22 +783,25 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Day%i.LowTemp'                     % count, minList[count])
             setProperty(WEATHER_WINDOW, 'Day%i.Outlook'                     % count, desc)
             setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                 % count, '%s.png' % weathercode)
+            setProperty(WEATHER_WINDOW, 'Day%i.ConditionIcon'               % count, '%s.png' % weathercode)
             setProperty(WEATHER_WINDOW, 'Day%i.FanartCode'                  % count, weathercode)
 
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate'                   % count, str(goodshortDate))
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                    % count, shortDay)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Title'                       % count, day)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ChancePrecipitation'         % count, rainChanceList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'               % count, common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                  % count, rainChanceList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'            % count, common.replaceHTMLCodes(rainAmountList[count]))
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % count, maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % count, maxList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % count, minList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % count, minList[count])
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % count, desc)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % count, '%s.png' % weathercode)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % count, weathercode)
+            #the new Daily labels run from 1 to 7
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate'                   % (count + 1), str(goodshortDate))
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                    % (count + 1), shortDay)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Title'                       % (count + 1), day)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ChancePrecipitation'         % (count + 1), rainChanceList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'               % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
+            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                  % (count + 1), rainChanceList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'            % (count + 1), common.replaceHTMLCodes(rainAmountList[count]))
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'             % (count + 1), maxList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                    % (count + 1), maxList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count])
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % (count + 1), desc)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % (count + 1), '%s.png' % weathercode)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), '%s.png' % weathercode)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % (count + 1), weathercode)
 
     except Exception as inst:
         log("********** OzWeather Couldn't set all the properties, sorry!!", inst)
