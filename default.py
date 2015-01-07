@@ -51,6 +51,7 @@ HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
 RADAR_BACKGROUNDS_PATH = ""
 LOOP_IMAGES_PATH = ""
 TEMPUNIT = unicode(xbmc.getRegion('tempunit'),encoding='utf-8')
+WEATHER_ICON = xbmc.translatePath('special://temp/weather/%s.png').decode("utf-8")
 
 # this is fetchpage from parseDOM...
 # added emergency latin 1 decoding for wierd char issues on Weatherzone
@@ -171,8 +172,8 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Current.FeelsLike')
         setProperty(WEATHER_WINDOW, 'Current.DewPoint')
         setProperty(WEATHER_WINDOW, 'Current.UVIndex')
-        setProperty(WEATHER_WINDOW, 'Current.OutlookIcon')
-        setProperty(WEATHER_WINDOW, 'Current.ConditionIcon')
+        setProperty(WEATHER_WINDOW, 'Current.OutlookIcon', "na.png")
+        setProperty(WEATHER_WINDOW, 'Current.ConditionIcon', "na.png")
         setProperty(WEATHER_WINDOW, 'Current.FanartCode')
         setProperty(WEATHER_WINDOW, 'Current.Sunrise')
         setProperty(WEATHER_WINDOW, 'Current.Sunset')
@@ -199,7 +200,8 @@ def clearProperties():
             setProperty(WEATHER_WINDOW, 'Day%i.LowTemperature'              % count)
             setProperty(WEATHER_WINDOW, 'Day%i.Outlook'                     % count)
             setProperty(WEATHER_WINDOW, 'Day%i.LongOutlookDay'              % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                 % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                 % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Day%i.ConditionIcon'               % count, "na.png")
             setProperty(WEATHER_WINDOW, 'Day%i.FanartCode'                  % count)
             setProperty(WEATHER_WINDOW, 'Day.%i.ShortDate'                  % count)
             setProperty(WEATHER_WINDOW, 'Day.%i.ShortDay'                   % count)
@@ -215,7 +217,8 @@ def clearProperties():
             setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.LongOutlookDay'              % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % count, "na.png")
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate'                   % count)
             setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                    % count)
@@ -776,6 +779,9 @@ def propertiesPDOM(page, extendedFeatures):
             futureDate = tdate + datetime.timedelta(days=count) #establishs the future dates one at a time
             newdatetuple = time.strptime(str(futureDate),'%Y-%m-%d')#creates a time tuple of that future date
             goodshortDate = time.strftime('%d %b', newdatetuple) #sets the format of the time tuple, taken from this table http://docs.python.org/2/library/datetime.html#strftime-and-strptime-behavior
+            #trim leading zero if present
+            if goodshortDate.startswith("0"):
+                goodshortDate = goodshortDate[1:]
             shortDay = str(time.strftime('%a', newdatetuple)).upper()
 
             #these are the old style labels, use a range of 0 to 6
@@ -808,8 +814,8 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'              % (count + 1), minList[count] + TEMPUNIT)
             setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                     % (count + 1), minList[count] + TEMPUNIT)
             setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                     % (count + 1), desc)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % (count + 1), '%s.png' % weathercode)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), '%s.png' % weathercode)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                 % (count + 1), WEATHER_ICON % weathercode)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), WEATHER_ICON % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % (count + 1), weathercode)
 
         setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'  , "true")
