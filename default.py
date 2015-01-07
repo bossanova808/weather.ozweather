@@ -150,8 +150,8 @@ def clearProperties():
     try:
         setProperty(WEATHER_WINDOW, 'Weather.IsFetched',"false")
         setProperty(WEATHER_WINDOW, 'Current.IsFetched',"false")
-        setProperty(WEATHER_WINDOW, 'Today.IsFetched',"false")
-        setProperty(WEATHER_WINDOW, 'Daily.IsFetched',"false")
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched'  ,"false")
+        setProperty(WEATHER_WINDOW, 'Daily.IsFetched'  ,"false")
         setProperty(WEATHER_WINDOW, 'Radar')
         setProperty(WEATHER_WINDOW, 'Video.1')
 
@@ -761,7 +761,7 @@ def propertiesPDOM(page, extendedFeatures):
         #we only have one long description available so set it here instead of in the loop
         setProperty(WEATHER_WINDOW, 'Daily.0.LongOutlookDay', longDayCast)
         setProperty(WEATHER_WINDOW, 'Current.IsFetched'     , "true")
-        setProperty(WEATHER_WINDOW, 'Today.IsFetched'     , "true")
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched'       , "true")
 
 
         #and all the properties for the forecast
@@ -812,7 +812,7 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), '%s.png' % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % (count + 1), weathercode)
 
-        setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'     , "true")
+        setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'  , "true")
         setProperty(WEATHER_WINDOW, 'Daily.IsFetched'     , "true")
 
     except Exception as inst:
