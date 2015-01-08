@@ -156,7 +156,7 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Radar')
         setProperty(WEATHER_WINDOW, 'Video.1')
 
-        #now set all the XBMC current weather properties
+        #now clear all the XBMC current weather properties
         setProperty(WEATHER_WINDOW, 'Current.Condition')
         setProperty(WEATHER_WINDOW, 'Current.ConditionLong')
         setProperty(WEATHER_WINDOW, 'Current.Temperature')
@@ -177,9 +177,11 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Current.FanartCode')
         setProperty(WEATHER_WINDOW, 'Current.Sunrise')
         setProperty(WEATHER_WINDOW, 'Current.Sunset')
+
         setProperty(WEATHER_WINDOW, 'Today.Sunrise')
         setProperty(WEATHER_WINDOW, 'Today.Sunset')
         setProperty(WEATHER_WINDOW, 'Today.moonphase')
+
         setProperty(WEATHER_WINDOW, 'Current.RainSince9')
         setProperty(WEATHER_WINDOW, 'Current.RainLastHr')
         setProperty(WEATHER_WINDOW, 'Current.Precipitation')
@@ -735,7 +737,12 @@ def propertiesPDOM(page, extendedFeatures):
     #SET PROPERTIES
     try:
         #now set all the XBMC current weather properties
+        setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'   , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
+        setProperty(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia (via WeatherZone)')
+        setProperty(WEATHER_WINDOW, 'WeatherVersion', ADDONNAME + "-" + VERSION)
+
         setProperty(WEATHER_WINDOW, 'Current.Condition'     , shortDesc[0])
+        setProperty(WEATHER_WINDOW, 'Current.ShortOutlook'  , shortDesc[0])
         setProperty(WEATHER_WINDOW, 'Current.ConditionLong' , longDayCast)
         setProperty(WEATHER_WINDOW, 'Current.Temperature'   , temperature)
         setProperty(WEATHER_WINDOW, 'Current.WindGust'      , windGusts)
@@ -751,21 +758,21 @@ def propertiesPDOM(page, extendedFeatures):
         setProperty(WEATHER_WINDOW, 'Current.UVIndex'       , UV)
         setProperty(WEATHER_WINDOW, 'Current.Sunrise'       , sunrise)
         setProperty(WEATHER_WINDOW, 'Current.Sunset'        , sunset)
-        setProperty(WEATHER_WINDOW, 'Today.Sunrise'         , sunrise)
-        setProperty(WEATHER_WINDOW, 'Today.Sunset'          , sunset)
-        setProperty(WEATHER_WINDOW, 'Today.moonphase'       , moonPhase)
         setProperty(WEATHER_WINDOW, 'Current.Precipitation' , rainSince9)
         setProperty(WEATHER_WINDOW, 'Current.RainSince9'    , rainSince9)
         setProperty(WEATHER_WINDOW, 'Current.RainLastHr'    , rainLastHr)
         setProperty(WEATHER_WINDOW, 'Current.OutlookIcon'   , '%s.png' % weathercode)
         setProperty(WEATHER_WINDOW, 'Current.ConditionIcon' , '%s.png' % weathercode)
         setProperty(WEATHER_WINDOW, 'Current.FanartCode'    , weathercode)
-        setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'   , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
+        setProperty(WEATHER_WINDOW, 'Current.IsFetched'     , "true")
+ 
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched'       , "true")
+        setProperty(WEATHER_WINDOW, 'Today.Sunrise'         , sunrise)
+        setProperty(WEATHER_WINDOW, 'Today.Sunset'          , sunset)
+        setProperty(WEATHER_WINDOW, 'Today.moonphase'       , moonPhase)
+
         #we only have one long description available so set it here instead of in the loop
         setProperty(WEATHER_WINDOW, 'Daily.0.LongOutlookDay', longDayCast)
-        setProperty(WEATHER_WINDOW, 'Current.IsFetched'     , "true")
-        setProperty(WEATHER_WINDOW, 'Today.IsFetched'       , "true")
-
 
         #and all the properties for the forecast
         for count, desc in enumerate(shortDesc):
@@ -818,16 +825,18 @@ def propertiesPDOM(page, extendedFeatures):
             setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'               % (count + 1), WEATHER_ICON % weathercode)
             setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                  % (count + 1), weathercode)
 
-        setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'  , "true")
+        setProperty(WEATHER_WINDOW, 'Forecast.IsFetched'    , "true")
+        setProperty(WEATHER_WINDOW, 'Forecast.City'         , ADDON.getSetting('Location%s' % sys.argv[1]))
+        setProperty(WEATHER_WINDOW, 'Forecast.Country'      , "Australia")
+        setProperty(WEATHER_WINDOW, 'Forecast.Updated'      , time.strftime("%d/%m/%Y %H:%M"))
+
         setProperty(WEATHER_WINDOW, 'Daily.IsFetched'     , "true")
+        #Ok, if we got here we're done
+        setProperty(WEATHER_WINDOW, "Weather.IsFetched", "true")
 
     except Exception as inst:
         log("********** OzWeather Couldn't set all the properties, sorry!!", inst)
 
-    #Ok, if we got here we're done
-    setProperty(WEATHER_WINDOW, "Weather.IsFetched", "true")
-
-    #END SET PROPERTIES
 
 
 ##############################################
@@ -926,8 +935,6 @@ else:
 
 #refresh the locations and set the weather provider property
 refresh_locations()
-setProperty(WEATHER_WINDOW, 'WeatherProvider', 'BOM Australia via WeatherZone')
-setProperty(WEATHER_WINDOW, 'WeatherVersion', ADDONNAME + "-" + VERSION)
 
 #and close out...
 footprints(startup=False)
