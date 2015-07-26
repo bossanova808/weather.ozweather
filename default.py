@@ -367,10 +367,12 @@ def downloadBackground(radarCode, fileName):
             fileCreation = os.path.getmtime( RADAR_BACKGROUNDS_PATH + outFileName)
             now = time.time()
             weekAgo = now - 7*60*60*24 # Number of seconds in a week
-            #log ("filec " + str(fileCreation) + " dayAgo " + str(dayAgo))
+            #log ("filecreation: " + str(fileCreation) + " weekAgo " + str(weekAgo))
             if fileCreation < weekAgo:
-                log("Background older than one week - let's refresh - " + outFileName)
+                log("Background stale (older than one week) - let's refresh - " + outFileName)
                 os.remove(RADAR_BACKGROUNDS_PATH + outFileName)
+            else:
+                log("Background not stale - use existing - " + outFileName)
 
     #download the backgrounds only if we don't have them yet
     if not xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
