@@ -360,14 +360,17 @@ def downloadBackground(radarCode, fileName):
         fileName = radarCode + "." + fileName
 
     #are the backgrounds stale?
-    if xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
-        fileCreation = os.path.getmtime( RADAR_BACKGROUNDS_PATH + outFileName)
-        now = time.time()
-        weekAgo = now - 7*60*60*24 # Number of seconds in a week
-        #log ("filec " + str(fileCreation) + " dayAgo " + str(dayAgo))
-        if fileCreation < weekAgo:
-            log("Background older than one week - let's refresh - " + outFileName)
-            os.remove(RADAR_BACKGROUNDS_PATH + outFileName)
+    updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
+    if updateRadarBackgrounds:
+
+        if xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
+            fileCreation = os.path.getmtime( RADAR_BACKGROUNDS_PATH + outFileName)
+            now = time.time()
+            weekAgo = now - 7*60*60*24 # Number of seconds in a week
+            #log ("filec " + str(fileCreation) + " dayAgo " + str(dayAgo))
+            if fileCreation < weekAgo:
+                log("Background older than one week - let's refresh - " + outFileName)
+                os.remove(RADAR_BACKGROUNDS_PATH + outFileName)
 
     #download the backgrounds only if we don't have them yet
     if not xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
@@ -420,16 +423,19 @@ def downloadBackground(radarCode, fileName):
 
 def prepareBackgrounds(radarCode):
 
-    log("Called prepareBackgrounds() with radarCode [" + radarCode + "]")
+    updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
+    if updateRadarBackgrounds:
 
-    downloadBackground(radarCode, "IDR.legend.0.png")
-    downloadBackground(radarCode, "background.png")
-    #these images don't exist for the national radar, so don't try and get them
-    if radarCode != "IDR00004":
-        downloadBackground(radarCode, "locations.png")
-        downloadBackground(radarCode, "range.png")
-        downloadBackground(radarCode, "topography.png")
-        downloadBackground(radarCode, "catchments.png")
+        log("Called prepareBackgrounds() with radarCode [" + radarCode + "]")
+
+        downloadBackground(radarCode, "IDR.legend.0.png")
+        downloadBackground(radarCode, "background.png")
+        #these images don't exist for the national radar, so don't try and get them
+        if radarCode != "IDR00004":
+            downloadBackground(radarCode, "locations.png")
+            downloadBackground(radarCode, "range.png")
+            downloadBackground(radarCode, "topography.png")
+            downloadBackground(radarCode, "catchments.png")
 
 
 ################################################################################
@@ -437,6 +443,8 @@ def prepareBackgrounds(radarCode):
 # the radar images are downloaded with each update (~60kb each time)
 
 def buildImages(radarCode):
+
+   
 
     log("Called buildImages with radarCode: " + radarCode + " and loop path " + LOOP_IMAGES_PATH + " and radar path " + RADAR_BACKGROUNDS_PATH)
 
