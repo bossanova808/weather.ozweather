@@ -361,6 +361,7 @@ def downloadBackground(radarCode, fileName):
 
     #are the backgrounds stale?
     updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
+    log("&&&&&&&&&&&& " + str(updateRadarBackgrounds))
     if updateRadarBackgrounds:
 
         if xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
