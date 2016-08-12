@@ -500,7 +500,6 @@ def buildImages(radarCode):
     #ok get ready to retrieve some images
 
     log("Download the radar loop")
-    image = urllib.URLopener()
     files = []
 
     log("Log in to BOM FTP")
@@ -532,7 +531,10 @@ def buildImages(radarCode):
             imageToRetrieve = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar/" + f
             log("Retrieving radar image: " + imageToRetrieve)
             try:
-                image.retrieve(imageToRetrieve, LOOP_IMAGES_PATH + "/" + f )
+                radarImage = urllib2.urlopen(imageToRetrieve)
+                fh = open( LOOP_IMAGES_PATH + "/" + f , "wb")
+                fh.write(radarImage.read())
+                fh.close()
             except Exception as inst:
                 log("Failed to retrieve radar image: " + imageToRetrieve + ", oh well never mind!", inst )
 
