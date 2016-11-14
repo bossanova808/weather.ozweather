@@ -27,11 +27,8 @@ SCHEMA = "http://"
 WEATHERZONE_URL = 'www.weatherzone.com.au'
 WEATHERZONE_SEARCH_URL = WEATHERZONE_URL + "/search/"
 
-
-
-# Returns :
-# [] 
-# [{'LocationName': u'Ascot Vale, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/ascot-vale'}, {'LocationName': u'Maribyrnong, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/maribyrnong'}, {'LocationName': u'Travancore, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/travancore'}, {'LocationName': u'Highpoint City, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/highpoint-city'}]
+# Returns an array of dicts, each with a Locationname and LocationUrlPart.  Empty if no location found.
+# [{'LocationName': u'Ascot Vale, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/ascot-vale'}, ... ]
 
 def getLocationsForPostcodeOrSuburb(text):
 
@@ -74,11 +71,11 @@ if __name__ == "__main__":
 
     print("First test getting weatherzone location from postcode/suburb name:");
 
-    log("\n\n3032:")
+    log("\n3032:")
     log(getLocationsForPostcodeOrSuburb(3032))
-    log("\n\n9999:")
+    log("\n9999:")
     log(getLocationsForPostcodeOrSuburb(9999))
-    log("\n\nKyneton:")
+    log("\nKyneton:")
     log(getLocationsForPostcodeOrSuburb("Kyneton"))
 
 

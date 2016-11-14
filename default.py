@@ -361,7 +361,7 @@ def downloadBackground(radarCode, fileName):
 
     #are the backgrounds stale?
     updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
-    log("&&&&&&&&&&&& " + str(updateRadarBackgrounds))
+    log("updateRadarBackgrounds " + str(updateRadarBackgrounds))
     if updateRadarBackgrounds:
 
         if xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
@@ -370,10 +370,10 @@ def downloadBackground(radarCode, fileName):
             weekAgo = now - 7*60*60*24 # Number of seconds in a week
             #log ("filecreation: " + str(fileCreation) + " weekAgo " + str(weekAgo))
             if fileCreation < weekAgo:
-                log("Background stale (older than one week) - let's refresh - " + outFileName)
+                log("Backgrounds stale (older than one week) - let's refresh - " + outFileName)
                 os.remove(RADAR_BACKGROUNDS_PATH + outFileName)
             else:
-                log("Background not stale - use existing - " + outFileName)
+                log("Backgrounds not stale - use existing - " + outFileName)
 
     #download the backgrounds only if we don't have them yet
     if not xbmcvfs.exists( RADAR_BACKGROUNDS_PATH + outFileName ):
@@ -438,7 +438,7 @@ def prepareBackgrounds(radarCode):
             downloadBackground(radarCode, "locations.png")
             downloadBackground(radarCode, "range.png")
             downloadBackground(radarCode, "topography.png")
-            downloadBackground(radarCode, "catchments.png")
+            # downloadBackground(radarCode, "waterways.png")
 
 
 ################################################################################
