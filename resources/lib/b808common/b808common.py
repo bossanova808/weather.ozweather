@@ -44,6 +44,7 @@ def log(message, inst=None, level=xbmc.LOGDEBUG):
 def logNotice(message, inst=None):
     log(message, inst, level = xbmc.LOGNOTICE)
 
+
 ################################################################################
 # Trigger a toast pop up on screen
 # & log the message to the XBMC Log about the popup if debugging
@@ -186,9 +187,11 @@ def stripList(l, chars):
 # to clear a property, leave the value blank
 
 def setProperty(window, name, value = ""):
-    log("Set property on " + window + " - Name: [" + name + "] - Value:[" + value +"]")
+    log("Set property on " + str(window) + " - Name: [" + name + "] - Value:[" + value +"]")
     window.setProperty(name, value)
 
+def clearProperty(window, name):
+    setProperty(window, name)
 
 def getThumbnailModeID():
     VIEW_MODES = {
@@ -280,7 +283,8 @@ elif xbmc.getCondVisibility( "System.Platform.Android" ):
 log("uname is: " + str(uname))
 log("System is " + SYSTEM)
 
-XBMC_VERSION = ""
+XBMC_VERSION = None
+
 log(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[0:4])
 version_number = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[0:4])
 if version_number >= 12.9:
