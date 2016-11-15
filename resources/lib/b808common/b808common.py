@@ -190,9 +190,6 @@ def setProperty(window, name, value = ""):
     log("Set property on " + str(window) + " - Name: [" + name + "] - Value:[" + value +"]")
     window.setProperty(name, value)
 
-def clearProperty(window, name):
-    setProperty(window, name)
-
 def getThumbnailModeID():
     VIEW_MODES = {
         'thumbnail': {
