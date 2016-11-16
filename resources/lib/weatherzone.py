@@ -338,15 +338,9 @@ def getWeatherData(urlPath, extendedFeatures = True):
         raise
        
 
-    # @TODO Next 12 Hours
-    # try:        
-    # except Exception as inst:
-    #     print("Exception processing next 12 hour forecast data from " + SCHEMA + WEATHERZONE_URL + urlPath + "\n" + str(inst))
-    #     raise
-
+    # @TODO Long forecast, Next 12 Hours, UV, rainfall this month & averages?
 
     # 7 Day Forecast
-
     try:
         forecastTable = soup.find("table", id="forecast-table")
         

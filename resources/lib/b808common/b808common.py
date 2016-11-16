@@ -30,9 +30,13 @@ from traceback import format_exc
 # call logNotice() is you want print out regardless of debug settings
 
 def log(message, inst=None, level=xbmc.LOGDEBUG):
+    
     if isinstance (message,str):
         message = message.decode("utf-8")
         message = u'### %s - %s ### %s' % (ADDONNAME,VERSION, message)
+    else:
+        message = u'### %s - %s ### %s' % (ADDONNAME,VERSION, message)
+
     if inst is None:
       xbmc.log(message.encode("utf-8"), level )
     else:
@@ -188,7 +192,7 @@ def stripList(l, chars):
 
 def setProperty(window, name, value = ""):
     window.setProperty(name, value)
-    log("Set property Name: [%s] - Value:[%s]" % (name,value))
+    log("Set property name: [%s] - value:[%s]" % (name,value))
 
 def getThumbnailModeID():
     VIEW_MODES = {
@@ -236,7 +240,6 @@ VERSION     = ADDON.getAddonInfo('version')
 CWD         = ADDON.getAddonInfo('path')
 LANGUAGE    = ADDON.getLocalizedString
 USERAGENT   = "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.9.0.1) Gecko/2008070208 Firefox/3.6"
-
 
 
 # Set up the paths
