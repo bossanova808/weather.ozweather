@@ -187,8 +187,8 @@ def stripList(l, chars):
 # to clear a property, leave the value blank
 
 def setProperty(window, name, value = ""):
-    log("Set property on " + str(window) + " - Name: [" + name + "] - Value:[" + value +"]")
     window.setProperty(name, value)
+    log("Set property Name: [%s] - Value:[%s]" % (name,value))
 
 def getThumbnailModeID():
     VIEW_MODES = {
