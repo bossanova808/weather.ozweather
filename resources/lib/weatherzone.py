@@ -494,10 +494,10 @@ def getWeatherData(urlPath, extendedFeatures = True, XBMC_VERSION=17.0):
                             todaySunrise = now.replace(hour=int(sunriseHour), minute=int(sunriseMinutes), second=0, microsecond=0)
                             todaySunset = now.replace(hour=int(sunsetHour), minute=int(sunsetMinutes), second=0, microsecond=0)
 
-                            if todaySunrise < now < todaySunset:
-                                weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
-                            else:
+                            if i=="1" and (todaySunrise > now > todaySunset):
                                 weathercode = WEATHER_CODES_NIGHT[cleanShortDescription(shortDesc.text)]
+                            else:                                
+                                weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
                         
                         except Exception as inst:
                             print(str(inst))
