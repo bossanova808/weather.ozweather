@@ -182,6 +182,27 @@ def refresh_locations():
 
 
 
+# Set any weather values to the old style, e.g. hardcoded icon paths
+def oldKodiWeatherData(weatherData):
+
+    for index in range(0,7):
+
+        keys = ["OutlookIcon","ConditionIcon"]   
+        value = weatherData['Day' + str(index) + '.' + keys[0]]
+        value = xbmc.translatePath('special://temp/weather/%s').decode("utf-8") % value
+
+        for key in keys:
+            if index is 0:
+                weatherData['Current.' + key] = value
+                weatherData['Current.' + key] = value
+
+            weatherData['Day' + str(index) + '.' + key] = value
+            weatherData['Day' + str(index) + '.' + key] = value
+
+    print weatherData
+
+    return weatherData
+
 # The main forecast retrieval function
 # Does either a basic forecast or a more extended forecast with radar etc.
 
@@ -191,20 +212,7 @@ def forecast(urlPath, radarCode):
 
     log("Getting weather from [%s] with radar [%s], extended features is: [%s]" % (urlPath, radarCode, str(extendedFeatures)))
 
-    # Get all the weather & forecast data from weatherzone
-    log("Get the forecast data from http://weatherzone.com.au" + urlPath)
-    weatherData = getWeatherData(urlPath,extendedFeatures)
-    for key in sorted(weatherData):
-        setProperty(WEATHER_WINDOW, key, weatherData[key])
-
-    # Get the ABC video link
-    if extendedFeatures == "true":
-        log("Get the ABC weather video link")
-        url = getABCWeatherVideoLink(ADDON.getSetting("ABCQuality"))
-        if url:
-            setProperty(WEATHER_WINDOW, 'Video.1',url)
-
-    # Get the radar images 
+    # Get the radar images first - looks better on refreshes
     if extendedFeatures == "true":
         log("Getting radar images for " + radarCode)
         
@@ -215,6 +223,23 @@ def forecast(urlPath, radarCode):
 
         buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath)
         setProperty(WEATHER_WINDOW, 'Radar', radarCode)
+
+    # Get all the weather & forecast data from weatherzone
+    log("Get the forecast data from http://weatherzone.com.au" + urlPath)
+    weatherData = getWeatherData(urlPath, extendedFeatures, VERSION_NUMBER)
+    if VERSION_NUMBER < 17:
+        weatherData = oldKodiWeatherData(weatherData)
+
+    for key in sorted(weatherData):
+        setProperty(WEATHER_WINDOW, key, weatherData[key])
+
+    # Get the ABC video link
+    if extendedFeatures == "true":
+        log("Get the ABC weather video link")
+        url = getABCWeatherVideoLink(ADDON.getSetting("ABCQuality"))
+        if url:
+            setProperty(WEATHER_WINDOW, 'Video.1',url)
+
 
     # And announce everything is fetched..    
     setProperty(WEATHER_WINDOW, "Weather.IsFetched", "true")
@@ -279,6 +304,13 @@ if __name__ == "__main__":
         # Retrieve the currently chosen location & radar
         locationUrlPath = ""
         locationUrlPath = ADDON.getSetting('Location%sUrlPath' % sys.argv[1])
+
+        # Old style paths (pre v0.8.5) must be updated to new
+        if not locationUrlPath:
+            locationUrlPath = ADDON.getSetting('Location%sid' % sys.argv[1])
+            locationUrlPath = locationUrlPath.replace("http://www.weatherzone.com.au","")
+            ADDON.setSetting('Location%sUrlPath' % sys.argv[1], locationUrlPath)
+
         radar = ""
         radar = ADDON.getSetting('Radar%s' % sys.argv[1])
         # If we don't have a radar code, get the national radar by default

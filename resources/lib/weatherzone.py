@@ -19,6 +19,7 @@
 import requests
 from bs4 import BeautifulSoup
 from urlparse import urlparse
+import datetime
 
 # CONSTANTS
 
@@ -79,6 +80,55 @@ WEATHER_CODES = {   'Clearing Shower'                 : '39',
                     'Unknown'                         : 'na',
                     'nt_unknown'                      : 'na'}
 
+
+WEATHER_CODES_NIGHT = { 'Clearing Shower'                 : '45',
+                        'Cloudy'                          : '29',
+                        'Cloud And Wind Increasing'       : '27',
+                        'Cloud Increasing'                : '27',
+                        'Drizzle'                         : '45',
+                        'Drizzle Clearing'                : '45',
+                        'Fog Then Sunny'                  : '33',
+                        'Frost Then Sunny'                : '33',
+                        'Hazy'                            : '33',
+                        'Heavy Rain'                      : '47',
+                        'Heavy Showers'                   : '45',
+                        'Increasing Sunshine'             : '31',
+                        'Late Shower'                     : '45',
+                        'Late Thunder'                    : '47',
+                        'Mostly Cloudy'                   : '27',
+                        'Mostly Sunny'                    : '31',
+                        'Overcast'                        : '29',
+                        'Possible Shower'                 : '45',
+                        'Possible Thunderstorm'           : '47',
+                        'Rain'                            : '45',
+                        'Rain And Snow'                   : '46',
+                        'Rain Clearing'                   : '45',
+                        'Rain Developing'                 : '45',
+                        'Rain Tending To Snow'            : '45',
+                        'Showers'                         : '45',
+                        'Showers Easing'                  : '45',
+                        'Showers Increasing'              : '45',
+                        'Snow'                            : '46',
+                        'Snowfalls Clearing'              : '46',
+                        'Snow Developing'                 : '46',
+                        'Snow Showers'                    : '46',
+                        'Snow Tending To Rain'            : '46',
+                        'Sunny'                           : '31',
+                        'Thunderstorms'                   : '47',
+                        'ThunderStorms'                   : '47',
+                        'Thunderstorms Clearing'          : '47',
+                        'Windy'                           : '29',
+                        'Windy With Rain'                 : '45',
+                        'Windy With Showers'              : '45',
+                        'Windy With Snow'                 : '46',
+                        'Wind And Rain Increasing'        : '45',
+                        'Wind And Showers Easing'         : '45',
+                        'Unknown'                         : 'na',
+                        'nt_unknown'                      : 'na'}
+
+
+
+
 """   These are the weather codes for XBMC is seems
 N/A Not Available
 0 Rain/Lightning
@@ -129,12 +179,24 @@ N/A Not Available
 45 Rain/Night
 46 Snow/Night
 47 Thunder Showers/Night
+
+NIGHT SUBSET:
+27 Mostly Cloudy/Night
+29 Partly Cloudy/Night
+31 Clear/Night
+33 Hazy/Night
+45 Rain/Night
+46 Snow/Night
+47 Thunder Showers/Night
+
 """
 
 
 
 # Our global to hold the built up weather data
 weatherData = {}
+
+# Convert a fire danger numerical rating to human friendly text
 
 def fireDangerToText(fireDangerFloat):
 
@@ -157,6 +219,7 @@ def fireDangerToText(fireDangerFloat):
 
     return fireDangerText
 
+# Clean up the short weather description text
 
 def cleanShortDescription(description):
     description = description.replace( '-<br />','')
@@ -166,14 +229,7 @@ def cleanShortDescription(description):
     # title capatilises the first letter of each word
     return description.title()
 
-# -        if extendedFeatures == "true":
-# -            longDayCast = common.parseDOM(page, "div", attrs = { "class": "top_left" })
-# -            longDayCast = common.parseDOM(longDayCast, "p" )
-# -            longDayCast = common.stripTags(longDayCast[0])
-# -            longDayCast = longDayCast.replace( '\t','')
-# -            longDayCast = longDayCast.replace( '\r',' ')
-# -            longDayCast = longDayCast.replace( '&amp;','&')
-# -            longDayCast = longDayCast[:-1]
+# Clean up the long weather description text
 
 def cleanLongDescription(description):
     description = description.replace( '\t','')
@@ -182,6 +238,36 @@ def cleanLongDescription(description):
     description = description[:-1]
     return description
 
+# Set a group of keys at once - for old and new weather label support
+
+def setKeys(index, keys, value):
+
+    global weatherData
+
+    for key in keys:
+        if index is 0:
+            weatherData['Current.' + key] = value
+            weatherData['Current.' + key] = value
+
+        weatherData['Day' + str(index) + '.' + key] = value
+        weatherData['Day' + str(index) + '.' + key] = value
+        weatherData['Daily.' + str(index+1) + '.' + key] = value
+        weatherData['Daily.' + str(index+1) + '.' + key] = value
+
+# Set a key - for old and new weather label support
+
+def setKey(index, key, value):
+
+    global weatherData
+
+    if index is 0:
+        weatherData['Current.' + key] = value
+        weatherData['Current.' + key] = value
+
+    weatherData['Day' + str(index) + '.' + key] = value
+    weatherData['Day' + str(index) + '.' + key] = value
+    weatherData['Daily.' + str(index+1) + '.' + key] = value
+    weatherData['Daily.' + str(index+1) + '.' + key] = value
 
 # Returns an array of dicts, each with a Locationname and LocationUrlPart.  Empty if no location found.
 # [{'LocationName': u'Ascot Vale, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/ascot-vale'}, ... ]
@@ -230,53 +316,22 @@ def getLocationsForPostcodeOrSuburb(text):
 
     return locations, locationURLPaths
 
-
-def setKeys(index, keys, value):
-
-    global weatherData
-
-    for key in keys:
-        if index is 0:
-            weatherData['Current.' + key] = value
-            weatherData['Current.' + key] = value
-
-        weatherData['Day.' + str(index) + '.' + key] = value
-        weatherData['Day.' + str(index) + '.' + key] = value
-        weatherData['Daily.' + str(index+1) + '.' + key] = value
-        weatherData['Daily.' + str(index+1) + '.' + key] = value
-
-def setKey(index, key, value):
-
-    global weatherData
-
-    if index is 0:
-        weatherData['Current.' + key] = value
-        weatherData['Current.' + key] = value
-
-    weatherData['Day.' + str(index) + '.' + key] = value
-    weatherData['Day.' + str(index) + '.' + key] = value
-    weatherData['Daily.' + str(index+1) + '.' + key] = value
-    weatherData['Daily.' + str(index+1) + '.' + key] = value
-
 # Returns a dict of weather data values
+# All the try/excepts to follow are gross - python needs ?? support.  
+# But let's not fail if one value is missing/malformed...
 
-def getWeatherData(urlPath, extendedFeatures = True):
+def getWeatherData(urlPath, extendedFeatures = True, XBMC_VERSION=17.0):
 
     try:
         r = requests.get(SCHEMA + WEATHERZONE_URL + urlPath)
         soup = BeautifulSoup(r.text, 'html.parser')
 
     except Exception as inst:
+        # If we can't get and parse the page at all, might as well bail right out...
         print("Error requesting/souping weather page at " + SCHEMA + WEATHERZONE_URL + urlPath)
+        raise
 
-
-    # All the try/excepts to follow are gross - python needs ?? support.  
-    # But let's not fail if one value is missing/malformed...
-
-
-
-
-    # # The longer forecast text
+    # The longer forecast text
     try:
         p = soup.find_all("p", class_="district-forecast")  
         weatherData["Current.ConditionLong"] = cleanLongDescription(p[0].text)
@@ -344,15 +399,19 @@ def getWeatherData(urlPath, extendedFeatures = True):
             weatherData["Current.FireDangerText"] = "?"
         try:
             rainSince = lhs[8].text.partition('/')
-            weatherData["Current.RainSince9am"] = str(rainSince[0][:-3])
-            weatherData["Current.Precipitation"] = str(weatherData["Current.RainSince9am"])
+            if rainSince[0] == "- ":
+                weatherData["Current.RainSince9"] = "0 mm"
+                weatherData["Current.Precipitation"] = "0 mm"
+            else:
+                weatherData["Current.RainSince9"] = str(rainSince[0][:-3])
+                weatherData["Current.Precipitation"] = str(weatherData["Current.RainSince9"])
             if rainSince[2] == " -":
-                weatherData["Current.RainLastHr"] = "0"
+                weatherData["Current.RainLastHr"] = "0 mm"
             else:
                 weatherData["Current.RainLastHr"] = str(rainSince[2][:-2])   
         except Exception as inst:
             print(str(inst))
-            weatherData["Current.RainSince9am"] = "?"
+            weatherData["Current.RainSince9"] = "?"
             weatherData["Current.Precipitation"] = "?"
             weatherData["Current.RainLastHr"] = "?"
 
@@ -364,10 +423,15 @@ def getWeatherData(urlPath, extendedFeatures = True):
         try:
             weatherData['Today.Sunrise'] = rhs[0].text
             weatherData['Today.Sunset'] = rhs[1].text
+            weatherData['Current.Sunrise'] = rhs[0].text
+            weatherData['Current.Sunset'] = rhs[1].text 
+
         except Exception as inst:
             print(str(inst))
             weatherData['Today.Sunrise'] = "?"
             weatherData['Today.Sunset'] = "?"
+            weatherData['Current.Sunrise'] = "?"
+            weatherData['Current.Sunset'] = "?"
 
     except Exception as inst:
         print("Exception processing current conditions data from " + SCHEMA + WEATHERZONE_URL + urlPath + "\n" + str(inst))
@@ -417,10 +481,31 @@ def getWeatherData(urlPath, extendedFeatures = True):
                             setKey(i, "Condition", "?")
                        
                         try:
-                            weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
+                            now = datetime.datetime.now()
+                            
+                            sunriseTime = weatherData['Today.Sunrise'].split(" ")
+                            sunriseHour = sunriseTime[0].split(":")[0]
+                            sunriseMinutes = sunriseTime[0].split(":")[1]
+
+                            sunsetTime = weatherData['Today.Sunset'].split(" ")
+                            sunsetHour = sunsetTime[0].split(":")[0]
+                            sunsetMinutes = sunsetTime[0].split(":")[1]
+ 
+                            todaySunrise = now.replace(hour=int(sunriseHour), minute=int(sunriseMinutes), second=0, microsecond=0)
+                            todaySunset = now.replace(hour=int(sunsetHour), minute=int(sunsetMinutes), second=0, microsecond=0)
+
+                            if todaySunrise < now < todaySunset:
+                                weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
+                            else:
+                                weathercode = WEATHER_CODES_NIGHT[cleanShortDescription(shortDesc.text)]
+                        
                         except Exception as inst:
                             print(str(inst))
-                            weathercode = 'na'
+                            try:    
+                                weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
+                            except Exception as inst:
+                                print(str(inst))
+                                weathercode = 'na'
                         
                         value = '%s.png' % weathercode
                         setKeys(i, ["OutlookIcon","ConditionIcon"], value)
@@ -455,9 +540,11 @@ def getWeatherData(urlPath, extendedFeatures = True):
                     try:
                         value = '%s' % td.text[:-1]
                         setKey(i, "ChancePrecipitation", value)
+                        setKey(i, "RainChance", value)
                     except Exception as inst:
                         print(str(inst))
-                        setKey(i, "ChancePrecipitation", "?")                   
+                        setKey(i, "ChancePrecipitation", "?") 
+                        setKey(i, "RainChance", "?")                  
 
             # Amount of rain
             if index is 5:
@@ -466,10 +553,11 @@ def getWeatherData(urlPath, extendedFeatures = True):
                     try:
                         value = '%s' % td.text
                         setKey(i, "Precipitation", value)
+                        setKey(i, "RainChanceAmount", value)
                     except Exception as inst:
                         print(str(inst))
                         setKey(i, "Precipitation", "?")
-
+                        setKey(i, "RainChanceAmount", "?")
             # UV
             if index is 6:
 
@@ -522,4 +610,6 @@ if __name__ == "__main__":
     weatherData = getWeatherData("/vic/central/kyneton", True)
 
     for key in sorted(weatherData):
-        print "%s: %s" % (key, weatherData[key])
+        if weatherData[key] == "?" or weatherData[key] == "na":
+            print("**** MISSING: ")
+        print("%s: %s" % (key, weatherData[key]))

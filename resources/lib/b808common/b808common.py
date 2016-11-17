@@ -4,7 +4,7 @@
 ### By bossanova808 2015
 ### Free in all senses....
 
-### VERSION 0.2.0 14/11/2016
+### VERSION 0.2.1 17/11/2016
 
 import xbmc
 import xbmcaddon
@@ -284,32 +284,35 @@ log("uname is: " + str(uname))
 log("System is " + SYSTEM)
 
 XBMC_VERSION = None
+VERSION_NUMBER = None
 
 log(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[0:4])
-version_number = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[0:4])
-if version_number >= 12.9:
+VERSION_NUMBER = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[0:4])
+if VERSION_NUMBER >= 12.9:
     XBMC_VERSION = "G*" 
-if version_number >= 13.9:
+if VERSION_NUMBER >= 13.9:
     XBMC_VERSION = "H*" 
-if version_number >= 14.9:
+if VERSION_NUMBER >= 14.9:
     XBMC_VERSION = "I*" 
-if version_number >= 15.9:
+if VERSION_NUMBER >= 15.9:
     XBMC_VERSION = "J*"
-if version_number >= 16.9:
+if VERSION_NUMBER >= 16.9:
     XBMC_VERSION = "K*" 
-if version_number >= 17.9:
+if VERSION_NUMBER >= 17.9:
     XBMC_VERSION = "L*"     
-if version_number >= 18.9:
+if VERSION_NUMBER >= 18.9:
     XBMC_VERSION = "M*"
-if version_number >= 19.9:
+if VERSION_NUMBER >= 19.9:
     XBMC_VERSION = "N*"
-if version_number >= 20.9:
+if VERSION_NUMBER >= 20.9:
     XBMC_VERSION = "O*"
-if version_number >= 21.9:
+if VERSION_NUMBER >= 21.9:
     XBMC_VERSION = "P*"        
-if version_number >= 22.9:
-    XBMC_VERSION = ">P"    
-log("Kodi Version is " + XBMC_VERSION)    
+if VERSION_NUMBER >= 22.9:
+    XBMC_VERSION = ">P" 
+
+log("Kodi Version #: " + str(VERSION_NUMBER))      
+log("Kodi Version  : " + XBMC_VERSION)    
 
 
 
