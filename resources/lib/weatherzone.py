@@ -456,11 +456,13 @@ def getWeatherData(urlPath, extendedFeatures = True, XBMC_VERSION=17.0):
                             fullDay = DAYS[day.text]
                             setKey(i, "ShortDay", day.text)
                             setKey(i, "Title", fullDay)
+                            setKey(i, "LongDay", fullDay)
 
                         except Exception as inst:
                             print(str(inst))
                             setKey(i, "ShortDay", "?")
-                            setKey(i, "Title", "?")                        
+                            setKey(i, "Title", "?")  
+                            setKey(i, "LongDay", "?")                      
        
                     for i, date in enumerate(row.find_all("span", class_="text_blue")):
                         try:
@@ -498,7 +500,7 @@ def getWeatherData(urlPath, extendedFeatures = True, XBMC_VERSION=17.0):
                             todaySunrise = now.replace(hour=int(sunriseHour), minute=int(sunriseMinutes), second=0, microsecond=0)
                             todaySunset = now.replace(hour=int(sunsetHour), minute=int(sunsetMinutes), second=0, microsecond=0)
 
-                            if i=="0" and (todaySunrise > now > todaySunset):
+                            if i==0 and (now > todaySunset or now < todaySunrise):
                                 weathercode = WEATHER_CODES_NIGHT[cleanShortDescription(shortDesc.text)]
                             else:                                
                                 weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]

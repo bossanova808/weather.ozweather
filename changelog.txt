@@ -1,3 +1,6 @@
+V0.8.5
+- Release of below after a few bugfixes...
+
 V0.8.4 - Test only release
 - Re-Write for Krypton
 - Set more of the new weather labels
