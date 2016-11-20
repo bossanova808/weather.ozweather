@@ -116,6 +116,8 @@ WEATHER_CODES_NIGHT = { 'Clearing Shower'                 : '45',
                         'Sunny'                           : '31',
                         'Thunderstorms'                   : '47',
                         'ThunderStorms'                   : '47',
+                        'Thunder-Storms'                  : '47',
+                        'Thunder-storms'                  : '47',
                         'Thunderstorms Clearing'          : '47',
                         'Windy'                           : '29',
                         'Windy With Rain'                 : '45',
@@ -222,8 +224,10 @@ def fireDangerToText(fireDangerFloat):
 # Clean up the short weather description text
 
 def cleanShortDescription(description):
-    description = description.replace( '-<br />','')
-    description = description.replace( '-<Br />','')
+    description = description.replace( '<br />','')
+    description = description.replace( '<Br />','')
+    description = description.replace( '-','')
+    description = description.replace( '-','')
     description = description.replace( 'ThunderStorms','Thunderstorms')
     description = description.replace( 'windy','Windy')
     # title capatilises the first letter of each word
@@ -494,7 +498,7 @@ def getWeatherData(urlPath, extendedFeatures = True, XBMC_VERSION=17.0):
                             todaySunrise = now.replace(hour=int(sunriseHour), minute=int(sunriseMinutes), second=0, microsecond=0)
                             todaySunset = now.replace(hour=int(sunsetHour), minute=int(sunsetMinutes), second=0, microsecond=0)
 
-                            if i=="1" and (todaySunrise > now > todaySunset):
+                            if i=="0" and (todaySunrise > now > todaySunset):
                                 weathercode = WEATHER_CODES_NIGHT[cleanShortDescription(shortDesc.text)]
                             else:                                
                                 weathercode = WEATHER_CODES[cleanShortDescription(shortDesc.text)]
@@ -608,6 +612,14 @@ if __name__ == "__main__":
 
     print("\n\nGet weather data for /vic/central/kyneton:")
     weatherData = getWeatherData("/vic/central/kyneton", True)
+
+    for key in sorted(weatherData):
+        if weatherData[key] == "?" or weatherData[key] == "na":
+            print("**** MISSING: ")
+        print("%s: %s" % (key, weatherData[key]))
+
+    print("\n\nGet weather data for /vic/melbourne/ascot-vale:")
+    weatherData = getWeatherData("/vic/melbourne/ascot-vale", True)
 
     for key in sorted(weatherData):
         if weatherData[key] == "?" or weatherData[key] == "na":
