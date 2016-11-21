@@ -185,7 +185,7 @@ def refresh_locations():
 # Set any weather values to the old style, e.g. hardcoded icon paths
 def oldKodiWeatherData(weatherData):
 
-    print("Modifying weather data for kodi version " + VERSION_NUMBER)
+    print("Modifying weather data for kodi version " + str(VERSION_NUMBER))
     
     for index in range(0,7):
 
