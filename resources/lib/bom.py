@@ -18,7 +18,7 @@
 
 import requests
 import glob
-import os
+import os, sys, shutil
 import time
 import ftplib
 import urllib, urllib2
@@ -124,9 +124,12 @@ def prepareBackgrounds(radarCode, backgroundsPath):
 
 
 # Builds the radar images given a BOM radar code like IDR023
-# the radar images are cached for four hours, backgrounds for a week
+# the radar images are cached for four hours, backgrounds for a week (or always if updateRadarBackgrounds is false)
 
 def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath):
+
+    # grab the current time as as 12 digit 0 padded string
+    timeNow = format(int(time.time()),'012d')
 
     print("buildImages(%s)" % radarCode)
     print("Overlay loop path: " + overlayLoopPath)
@@ -134,14 +137,22 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
 
     # remove any backgrounds older than 
 
-    print("Deleting any radar overlays older than 2 hours")
+    print("Deleting any radar overlays older than 1 hour")
     currentFiles = glob.glob (overlayLoopPath + "/*.png")
-    for file in currentFiles:
+    for count, file in enumerate(currentFiles):
         filetime = os.path.getmtime(file) 
-        fourHoursAgo = time.time() - (4 * 60 * 60)
+        fourHoursAgo = time.time() - (1 * 60 * 60)
         if filetime < fourHoursAgo:
             print("Deleted " + str(os.path.basename(file)))
             os.remove(file)
+
+    # rename the currently kept radar backgrounds to prevent Kodi caching issues
+    currentFiles = glob.glob (overlayLoopPath + "/*.png")
+    for file in currentFiles:
+        os.rename(file, os.path.dirname(file) + "/" + timeNow + "." + os.path.basename(file)[13:])
+
+
+    #sys.exit()
 
     # We need make the directories to store stuff if they don't exist
     # delay hack is here to make sure OS has actually released the handle
@@ -193,7 +204,7 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
     print("Download the radar loop")
     files = []
 
-    print("print in to BOM FTP")
+    print("Log in to BOM FTP")
     ftp = ftplib.FTP("ftp.bom.gov.au")
     ftp.login("anonymous", "anonymous@anonymous.org")
     ftp.cwd("/anon/gen/radar/")
@@ -218,14 +229,16 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
     #download the actual images, might as well get the longest loop they have
     for f in loopPicNames:
         # don't re-download ones we already have
-        if not os.path.isfile(overlayLoopPath + "/" + f):
+        if not os.path.isfile(overlayLoopPath + timeNow + "." + f):
             #ignore the composite gif...
             if f[-3:] == "png":
                 imageToRetrieve = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar/" + f
+                outputFile = timeNow + "." + f
                 print("Retrieving new radar image: " + imageToRetrieve)
+                print("Output to file: " + outputFile)
                 try:
                     radarImage = urllib2.urlopen(imageToRetrieve)
-                    fh = open( overlayLoopPath + "/" + f , "wb")
+                    fh = open( overlayLoopPath + "/" + outputFile , "wb")
                     fh.write(radarImage.read())
                     fh.close()
                 except Exception as inst:
@@ -239,12 +252,26 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
 
 if __name__ == "__main__":
 
-    print("\n\nTesting getting radar images from them BOM\n")
-
     radarCode = "IDR023"
     backgroundsPath = os.getcwd() + "/test-outputs/backgrounds/" + radarCode + "/"
     overlayLoopPath = os.getcwd() + "/test-outputs/loop/" + radarCode + "/"
 
+    if len(sys.argv) > 1 and sys.argv[1] == "clean":
+        try:
+            print("\n\nCleaning test-outputs folder")
+            shutil.rmtree(os.getcwd() + "/test-outputs/")
+        except Exception as inst:
+            pass        
+
+    print("\nCurrent files in test-outputs:\n")
+
+    for dirpath, dirnames, filenames in os.walk(os.getcwd() + "/test-outputs/"):
+        for name in dirnames:
+            print(os.path.join(dirpath, name))
+        for name in filenames:
+            print(os.path.join(dirpath, name))
+ 
+    print("\nTesting getting radar images from them BOM\n")
     buildImages(radarCode, True, backgroundsPath, overlayLoopPath)
 
     print(os.listdir(backgroundsPath))
