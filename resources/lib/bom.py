@@ -137,12 +137,12 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
 
     # remove any backgrounds older than 
 
-    print("Deleting any radar overlays older than 1 hour")
+    print("Deleting any radar overlays older than 2 hours")
     currentFiles = glob.glob (overlayLoopPath + "/*.png")
     for count, file in enumerate(currentFiles):
         filetime = os.path.getmtime(file) 
-        fourHoursAgo = time.time() - (1 * 60 * 60)
-        if filetime < fourHoursAgo:
+        twoHoursAgo = time.time() - (2 * 60 * 60)
+        if filetime < twoHoursAgo:
             print("Deleted " + str(os.path.basename(file)))
             os.remove(file)
 
@@ -237,7 +237,7 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
                 print("Retrieving new radar image: " + imageToRetrieve)
                 print("Output to file: " + outputFile)
                 try:
-                    radarImage = urllib2.urlopen(imageToRetrieve)
+                    radarImage = urllib2.urlopen(imageToRetrieve)                    
                     fh = open( overlayLoopPath + "/" + outputFile , "wb")
                     fh.write(radarImage.read())
                     fh.close()
