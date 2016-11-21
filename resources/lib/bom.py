@@ -244,7 +244,7 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
                 except Exception as inst:
                     print("Failed to retrieve radar image: " + imageToRetrieve + ", oh well never mind!", inst )
         else:
-            print("Using cached radar image: " + f)
+            print("Using cached radar image: " + timeNow + "." + f)
 
 
 ###########################################################

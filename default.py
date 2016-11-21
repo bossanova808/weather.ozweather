@@ -185,6 +185,8 @@ def refresh_locations():
 # Set any weather values to the old style, e.g. hardcoded icon paths
 def oldKodiWeatherData(weatherData):
 
+    print("Modifying weather data for kodi version " + VERSION_NUMBER)
+    
     for index in range(0,7):
 
         keys = ["OutlookIcon","ConditionIcon"]   
@@ -198,8 +200,6 @@ def oldKodiWeatherData(weatherData):
 
             weatherData['Day' + str(index) + '.' + key] = value
             weatherData['Day' + str(index) + '.' + key] = value
-
-    print weatherData
 
     return weatherData
 
@@ -227,7 +227,7 @@ def forecast(urlPath, radarCode):
     # Get all the weather & forecast data from weatherzone
     log("Get the forecast data from http://weatherzone.com.au" + urlPath)
     weatherData = getWeatherData(urlPath, extendedFeatures, VERSION_NUMBER)
-    if VERSION_NUMBER < 17:
+    if VERSION_NUMBER < 16.9:
         weatherData = oldKodiWeatherData(weatherData)
 
     for key in sorted(weatherData):
