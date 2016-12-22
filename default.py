@@ -200,6 +200,8 @@ def oldKodiWeatherData(weatherData):
 
             weatherData['Day' + str(index) + '.' + key] = value
             weatherData['Day' + str(index) + '.' + key] = value
+            weatherData['Daily.' + str(index+1) + '.' + key] = value
+            weatherData['Daily.' + str(index+1) + '.' + key] = value
 
     return weatherData
 
