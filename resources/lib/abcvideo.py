@@ -19,6 +19,13 @@
 import requests
 import re
 
+try:
+    from xbmc import log as log
+except ImportError:
+    print("\nXBMC is not available -> probably unit testing")
+    def log(str):
+        print(str)
+
 ABC_URL = "https://www.abc.net.au/news/newschannel/weather-in-90-seconds/"
 VIDEO_PATTERN = "//abcmedia.akamaized.net/news/news24/wins/(.+?)/WIN(.*?)_512k.mp4"
 
@@ -34,18 +41,18 @@ def getABCWeatherVideoLink(quality):
             url = "https://abcmedia.akamaized.net/news/news24/wins/"+ video[0][0] + "/WIN" + video[0][1] + "_" + quality + ".mp4"
             return url
         except Exception as inst:
-            print("Couldn't get ABC video URL from page", inst)
+            log("Couldn't get ABC video URL from page", inst)
             return ""
 
     except Exception as inst:
-        print("********** Couldn't get ABC video page", inst)
+        log("********** Couldn't get ABC video page", inst)
         return ""
     
 
 if __name__ == "__main__":
-    print("\n\nTesting scraping of ABC Weather Video\n")
+    log("\nTesting scraping of ABC Weather Video\n")
 
-    print(getABCWeatherVideoLink("Best"))
+    log(getABCWeatherVideoLink("Best") + "\n")
 
 
 
