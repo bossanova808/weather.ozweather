@@ -98,15 +98,15 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
             try:
                 #log(FTPSTUB + fileName)
                 #image.retrieve(HTTPSTUB + fileName, imageFileIndexed )
-                http = urllib3.PoolManager()                                                                                                                        
-                r = http.request('GET', HTTPSTUB + fileName, preload_content=False)                                                                
-                with open(imageFileRGB, 'wb') as out:                                                                                                               
-                    while True:                                                                                                                                     
-                        data = r.read(chunk_size)                                                                                                                   
-                        if not data:                                                                                                                                
-                            break                                                                                                                                   
-                        out.write(data)                                                                                                                             
-                r.release_conn()                                                                                                                                    
+                http = urllib3.PoolManager()
+                r = http.request('GET', HTTPSTUB + fileName, preload_content=False)
+                with open(imageFileRGB, 'wb') as out:
+                    while True:
+                        data = r.read(chunk_size)
+                        if not data:
+                            break
+                        out.write(data)
+                r.release_conn()
             except Exception as inst:
                 log("http failed with error: " + str(inst))
 
@@ -248,7 +248,7 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
                 log("Retrieving new radar image: " + imageToRetrieve)
                 log("Output to file: " + outputFile)
                 try:
-                    radarImage = urllib.request.urlopen(imageToRetrieve)                    
+                    radarImage = urllib.request.urlopen(imageToRetrieve)
                     fh = open( overlayLoopPath + "/" + outputFile , "wb")
                     fh.write(radarImage.read())
                     fh.close()
