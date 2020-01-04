@@ -80,10 +80,13 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
         imageFileIndexed = backgroundsPath + "idx." + fileName
         imageFileRGB = backgroundsPath + outFileName
 
+        USERAGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.9.0.1) Gecko/2008070208 Firefox/3.6"
+        headers = urllib3.util.request.make_headers(accept_encoding='gzip, deflate', keep_alive=True, user_agent=USERAGENT)
+        
         #special case for national radar background (already an RGB image)
         if "background.png" in fileName and '00004' in fileName:
             http = urllib3.PoolManager()
-            r = http.request('GET', HTTPSTUB + 'IDE00035.background.png', preload_content=False)
+            r = http.request('GET', HTTPSTUB + 'IDE00035.background.png', preload_content=False, headers=headers)
             with open(imageFileRGB, 'wb') as out:
                 while True:
                     data = r.read(65536)
@@ -99,7 +102,7 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
                 #log(FTPSTUB + fileName)
                 #image.retrieve(HTTPSTUB + fileName, imageFileIndexed )
                 http = urllib3.PoolManager()
-                r = http.request('GET', HTTPSTUB + fileName, preload_content=False)
+                r = http.request('GET', HTTPSTUB + fileName, preload_content=False, headers=headers)
                 with open(imageFileRGB, 'wb') as out:
                     while True:
                         data = r.read(65536)
