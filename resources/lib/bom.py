@@ -102,7 +102,7 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
                 r = http.request('GET', HTTPSTUB + fileName, preload_content=False)
                 with open(imageFileRGB, 'wb') as out:
                     while True:
-                        data = r.read(chunk_size)
+                        data = r.read(65536)
                         if not data:
                             break
                         out.write(data)
