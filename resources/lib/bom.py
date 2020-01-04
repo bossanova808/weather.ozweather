@@ -21,7 +21,7 @@ import glob
 import os, sys, shutil
 import time
 import ftplib
-import urllib, urllib2
+import urllib.request, urllib.parse, urllib.error, urllib3
 
 try:
     from xbmc import log as log
@@ -41,7 +41,7 @@ HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
 def downloadBackground(radarCode, fileName, backgroundsPath):
 
     # Needed due to bug in python 2.7 urllib - https://stackoverflow.com/questions/44733710/downloading-second-file-from-ftp-fails
-    urllib.urlcleanup()
+    urllib.request.urlcleanup()
     
     outFileName = fileName
 
@@ -76,21 +76,39 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
         log("Downloading missing background image....[%s] as [%s]" % (fileName, outFileName))
         
         #ok get ready to retrieve some images
-        image = urllib.URLopener()
+        #image = urllib.request.URLopener()
         imageFileIndexed = backgroundsPath + "idx." + fileName
         imageFileRGB = backgroundsPath + outFileName
 
         #special case for national radar background (already an RGB image)
         if "background.png" in fileName and '00004' in fileName:
-            image.retrieve(FTPSTUB + 'IDE00035.background.png', imageFileRGB )
+            http = urllib3.PoolManager()
+            r = http.request('GET', HTTPSTUB + 'IDE00035.background.png', preload_content=False)
+            with open(imageFileRGB, 'wb') as out:
+                while True:
+                    data = r.read(65536)
+                    if not data:
+                        break
+                    out.write(data)
+            r.release_conn()
+            #image.retrieve(HTTPSTUB + 'IDE00035.background.png', imageFileRGB )
             log("Got IDE00035.background.png as " + outFileName)
         #all other images...need to be converted from indexed colour to RGB
         else:          
             try:
                 #log(FTPSTUB + fileName)
-                image.retrieve(FTPSTUB + fileName, imageFileIndexed )
+                #image.retrieve(HTTPSTUB + fileName, imageFileIndexed )
+                http = urllib3.PoolManager()                                                                                                                        
+                r = http.request('GET', HTTPSTUB + fileName, preload_content=False)                                                                
+                with open(imageFileRGB, 'wb') as out:                                                                                                               
+                    while True:                                                                                                                                     
+                        data = r.read(chunk_size)                                                                                                                   
+                        if not data:                                                                                                                                
+                            break                                                                                                                                   
+                        out.write(data)                                                                                                                             
+                r.release_conn()                                                                                                                                    
             except Exception as inst:
-                log("ftp failed with error: " + str(inst))
+                log("http failed with error: " + str(inst))
 
             try:
                 log("Downloaded background texture...now converting from indexed file [" + imageFileIndexed +  "] to RGB: " + fileName)
@@ -230,7 +248,7 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
                 log("Retrieving new radar image: " + imageToRetrieve)
                 log("Output to file: " + outputFile)
                 try:
-                    radarImage = urllib2.urlopen(imageToRetrieve)                    
+                    radarImage = urllib.request.urlopen(imageToRetrieve)                    
                     fh = open( overlayLoopPath + "/" + outputFile , "wb")
                     fh.write(radarImage.read())
                     fh.close()
@@ -277,7 +295,3 @@ if __name__ == "__main__":
     buildImages(radarCode, True, backgroundsPath, overlayLoopPath)
     log(os.listdir(backgroundsPath))
     log(os.listdir(overlayLoopPath))
-
-
-
-  
