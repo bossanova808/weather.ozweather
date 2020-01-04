@@ -11,7 +11,7 @@ import xbmcaddon
 import xbmcplugin
 import xbmcvfs
 import xbmcgui
-import urllib
+import urllib.request, urllib.parse, urllib.error
 import sys
 import os
 import platform
@@ -32,15 +32,17 @@ from traceback import format_exc
 def log(message, inst=None, level=xbmc.LOGDEBUG):
     
     if isinstance (message,str):
-        message = message.decode("utf-8")
-        message = u'### %s - %s ### %s' % (ADDONNAME,VERSION, message)
+        #message = message.decode("utf-8")
+        message = '### %s - %s ### %s' % (ADDONNAME,VERSION, message)
     else:
-        message = u'### %s - %s ### %s' % (ADDONNAME,VERSION, message)
+        message = '### %s - %s ### %s' % (ADDONNAME,VERSION, message)
 
     if inst is None:
-      xbmc.log(message.encode("utf-8"), level )
+      #xbmc.log(message.encode("utf-8"), level )
+      xbmc.log(message, level )
     else:
-      xbmc.log(message.encode("utf-8"), level )
+      #xbmc.log(message.encode("utf-8"), level )
+      xbmc.log(message, level )
       xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### Exception:" + format_exc(inst), level )
 
 #log something even if debug logging is off - for important stuff only!
@@ -106,7 +108,7 @@ def frontPadTo9Chars(shortStr):
 # Reverse the key value pairs in a dict
 
 def swap_dictionary(original_dict):
-   return dict([(v, k) for (k, v) in original_dict.iteritems()])
+   return dict([(v, k) for (k, v) in list(original_dict.items())])
 
 
 ################################################################################
@@ -143,17 +145,17 @@ def unquoteUni(text):
         #return urllib.unquote(text)
         _hexdig = '0123456789ABCDEFabcdef'
         _hextochr = dict((a+b, chr(int(a+b,16))) for a in _hexdig for b in _hexdig)
-        if isinstance(text, unicode):
+        if isinstance(text, str):
             text = text.encode('utf-8')
         res = text.split('%')
-        for i in xrange(1, len(res)):
+        for i in range(1, len(res)):
             item = res[i]
             try:
                 res[i] = _hextochr[item[:2]] + item[2:]
             except KeyError:
                 res[i] = '%' + item
             except UnicodeDecodeError:
-                res[i] = unichr(int(item[:2], 16)) + item[2:]
+                res[i] = chr(int(item[:2], 16)) + item[2:]
         return "".join(res)
 
 ##############################################################################
@@ -183,7 +185,7 @@ def getParams():
 # Build a plugin URL with urlencoded parameters
 
 def buildPluginURL(params):
-    return PLUGINSTUB + urllib.urlencode(params)
+    return PLUGINSTUB + urllib.parse.urlencode(params)
 
 ################################################################################
 # Strip given chararacters from all members of a given list
@@ -322,6 +324,3 @@ if VERSION_NUMBER >= 21.9:
     XBMC_VERSION = "P*"        
 if VERSION_NUMBER >= 22.9:
     XBMC_VERSION = ">P" 
-
-
-
