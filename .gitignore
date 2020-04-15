@@ -2,3 +2,4 @@
 *.pyo
 resources/lib/test-outputs
 
+.idea
