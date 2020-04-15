@@ -11,7 +11,9 @@ import xbmcaddon
 import xbmcplugin
 import xbmcvfs
 import xbmcgui
-import urllib.request, urllib.parse, urllib.error
+import urllib.request
+import urllib.parse
+import urllib.error
 import sys
 import os
 import platform
@@ -26,29 +28,25 @@ from traceback import format_exc
 ################################################################################
 # Log a message to the XBMC Log, and an exception if supplied
 #
-# call log() to log only if degbug logging is on
+# call log() to log only if debug logging is on
 # call logNotice() is you want print out regardless of debug settings
+
 
 def log(message, inst=None, level=xbmc.LOGDEBUG):
     
-    if isinstance (message,str):
-        #message = message.decode("utf-8")
-        message = '### %s - %s ### %s' % (ADDONNAME,VERSION, message)
-    else:
-        message = '### %s - %s ### %s' % (ADDONNAME,VERSION, message)
+    message = '### %s - %s ### %s' % (ADDONNAME, VERSION, message)
 
     if inst is None:
-      #xbmc.log(message.encode("utf-8"), level )
-      xbmc.log(message, level )
+      xbmc.log(message, level)
     else:
-      #xbmc.log(message.encode("utf-8"), level )
-      xbmc.log(message, level )
+      xbmc.log(message, level)
       xbmc.log("### " + ADDONNAME + "-" + VERSION +  " ### Exception:" + format_exc(inst), level )
 
-#log something even if debug logging is off - for important stuff only!
+# log something even if debug logging is off - for important stuff only!
+
 
 def logNotice(message, inst=None):
-    log(message, inst, level = xbmc.LOGNOTICE)
+    log(message, inst, level=xbmc.LOGNOTICE)
 
 
 ################################################################################

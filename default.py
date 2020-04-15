@@ -16,25 +16,30 @@
 # *  http://www.gnu.org/copyleft/gpl.html
 # *
 
-import os, sys, socket
-import xbmc, xbmcvfs, xbmcgui, xbmcaddon
-import re
+import os
+import sys
+import socket
+import xbmc
+import xbmcgui
+import xbmcaddon
 import time
 
+
 # Minimal code to import bossanova808 common code
-ADDON           = xbmcaddon.Addon()
-CWD             = ADDON.getAddonInfo('path')
-RESOURCES_PATH  = xbmc.translatePath( os.path.join( CWD, 'resources' ))
-LIB_PATH        = xbmc.translatePath(os.path.join( RESOURCES_PATH, "lib" ))
-WEATHER_WINDOW  = xbmcgui.Window(12600)
+ADDON = xbmcaddon.Addon()
+CWD = ADDON.getAddonInfo('path')
+RESOURCES_PATH = xbmc.translatePath(os.path.join(CWD, 'resources'))
+LIB_PATH = xbmc.translatePath(os.path.join(RESOURCES_PATH, "lib"))
+WEATHER_WINDOW = xbmcgui.Window(12600)
 
 # Extra imports
-sys.path.append( LIB_PATH )
+sys.path.append(LIB_PATH)
 
 from b808common import *
 from weatherzone import *
 from abcvideo import *
 from bom import *
+
 
 # Clear all weather window properties
 
@@ -46,8 +51,8 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'WeatherVersion')
         setProperty(WEATHER_WINDOW, 'Location')
         setProperty(WEATHER_WINDOW, 'Updated')
-        setProperty(WEATHER_WINDOW, 'Weather.IsFetched',"false")
-        setProperty(WEATHER_WINDOW, 'Daily.IsFetched'  ,"false")
+        setProperty(WEATHER_WINDOW, 'Weather.IsFetched', "false")
+        setProperty(WEATHER_WINDOW, 'Daily.IsFetched', "false")
         setProperty(WEATHER_WINDOW, 'Radar')
         setProperty(WEATHER_WINDOW, 'Video.1')
 
@@ -55,7 +60,7 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Forecast.Country')
         setProperty(WEATHER_WINDOW, 'Forecast.Updated')
 
-        setProperty(WEATHER_WINDOW, 'Current.IsFetched',"false")
+        setProperty(WEATHER_WINDOW, 'Current.IsFetched', "false")
         setProperty(WEATHER_WINDOW, 'Current.Location')
         setProperty(WEATHER_WINDOW, 'Current.Condition')
         setProperty(WEATHER_WINDOW, 'Current.ConditionLong')
@@ -83,48 +88,47 @@ def clearProperties():
         setProperty(WEATHER_WINDOW, 'Current.ChancePrecipitation')
         setProperty(WEATHER_WINDOW, 'Current.SolarRadiation')
 
-        setProperty(WEATHER_WINDOW, 'Today.IsFetched'  ,"false")
+        setProperty(WEATHER_WINDOW, 'Today.IsFetched', "false")
         setProperty(WEATHER_WINDOW, 'Today.Sunrise')
         setProperty(WEATHER_WINDOW, 'Today.Sunset')
         setProperty(WEATHER_WINDOW, 'Today.moonphase')
         setProperty(WEATHER_WINDOW, 'Today.Moonphase')
 
+        # and all the properties for the forecast
+        for count in range(0, 8):
+            setProperty(WEATHER_WINDOW, 'Day%i.Title' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.RainChance' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.RainChanceAmount' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.ChancePrecipitation' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.Precipitation' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.HighTemp' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.LowTemp' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.HighTemperature' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.LowTemperature' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.Outlook' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.LongOutlookDay' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon' % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Day%i.ConditionIcon' % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Day%i.FanartCode' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.ShortDate' % count)
+            setProperty(WEATHER_WINDOW, 'Day%i.ShortDay' % count)
 
-        #and all the properties for the forecast
-        for count in range(0,8):
-            setProperty(WEATHER_WINDOW, 'Day%i.Title'                           % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.RainChance'                      % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.RainChanceAmount'                % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.ChancePrecipitation'             % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.Precipitation'                   % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.HighTemp'                        % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.LowTemp'                         % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.HighTemperature'                 % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.LowTemperature'                  % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.Outlook'                         % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.LongOutlookDay'                  % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.OutlookIcon'                     % count, "na.png")
-            setProperty(WEATHER_WINDOW, 'Day%i.ConditionIcon'                   % count, "na.png")
-            setProperty(WEATHER_WINDOW, 'Day%i.FanartCode'                      % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.ShortDate'                       % count)
-            setProperty(WEATHER_WINDOW, 'Day%i.ShortDay'                        % count)
-                        
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Title'                        % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance'                   % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount'             % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ChancePrecipitation'          % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation'                % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp'                     % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp'                      % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature'              % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature'               % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook'                      % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.LongOutlookDay'               % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon'                  % count, "na.png")
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon'                % count, "na.png")
-            setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode'                   % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate'                    % count)
-            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay'                     % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Title' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChance' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ChancePrecipitation' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Precipitation' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemp' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemp' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.HighTemperature' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LowTemperature' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.Outlook' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.LongOutlookDay' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.OutlookIcon' % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ConditionIcon' % count, "na.png")
+            setProperty(WEATHER_WINDOW, 'Daily.%i.FanartCode' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDate' % count)
+            setProperty(WEATHER_WINDOW, 'Daily.%i.ShortDay' % count)
 
     except Exception as inst:
         log("********** OzWeather Couldn't clear all the properties, sorry!!", inst)
@@ -133,7 +137,6 @@ def clearProperties():
 # Set the location and radar code properties
 
 def refresh_locations():
-
     log("Refreshing locations from settings")
     location_set1 = ADDON.getSetting('Location1')
     location_set2 = ADDON.getSetting('Location2')
@@ -181,15 +184,13 @@ def refresh_locations():
     setProperty(WEATHER_WINDOW, 'Radars', str(locations))
 
 
-
 # Set any weather values to the old style, e.g. hardcoded icon paths
 def oldKodiWeatherData(weatherData):
-
     log("Modifying weather data for kodi version " + str(VERSION_NUMBER))
-    
-    for index in range(0,7):
 
-        keys = ["OutlookIcon","ConditionIcon"]   
+    for index in range(0, 7):
+
+        keys = ["OutlookIcon", "ConditionIcon"]
         value = weatherData['Day' + str(index) + '.' + keys[0]]
         value = xbmc.translatePath('special://temp/weather/%s').decode("utf-8") % value
 
@@ -200,26 +201,29 @@ def oldKodiWeatherData(weatherData):
 
             weatherData['Day' + str(index) + '.' + key] = value
             weatherData['Day' + str(index) + '.' + key] = value
-            weatherData['Daily.' + str(index+1) + '.' + key] = value
-            weatherData['Daily.' + str(index+1) + '.' + key] = value
+            weatherData['Daily.' + str(index + 1) + '.' + key] = value
+            weatherData['Daily.' + str(index + 1) + '.' + key] = value
 
     return weatherData
+
 
 # The main forecast retrieval function
 # Does either a basic forecast or a more extended forecast with radar etc.
 
 def forecast(urlPath, radarCode):
-
     extendedFeatures = ADDON.getSetting('ExtendedFeaturesToggle')
 
-    log("Getting weather from [%s] with radar [%s], extended features is: [%s]" % (urlPath, radarCode, str(extendedFeatures)))
+    log("Getting weather from [%s] with radar [%s], extended features is: [%s]" % (
+    urlPath, radarCode, str(extendedFeatures)))
 
     # Get the radar images first - looks better on refreshes
     if extendedFeatures == "true":
         log("Getting radar images for " + radarCode)
-        
-        backgroundsPath = xbmc.translatePath("special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radarCode + "/");
-        overlayLoopPath = xbmc.translatePath("special://profile/addon_data/weather.ozweather/currentloop/" + radarCode + "/");
+
+        backgroundsPath = xbmc.translatePath(
+            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radarCode + "/");
+        overlayLoopPath = xbmc.translatePath(
+            "special://profile/addon_data/weather.ozweather/currentloop/" + radarCode + "/");
 
         updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
 
@@ -240,20 +244,19 @@ def forecast(urlPath, radarCode):
         log("Get the ABC weather video link")
         url = getABCWeatherVideoLink(ADDON.getSetting("ABCQuality"))
         if url:
-            setProperty(WEATHER_WINDOW, 'Video.1',url)
+            setProperty(WEATHER_WINDOW, 'Video.1', url)
 
-
-    # And announce everything is fetched..    
+    # And announce everything is fetched..
     setProperty(WEATHER_WINDOW, "Weather.IsFetched", "true")
     setProperty(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
-    setProperty(WEATHER_WINDOW, 'Today.IsFetched', "true")        
+    setProperty(WEATHER_WINDOW, 'Today.IsFetched', "true")
+
 
 def findLocation():
-
     keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
     keyboard.doModal()
-    
-    if (keyboard.isConfirmed() and keyboard.getText() != ''):
+
+    if keyboard.isConfirmed() and keyboard.getText() != '':
         text = keyboard.getText()
 
         log("Doing locations search for " + text)
@@ -261,32 +264,32 @@ def findLocation():
 
         # Now get them to choose an actual location
         dialog = xbmcgui.Dialog()
-        if locations != []:
+        if locations:
             selected = dialog.select(xbmc.getLocalizedString(396), locations)
             if selected != -1:
                 ADDON.setSetting(sys.argv[1], locations[selected])
                 ADDON.setSetting(sys.argv[1] + 'UrlPath', locationURLPaths[selected])
-        # Or indicate we did not receieve any locations
+        # Or indicate we did not receive any locations
         else:
             dialog.ok(ADDONNAME, xbmc.getLocalizedString(284))
 
-def getForecast():
 
+def getForecast():
     # Nice neat updates - clear out everything first...
     clearProperties()
 
     # Set basic properties/brand
-    setProperty(WEATHER_WINDOW, 'WeatherProviderLogo'       , xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
-    setProperty(WEATHER_WINDOW, 'WeatherProvider'           , 'Bureau of Meteorology Australia (via WeatherZone)')
-    setProperty(WEATHER_WINDOW, 'WeatherVersion'            , ADDONNAME + "-" + VERSION)
-    
+    setProperty(WEATHER_WINDOW, 'WeatherProviderLogo', xbmc.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
+    setProperty(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia (via WeatherZone)')
+    setProperty(WEATHER_WINDOW, 'WeatherVersion', ADDONNAME + "-" + VERSION)
+
     # Set what we updated and when
-    setProperty(WEATHER_WINDOW, 'Location'              , ADDON.getSetting('Location%s' % sys.argv[1]))
-    setProperty(WEATHER_WINDOW, 'Updated'               , time.strftime("%d/%m/%Y %H:%M"))
-    setProperty(WEATHER_WINDOW, 'Current.Location'      , ADDON.getSetting('Location%s' % sys.argv[1]))
-    setProperty(WEATHER_WINDOW, 'Forecast.City'         , ADDON.getSetting('Location%s' % sys.argv[1]))
-    setProperty(WEATHER_WINDOW, 'Forecast.Country'      , "Australia")
-    setProperty(WEATHER_WINDOW, 'Forecast.Updated'      , time.strftime("%d/%m/%Y %H:%M"))
+    setProperty(WEATHER_WINDOW, 'Location', ADDON.getSetting('Location%s' % sys.argv[1]))
+    setProperty(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m/%Y %H:%M"))
+    setProperty(WEATHER_WINDOW, 'Current.Location', ADDON.getSetting('Location%s' % sys.argv[1]))
+    setProperty(WEATHER_WINDOW, 'Forecast.City', ADDON.getSetting('Location%s' % sys.argv[1]))
+    setProperty(WEATHER_WINDOW, 'Forecast.Country', "Australia")
+    setProperty(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
     # Retrieve the currently chosen location & radar
     locationUrlPath = ""
@@ -295,18 +298,20 @@ def getForecast():
     # Old style paths (pre v0.8.5) must be updated to new
     if not locationUrlPath:
         locationUrlPath = ADDON.getSetting('Location%sid' % sys.argv[1])
-        locationUrlPath = locationUrlPath.replace("http://www.weatherzone.com.au","")
+        locationUrlPath = locationUrlPath.replace("http://www.weatherzone.com.au", "")
         ADDON.setSetting('Location%sUrlPath' % sys.argv[1], locationUrlPath)
 
     radar = ""
     radar = ADDON.getSetting('Radar%s' % sys.argv[1])
     # If we don't have a radar code, get the national radar by default
     if radar == "":
-        log("Radar code empty for location " + locationUrlPath +" so using default radar code IDR00004 (national radar)")
+        log(
+            "Radar code empty for location " + locationUrlPath + " so using default radar code IDR00004 (national radar)")
         radar = "IDR00004"
-    
+
     # Now scrape the weather data & radar images
     forecast(locationUrlPath, radar)
+
 
 # TWO MAJOR MODES - SETTINGS and FORECAST RETRIEVAL
 
@@ -325,7 +330,6 @@ if __name__ == "__main__":
     # sys.argv[1] has the current location number, so get the currently selected location and grab it's forecast
     else:
         getForecast()
-
 
     # Refresh the locations
     refresh_locations()

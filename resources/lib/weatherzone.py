@@ -234,7 +234,7 @@ def cleanShortDescription(description):
     description = description.replace('-', '')
     description = description.replace('ThunderStorms', 'Thunderstorms')
     description = description.replace('windy', 'Windy')
-    # title capatilises the first letter of each word
+    # title capitalises the first letter of each word
     return description.title()
 
 
@@ -272,7 +272,7 @@ def setKey(index, key, value):
     weatherData['Daily.' + str(index + 1) + '.' + key] = value.strip()
 
 
-# Returns an array of dicts, each with a Locationname and LocationUrlPart.  Empty if no location found.
+# Returns an array of dicts, each with a Location name and LocationUrlPart.  Empty if no location found.
 # [{'LocationName': u'Ascot Vale, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/ascot-vale'}, ... ]
 
 def getLocationsForPostcodeOrSuburb(text):
@@ -663,7 +663,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                     try:
                         header = row.find("th")
                         if header is not None and header.text == "Wind Direction":
-                            windDirectionData = row.find_all("td")            
+                            windDirectionData = row.find_all("td")
                             for i in range(0,len(windDirectionData),2):
                                 windDirections9am.append(windDirectionData[i].text.replace("\n",""))
                                 windDirections3pm.append(windDirectionData[i+1].text.replace("\n",""))
