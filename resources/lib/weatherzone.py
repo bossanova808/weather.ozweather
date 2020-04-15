@@ -19,7 +19,7 @@
 import requests
 import re
 from bs4 import BeautifulSoup
-from urlparse import urlparse
+from urllib.parse import urlparse
 import datetime
 
 try:
@@ -649,7 +649,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                         if header is not None and header.text == "Wind Speed":
 
                             windSpeedData = row.find_all("td")
-                            for i in xrange(0, len(windSpeedData), 2):
+                            for i in range(0,len(windSpeedData),2):
                                 windSpeeds9am.append(windSpeedData[i].text)
                                 windSpeeds3pm.append(windSpeedData[i + 1].text)
                     except Exception as inst:
@@ -663,18 +663,18 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                     try:
                         header = row.find("th")
                         if header is not None and header.text == "Wind Direction":
+                            windDirectionData = row.find_all("td")            
+                            for i in range(0,len(windDirectionData),2):
+                                windDirections9am.append(windDirectionData[i].text.replace("\n",""))
+                                windDirections3pm.append(windDirectionData[i+1].text.replace("\n",""))
 
-                            windDirectionData = row.find_all("td")
-                            for i in xrange(0, len(windDirectionData), 2):
-                                windDirections9am.append(windDirectionData[i].text.replace("\n", ""))
-                                windDirections3pm.append(windDirectionData[i + 1].text.replace("\n", ""))
                     except Exception as inst:
                         log(str(inst))
                         windDirections9am.append("?")
                         windDirections3pm.append("?")
 
             # Now join the stored wind data and set it...
-            for i in xrange(0, len(windSpeeds9am)):
+            for i in range(0,len(windSpeeds9am)):
                 # setKey(i, "WindSpeed", "9am - " + windSpeeds9am[i] + ", 3pm - " + windSpeeds3pm[i])
                 setKey(i, "WindSpeed", windSpeeds3pm[i])
                 # setKey(i, "WindDirection", "9am - " + windDirections9am[i] + ", 3pm - " + windDirections3pm[i])
