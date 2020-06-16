@@ -18,5 +18,9 @@
 		<website>https://kodi.wiki/index.php?title=Add-on:Oz_Weather</website>
 		<email></email>
 		<source>https://github.com/bossanova808/weather.ozweather</source>
+ 		<assets>
+       		<icon>icon.png</icon>
+       		<fanart>fanart.jpg</fanart>
+		</assets>
 	</extension>
 </addon>
