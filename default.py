@@ -32,13 +32,10 @@ RESOURCES_PATH = xbmc.translatePath(os.path.join(CWD, 'resources'))
 LIB_PATH = xbmc.translatePath(os.path.join(RESOURCES_PATH, "lib"))
 WEATHER_WINDOW = xbmcgui.Window(12600)
 
-# Extra imports
-sys.path.append(LIB_PATH)
-
-from b808common import *
-from weatherzone import *
-from abcvideo import *
-from bom import *
+from resources.lib.b808common import *
+from resources.lib.weatherzone import *
+from resources.lib.abcvideo import *
+from resources.lib.bom import *
 
 
 # Clear all weather window properties

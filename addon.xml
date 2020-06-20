@@ -12,8 +12,8 @@
 		<description lang="en">Weather forecast data scraped from the Australian Bureau of Meteorology via WeatherZone - www.bom.gov.au and www.weatherzone.com.au.  For full features (e.g. radar) make sure you install the replacement skin files found via the addon wiki (https://kodi.wiki/index.php?title=Add-on:Oz_Weather).</description>
 		<disclaimer lang="en">Use of this addon implies you agree to the following terms and conditions - http://reg.bom.gov.au/other/copyright.shtml and http://reg.bom.gov.au/other/disclaimer.shtml</disclaimer>
 		<platform>all</platform>
-		<language>en</language>
-		<license>GNU GENERAL PUBLIC LICENSE. Version 2, June 1991</license>
+		<language>en_GB</language>
+		<license>GPL-3.0-only</license>
 		<forum>https://forum.kodi.tv/showthread.php?tid=116905</forum>
 		<website>https://kodi.wiki/index.php?title=Add-on:Oz_Weather</website>
 		<email></email>
