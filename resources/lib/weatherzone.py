@@ -23,9 +23,9 @@ from urllib.parse import urlparse
 import datetime
 
 try:
-    from xbmc import log as log
+    from .common import log as log
 except ImportError:
-    print("\nXBMC is not available -> probably unit testing")
+    print("\nKodi is not available -> probably unit testing")
 
     def log(message):
         print(message)
@@ -262,7 +262,7 @@ def setKeys(index, keys, value):
 def setKey(index, key, value):
     global weatherData
 
-    if index is 0:
+    if index == 0:
         weatherData['Current.' + key] = value.strip()
         weatherData['Current.' + key] = value.strip()
 
@@ -490,7 +490,7 @@ def getWeatherData(urlPath):
             for index, row in enumerate(forecastTable.find_all("tr")):
 
                 # Days and dates
-                if index is 0:
+                if index == 0:
 
                     for i, day in enumerate(row.find_all("span", class_="bold")):
                         try:
@@ -516,7 +516,7 @@ def getWeatherData(urlPath):
                             setKey(i, "ShortDate", "?")
 
                 # Outlook = Short Descriptions & Corresponding Icons
-                if index is 1:
+                if index == 1:
 
                     for i, shortDesc in enumerate(row.find_all("span")):
 
@@ -576,7 +576,7 @@ def getWeatherData(urlPath):
                         setKeys(i, ["FanartCode"], value.replace(".png", ""))
 
                 # Maximums
-                if index is 2:
+                if index == 2:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -588,7 +588,7 @@ def getWeatherData(urlPath):
                             setKeys(i, ["HighTemp", "HighTemperature"], "?")
 
                             # Minimums
-                if index is 3:
+                if index == 3:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -600,7 +600,7 @@ def getWeatherData(urlPath):
                             setKeys(i, ["LowTemp", "LowTemperature"], "?")
 
                             # Chance of rain
-                if index is 4:
+                if index == 4:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -614,7 +614,7 @@ def getWeatherData(urlPath):
                             setKey(i, "RainChance", "?")
 
                             # Amount of rain
-                if index is 5:
+                if index == 5:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -627,7 +627,7 @@ def getWeatherData(urlPath):
                             setKey(i, "Precipitation", "?")
                             setKey(i, "RainChanceAmount", "?")
                 # UV
-                if index is 6:
+                if index == 6:
 
                     try:
                         tds = row.find_all("td")
@@ -642,7 +642,7 @@ def getWeatherData(urlPath):
                 # and, sigh, they can appear as rows 10 and 11 or 9 and 10, depending on if there is a pollen row...
 
                 # Wind Speed
-                if index is 9 or 10:
+                if index == 9 or 10:
 
                     try:
                         header = row.find("th")
@@ -658,7 +658,7 @@ def getWeatherData(urlPath):
                         windSpeeds9am.append("?")
 
                 # # Wind Direction
-                if index is 10 or 11:
+                if index == 10 or 11:
 
                     try:
                         header = row.find("th")
@@ -704,7 +704,7 @@ if __name__ == "__main__":
 
     log("\n\nGet weather data for /vic/central/kyneton:")
 
-    weatherData = getWeatherData("/vic/central/kyneton", True)
+    weatherData = getWeatherData("/vic/central/kyneton")
 
     for key in sorted(weatherData):
         if weatherData[key] == "?" or weatherData[key] == "na":
@@ -713,7 +713,7 @@ if __name__ == "__main__":
 
     log("\n\nGet weather data for /vic/melbourne/ascot-vale:")
 
-    weatherData = getWeatherData("/vic/melbourne/ascot-vale", True)
+    weatherData = getWeatherData("/vic/melbourne/ascot-vale")
 
     for key in sorted(weatherData):
         if weatherData[key] == "?" or weatherData[key] == "na":

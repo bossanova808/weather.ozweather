@@ -28,9 +28,9 @@ import urllib.request
 import urllib3
 
 try:
-    from xbmc import log as log
+    from .common import log as log
 except ImportError:
-    print("\nXBMC is not available -> probably unit testing")
+    print("\nKodi is not available -> probably unit testing")
 
     def log(message):
         print(message)
@@ -73,11 +73,6 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
     # Download the backgrounds only if we don't have them yet
     if not os.path.isfile(backgroundsPath + outFileName):
 
-        # Import PIL only if we need it so the add on can be run for data only on platforms without PIL
-
-        log("Importing PIL as extra features are activated.")
-        from PIL import Image
-
         log("Downloading missing background image....[%s] as [%s]" % (fileName, outFileName))
 
         # Ok get ready to retrieve some images
@@ -88,10 +83,15 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
                                                     keep_alive=True,
                                                     user_agent=USER_AGENT)
 
-        # Special case for national radar background (already an RGB image)
+        # Special case for national radar background
         if "background.png" in fileName and '00004' in fileName:
+            url_to_get = HTTPSTUB + 'IDE00035.background.png'
+        else:
+            url_to_get = HTTPSTUB + fileName
+
+        try:
             http = urllib3.PoolManager()
-            r = http.request('GET', HTTPSTUB + 'IDE00035.background.png', preload_content=False, headers=headers)
+            r = http.request('GET', url_to_get, preload_content=False, headers=headers)
             with open(imageFileRGB, 'wb') as out:
                 while True:
                     data = r.read(65536)
@@ -99,24 +99,11 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
                         break
                     out.write(data)
             r.release_conn()
-            log("Got IDE00035.background.png as " + outFileName)
-        # All other images...need to be converted from indexed colour to RGB
-        else:
-            try:
-                http = urllib3.PoolManager()
-                r = http.request('GET', HTTPSTUB + fileName, preload_content=False, headers=headers)
-                with open(imageFileRGB, 'wb') as out:
-                    while True:
-                        data = r.read(65536)
-                        if not data:
-                            break
-                        out.write(data)
-                r.release_conn()
-            except Exception as inst:
-                log("http failed with error: " + str(inst))
+        except Exception as e:
+            log(f'Failed to retrieve {url_to_get}', e)
+
 
 # Download backgrounds for a radar image
-
 def prepareBackgrounds(radarCode, backgroundsPath):
     log("Calling prepareBackgrounds on [%s]" % radarCode)
 

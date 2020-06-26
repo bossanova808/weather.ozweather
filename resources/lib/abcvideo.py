@@ -20,9 +20,9 @@ import requests
 import re
 
 try:
-    from xbmc import log as log
+    from .common import log as log
 except ImportError:
-    print("\nXBMC is not available -> probably unit testing")
+    print("\nKodi is not available -> probably unit testing")
 
     def log(message):
         print(message)
@@ -53,7 +53,7 @@ def getABCWeatherVideoLink(quality):
 
 # UNIT TESTING
 if __name__ == "__main__":
-    log("\nTesting scraping of ABC Weather Video\n")
+    log("\nTesting scraping of ABC Weather Video - here's the 'Best' link:\n")
     log(getABCWeatherVideoLink("Best") + "\n")
 
 # ABC VIDEO URL
