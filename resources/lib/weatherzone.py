@@ -323,7 +323,7 @@ def getLocationsForPostcodeOrSuburb(text):
 # All the try/excepts to follow are gross - python needs ?? support.  
 # But let's not fail if one value is missing/malformed...
 
-def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
+def getWeatherData(urlPath):
     log("Requesting & souping weather page at " + SCHEMA + WEATHERZONE_URL + urlPath)
 
     # Get the page data...

@@ -32,7 +32,6 @@ try:
 except ImportError:
     print("\nXBMC is not available -> probably unit testing")
 
-
     def log(message):
         print(message)
 
