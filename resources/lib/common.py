@@ -9,7 +9,6 @@
 import xbmc
 import xbmcaddon
 import sys
-import platform
 import traceback
 
 ADDON = xbmcaddon.Addon()
