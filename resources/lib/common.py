@@ -3,7 +3,7 @@
 # Handy utility functions for Kodi Addons
 # By bossanova808
 # Free in all senses....
-# VERSION 0.1
+# VERSION 0.1.1
 # (Matrix on)
 
 import xbmc
@@ -14,11 +14,13 @@ import traceback
 ADDON = xbmcaddon.Addon()
 ADDON_NAME = ADDON.getAddonInfo('name')
 ADDON_ID = ADDON.getAddonInfo('id')
+ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_AUTHOR = ADDON.getAddonInfo('author')
 ADDON_VERSION = ADDON.getAddonInfo('version')
 ADDON_ARGUMENTS = str(sys.argv)
 CWD = ADDON.getAddonInfo('path')
 LANGUAGE = ADDON.getLocalizedString
+PROFILE = xbmc.translatePath(ADDON.getAddonInfo('profile'))
 KODI_VERSION = xbmc.getInfoLabel('System.BuildVersion')
 USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.9.0.1) Gecko/2008070208 Firefox/3.6"
 
@@ -91,3 +93,22 @@ def send_kodi_json(human_description, json_string):
     result = xbmc.executeJSONRPC(json_string)
     log(f'KODI JSON RPC result: {str(result)}')
 
+
+def get_setting(setting):
+    """
+    Helper function to get string type from settings
+
+    @param setting:
+    @return: setting value
+    """
+    return ADDON.getSetting(setting).strip()
+
+
+def get_setting_as_bool(setting):
+    """
+    Helper function to get bool type from settings
+
+    @param setting:
+    @return: setting value as boolen
+    """
+    return get_setting(setting).lower() == "true"

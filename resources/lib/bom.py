@@ -1,21 +1,5 @@
 # -*- coding: utf-8 -*-
 
-# *  This Program is free software; you can redistribute it and/or modify
-# *  it under the terms of the GNU General Public License as published by
-# *  the Free Software Foundation; either version 2, or (at your option)
-# *  any later version.
-# *
-# *  This Program is distributed in the hope that it will be useful,
-# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# *  GNU General Public License for more details.
-# *
-# *  You should have received a copy of the GNU General Public License
-# *  along with KODI; see the file COPYING. If not, write to
-# *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
-# *  http://www.gnu.org/copyleft/gpl.html
-# *
-
 import ftplib
 import glob
 import os
@@ -27,6 +11,11 @@ import urllib.parse
 import urllib.request
 import urllib3
 
+# This little bit of code is only for unit testing.
+# When this module is run within Kodi, it will use the Kodi log function as usual
+# However, when unit testing from the command line, the xbmc* modules will not be importable
+# So the exception will be raised and in response we define a local log function that simply
+# prints stuff to the command line.
 try:
     from .common import log as log
 except ImportError:
@@ -121,6 +110,7 @@ def prepareBackgrounds(radarCode, backgroundsPath):
 # the radar images are cached for four hours, backgrounds for a week (or always if updateRadarBackgrounds is false)
 
 def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath):
+
     # grab the current time as as 12 digit 0 padded string
     timeNow = format(int(time.time()), '012d')
 
@@ -128,38 +118,26 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
     log("Overlay loop path: " + overlayLoopPath)
     log("Backgrounds path: " + backgroundsPath)
 
-    # remove any backgrounds older than 
-
     log("Deleting any radar overlays older than 2 hours (as BOM keeps last two hours, we do too)")
     currentFiles = glob.glob(overlayLoopPath + "/*.png")
     for count, file in enumerate(currentFiles):
         filetime = os.path.getmtime(file)
         twoHoursAgo = time.time() - (2 * 60 * 60)
         if filetime < twoHoursAgo:
-            log("Deleted " + str(os.path.basename(file)))
             os.remove(file)
+            log("Deleted aged radar image " + str(os.path.basename(file)))
 
     # rename the currently kept radar backgrounds to prevent Kodi caching issues
     currentFiles = glob.glob(overlayLoopPath + "/*.png")
     for file in currentFiles:
         os.rename(file, os.path.dirname(file) + "/" + timeNow + "." + os.path.basename(file)[13:])
 
-    # We need make the directories to store stuff if they don't exist
-    # delay hack is here to make sure OS has actually released the handle
-    # from the rmtree call above before we try and make the directory
-
+    # create the folder for the backgrounds path if it does not yet exist
     if not os.path.exists(backgroundsPath):
-        attempts = 0
-        success = False
-        while not success and (attempts < 20):
-            try:
-                os.makedirs(backgroundsPath)
-                success = True
-                log("Successfully created " + backgroundsPath)
-            except Exception:
-                attempts += 1
-                time.sleep(0.1)
-        if not success:
+        try:
+            os.makedirs(backgroundsPath)
+            log("Created path for backgrounds at" + backgroundsPath)
+        except Exception:
             log("ERROR: Failed to create directory for radar background images!")
             return
 
@@ -227,11 +205,11 @@ def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopP
                 log("Output to file: " + outputFile)
                 try:
                     radarImage = urllib.request.urlopen(imageToRetrieve)
-                    fh = open(overlayLoopPath + "/" + outputFile, "wb")
-                    fh.write(radarImage.read())
-                    fh.close()
-                except Exception as inst:
-                    log("Failed to retrieve radar image: " + imageToRetrieve + ", oh well never mind!" + str(inst))
+                    with open(overlayLoopPath + "/" + outputFile, "wb") as fh:
+                        fh.write(radarImage.read())
+
+                except Exception as e:
+                    log(f"Failed to retrieve radar image: {imageToRetrieve}, exception: {str(e)}")
         else:
             log("Using cached radar image: " + timeNow + "." + f)
 

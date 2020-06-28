@@ -1,24 +1,13 @@
 # -*- coding: utf-8 -*-
 
-# *  This Program is free software; you can redistribute it and/or modify
-# *  it under the terms of the GNU General Public License as published by
-# *  the Free Software Foundation; either version 2, or (at your option)
-# *  any later version.
-# *
-# *  This Program is distributed in the hope that it will be useful,
-# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# *  GNU General Public License for more details.
-# *
-# *  You should have received a copy of the GNU General Public License
-# *  along with KODI; see the file COPYING. If not, write to
-# *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
-# *  http://www.gnu.org/copyleft/gpl.html
-# *
-
 import requests
 import re
 
+# This little bit of code is only for unit testing.
+# When this module is run within Kodi, it will use the Kodi log function as usual
+# However, when unit testing from the command line, the xbmc* modules will not be importable
+# So the exception will be raised and in response we define a local log function that simply
+# prints stuff to the command line.
 try:
     from .common import log as log
 except ImportError:
