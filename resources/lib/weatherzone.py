@@ -1,31 +1,20 @@
 # -*- coding: utf-8 -*-
 
-# *  This Program is free software; you can redistribute it and/or modify
-# *  it under the terms of the GNU General Public License as published by
-# *  the Free Software Foundation; either version 2, or (at your option)
-# *  any later version.
-# *
-# *  This Program is distributed in the hope that it will be useful,
-# *  but WITHOUT ANY WARRANTY; without even the implied warranty of
-# *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-# *  GNU General Public License for more details.
-# *
-# *  You should have received a copy of the GNU General Public License
-# *  along with KODI; see the file COPYING. If not, write to
-# *  the Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
-# *  http://www.gnu.org/copyleft/gpl.html
-# *
-
 import requests
 import re
 from bs4 import BeautifulSoup
 from urllib.parse import urlparse
 import datetime
 
+# This little bit of code is only for unit testing.
+# When this module is run within Kodi, it will use the Kodi log function as usual
+# However, when unit testing from the command line, the xbmc* modules will not be importable
+# So the exception will be raised and in response we define a local log function that simply
+# prints stuff to the command line.
 try:
-    from xbmc import log as log
+    from .common import log as log
 except ImportError:
-    print("\nXBMC is not available -> probably unit testing")
+    print("\nKodi is not available -> probably unit testing")
 
     def log(message):
         print(message)
@@ -234,7 +223,7 @@ def cleanShortDescription(description):
     description = description.replace('-', '')
     description = description.replace('ThunderStorms', 'Thunderstorms')
     description = description.replace('windy', 'Windy')
-    # title capatilises the first letter of each word
+    # title capitalises the first letter of each word
     return description.title()
 
 
@@ -262,7 +251,7 @@ def setKeys(index, keys, value):
 def setKey(index, key, value):
     global weatherData
 
-    if index is 0:
+    if index == 0:
         weatherData['Current.' + key] = value.strip()
         weatherData['Current.' + key] = value.strip()
 
@@ -272,7 +261,7 @@ def setKey(index, key, value):
     weatherData['Daily.' + str(index + 1) + '.' + key] = value.strip()
 
 
-# Returns an array of dicts, each with a Locationname and LocationUrlPart.  Empty if no location found.
+# Returns an array of dicts, each with a Location name and LocationUrlPart.  Empty if no location found.
 # [{'LocationName': u'Ascot Vale, VIC 3032', 'LocationUrlPart': u'/vic/melbourne/ascot-vale'}, ... ]
 
 def getLocationsForPostcodeOrSuburb(text):
@@ -323,7 +312,7 @@ def getLocationsForPostcodeOrSuburb(text):
 # All the try/excepts to follow are gross - python needs ?? support.  
 # But let's not fail if one value is missing/malformed...
 
-def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
+def getWeatherData(urlPath):
     log("Requesting & souping weather page at " + SCHEMA + WEATHERZONE_URL + urlPath)
 
     # Get the page data...
@@ -490,7 +479,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
             for index, row in enumerate(forecastTable.find_all("tr")):
 
                 # Days and dates
-                if index is 0:
+                if index == 0:
 
                     for i, day in enumerate(row.find_all("span", class_="bold")):
                         try:
@@ -516,7 +505,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                             setKey(i, "ShortDate", "?")
 
                 # Outlook = Short Descriptions & Corresponding Icons
-                if index is 1:
+                if index == 1:
 
                     for i, shortDesc in enumerate(row.find_all("span")):
 
@@ -576,7 +565,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                         setKeys(i, ["FanartCode"], value.replace(".png", ""))
 
                 # Maximums
-                if index is 2:
+                if index == 2:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -588,7 +577,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                             setKeys(i, ["HighTemp", "HighTemperature"], "?")
 
                             # Minimums
-                if index is 3:
+                if index == 3:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -600,7 +589,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                             setKeys(i, ["LowTemp", "LowTemperature"], "?")
 
                             # Chance of rain
-                if index is 4:
+                if index == 4:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -614,7 +603,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                             setKey(i, "RainChance", "?")
 
                             # Amount of rain
-                if index is 5:
+                if index == 5:
 
                     for i, td in enumerate(row.find_all("td")):
                         try:
@@ -627,7 +616,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                             setKey(i, "Precipitation", "?")
                             setKey(i, "RainChanceAmount", "?")
                 # UV
-                if index is 6:
+                if index == 6:
 
                     try:
                         tds = row.find_all("td")
@@ -642,7 +631,7 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                 # and, sigh, they can appear as rows 10 and 11 or 9 and 10, depending on if there is a pollen row...
 
                 # Wind Speed
-                if index is 9 or 10:
+                if index == 9 or 10:
 
                     try:
                         header = row.find("th")
@@ -658,12 +647,12 @@ def getWeatherData(urlPath, extendedFeatures=True, XBMC_VERSION=17.0):
                         windSpeeds9am.append("?")
 
                 # # Wind Direction
-                if index is 10 or 11:
+                if index == 10 or 11:
 
                     try:
                         header = row.find("th")
                         if header is not None and header.text == "Wind Direction":
-                            windDirectionData = row.find_all("td")            
+                            windDirectionData = row.find_all("td")
                             for i in range(0,len(windDirectionData),2):
                                 windDirections9am.append(windDirectionData[i].text.replace("\n",""))
                                 windDirections3pm.append(windDirectionData[i+1].text.replace("\n",""))
@@ -704,7 +693,7 @@ if __name__ == "__main__":
 
     log("\n\nGet weather data for /vic/central/kyneton:")
 
-    weatherData = getWeatherData("/vic/central/kyneton", True)
+    weatherData = getWeatherData("/vic/central/kyneton")
 
     for key in sorted(weatherData):
         if weatherData[key] == "?" or weatherData[key] == "na":
@@ -713,7 +702,7 @@ if __name__ == "__main__":
 
     log("\n\nGet weather data for /vic/melbourne/ascot-vale:")
 
-    weatherData = getWeatherData("/vic/melbourne/ascot-vale", True)
+    weatherData = getWeatherData("/vic/melbourne/ascot-vale")
 
     for key in sorted(weatherData):
         if weatherData[key] == "?" or weatherData[key] == "na":
