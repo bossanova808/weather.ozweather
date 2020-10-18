@@ -1,3 +1,8 @@
+
+(unreleased)
+vX.X
+ - Change xbmc.translatePath (deprecated) to xbmcvfs.translatePath
+
 v1.2 
  - Submit to Kodi Matrx repo
  - Add github workflows for addon checking & submission
