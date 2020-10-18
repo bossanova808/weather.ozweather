@@ -1,3 +1,6 @@
+V1.2.2
+ - Updated for Kodi xbmc.translatePath -> xbmcvfs.translatePath
+
 v1.2 
  - Submit to Kodi Matrx repo
  - Add github workflows for addon checking & submission
