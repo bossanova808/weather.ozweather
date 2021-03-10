@@ -3,7 +3,7 @@
 # Handy utility functions for Kodi Addons
 # By bossanova808
 # Free in all senses....
-# VERSION 0.1.3 2020-08-31
+# VERSION 0.1.4 2020-10-18
 # (For Kodi Matrix & later)
 
 import xbmc
