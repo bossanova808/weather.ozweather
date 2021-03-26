@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import xbmcgui
 import socket
 
 from .common import *

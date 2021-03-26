@@ -1,20 +1,175 @@
-<?xml version="1.0" encoding="utf-8" standalone="yes"?>
-<settings>
-	<category label="Enter Settings">
-		<!-- Best is mapped to trw in default.py -->
-		
-		<setting id="Location1" label="32111" type="action" action="RunScript($ID,Location1)" default=""/>
-		<setting id="Location2" label="32112" type="action" action="RunScript($ID,Location2)" enable="!eq( -1,)" default=""/>
-		<setting id="Location3" label="32113" type="action" action="RunScript($ID,Location3)" enable="!eq( -1,)" default=""/>
-    	<setting id="ExtendedFeaturesToggle" label="32194" type="bool" default="false"/>
-   		<setting id="BGDownloadToggle" label="32197" type="bool" default="true" enable="!eq(-1,false)"/>
-   		<setting id="ABCQuality" label ="32196" type ="labelenum" values="256k|512K|1000k|Best" default="1000k" enable="!eq(-2,false)"/>
-   		<setting id="Radar1" label="32155" type="text" default="IDR00004" enable="!eq(-3,false)"/>
-		<setting id="Radar2" label="32156" type="text" enable="!eq( -6,) + !eq(-4,false)" default=""/>
-		<setting id="Radar3" label="32157" type="text" enable="!eq( -7,) + !eq(-5,false)" default=""/>
-	    <setting id="Location1UrlPath" type="text" visible="false" default=""/>
-		<setting id="Location2UrlPath" type="text" visible="false" default=""/>
-		<setting id="Location3UrlPath" type="text" visible="false" default=""/>
-
-	</category>
+<?xml version="1.0" ?>
+<settings version="1">
+	<section id="weather.ozweather">
+		<category id="suburb 1" label="32101" help="">
+			<group id="1">
+				<setting id="Location1" type="action" label="32111" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<control type="button" format="string">
+						<data>RunScript(weather.ozweather,Location1)</data>
+					</control>
+				</setting>
+				<setting id="Location2" type="action" label="32112" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="Location1"/>
+						</dependency>
+					</dependencies>
+					<control type="button" format="string">
+						<data>RunScript(weather.ozweather,Location2)</data>
+					</control>
+				</setting>
+				<setting id="Location3" type="action" label="32113" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="Location2"/>
+						</dependency>
+					</dependencies>
+					<control type="button" format="string">
+						<data>RunScript(weather.ozweather,Location3)</data>
+					</control>
+				</setting>
+				<setting id="ExtendedFeaturesToggle" type="boolean" label="32194" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+				<setting id="BGDownloadToggle" type="boolean" label="32197" help="">
+					<level>0</level>
+					<default>true</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="toggle"/>
+				</setting>
+				<setting id="ABCQuality" type="string" label="32196" help="">
+					<level>0</level>
+					<default>1000k</default>
+					<constraints>
+						<options>
+							<option label="256k">256k</option>
+							<option label="512K">512K</option>
+							<option label="1000k">1000k</option>
+							<option label="Best">Best</option>
+						</options>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="spinner" format="string"/>
+				</setting>
+				<setting id="Radar1" type="string" label="32155" help="">
+					<level>0</level>
+					<default>IDR00004</default>
+					<dependencies>
+						<dependency type="enable">
+							<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32155</heading>
+					</control>
+				</setting>
+				<setting id="Radar2" type="string" label="32156" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<and>
+								<condition operator="!is" setting="Location2"/>
+								<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32156</heading>
+					</control>
+				</setting>
+				<setting id="Radar3" type="string" label="32157" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="enable">
+							<and>
+								<condition operator="!is" setting="Location2"/>
+								<condition on="property" name="InfoBool"> !eq(-5,false)</condition>
+							</and>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading>32157</heading>
+					</control>
+				</setting>
+				<setting id="Location1UrlPath" type="string" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="Location2UrlPath" type="string" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+				<setting id="Location3UrlPath" type="string" help="">
+					<level>0</level>
+					<default/>
+					<constraints>
+						<allowempty>true</allowempty>
+					</constraints>
+					<dependencies>
+						<dependency type="visible">
+							<condition on="property" name="InfoBool">false</condition>
+						</dependency>
+					</dependencies>
+					<control type="edit" format="string">
+						<heading/>
+					</control>
+				</setting>
+			</group>
+		</category>
+	</section>
 </settings>

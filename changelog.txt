@@ -1,3 +1,10 @@
+V2.0.0
+- Note - addon must be reconfigured to work!!
+- Add startup screen to alert user about need to re-configure
+- Rewrite to use BOM data directly, remove WeatherZone as they are appear to no longer using BOM data
+- Use BOM places
+- Update settings to new Kodi format
+- Modernise code
 
 v1.2.2
  - Change xbmc.translatePath (deprecated) to xbmcvfs.translatePath

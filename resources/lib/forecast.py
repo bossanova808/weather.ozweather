@@ -6,7 +6,7 @@ from resources.lib.common import *
 from resources.lib.locations import *
 from resources.lib.weatherzone import *
 from resources.lib.abcvideo import *
-from resources.lib.bom import *
+from resources.lib.bom_radar import *
 
 
 def clear_properties():
