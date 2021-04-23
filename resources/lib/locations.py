@@ -1,64 +1,66 @@
 import xbmc
 import xbmcgui
 
-from resources.lib.common import *
 from resources.lib.weatherzone import *
-from resources.lib.bom_places import *
+from resources.lib.bom_locations import *
+
 
 def refresh_locations():
     """
-    Set the location and radar code properties from settings -> window
+    Get the user's location and radar code choices from the addon settings and set them as window properties
     """
     log("Refreshing locations from settings")
-    location_set1 = ADDON.getSetting('Location1')
-    location_set2 = ADDON.getSetting('Location2')
-    location_set3 = ADDON.getSetting('Location3')
+    location_setting1 = ADDON.getSetting('Location1')
+    location_setting2 = ADDON.getSetting('Location2')
+    location_setting3 = ADDON.getSetting('Location3')
     locations = 0
-    if location_set1 != '':
+    if location_setting1 != '':
         locations += 1
-        set_property(WEATHER_WINDOW, 'Location1', location_set1)
+        set_property(WEATHER_WINDOW, 'Location1', location_setting1)
     else:
         set_property(WEATHER_WINDOW, 'Location1')
-    if location_set2 != '':
+    if location_setting2 != '':
         locations += 1
-        set_property(WEATHER_WINDOW, 'Location2', location_set2)
+        set_property(WEATHER_WINDOW, 'Location2', location_setting2)
     else:
         set_property(WEATHER_WINDOW, 'Location2')
-    if location_set3 != '':
+    if location_setting3 != '':
         locations += 1
-        set_property(WEATHER_WINDOW, 'Location3', location_set3)
+        set_property(WEATHER_WINDOW, 'Location3', location_setting3)
     else:
         set_property(WEATHER_WINDOW, 'Location3')
-
+    # and set count of locations
     set_property(WEATHER_WINDOW, 'Locations', str(locations))
 
     log("Refreshing radar locations from settings")
-    radar_set1 = ADDON.getSetting('Radar1')
-    radar_set2 = ADDON.getSetting('Radar2')
-    radar_set3 = ADDON.getSetting('Radar3')
+    radar_setting1 = ADDON.getSetting('Radar1')
+    radar_setting2 = ADDON.getSetting('Radar2')
+    radar_setting3 = ADDON.getSetting('Radar3')
     radars = 0
-    if radar_set1 != '':
+    if radar_setting1 != '':
         radars += 1
-        set_property(WEATHER_WINDOW, 'Radar1', radar_set1)
+        set_property(WEATHER_WINDOW, 'Radar1', radar_setting1)
     else:
         set_property(WEATHER_WINDOW, 'Radar1')
-    if radar_set2 != '':
+    if radar_setting2 != '':
         radars += 1
-        set_property(WEATHER_WINDOW, 'Radar2', radar_set2)
+        set_property(WEATHER_WINDOW, 'Radar2', radar_setting2)
     else:
         set_property(WEATHER_WINDOW, 'Radar2')
-    if radar_set3 != '':
+    if radar_setting3 != '':
         radars += 1
-        set_property(WEATHER_WINDOW, 'Radar3', radar_set3)
+        set_property(WEATHER_WINDOW, 'Radar3', radar_setting3)
     else:
         set_property(WEATHER_WINDOW, 'Radar3')
-
+    # and set count of radars
     set_property(WEATHER_WINDOW, 'Radars', str(locations))
 
 
-def find_location():
+def find_bom_locations():
     """
-    Find a location (= WeatherZone url path) - when the user inputs a postcode or suburb
+    Find BOM location(s) when the user inputs a postcode or suburb
+    What we need is actually a geohash we can then use with the BOM API
+    Save the chosen result, e.g. Ascot Vale, VIC 3032 and geohash r1r11df
     """
     keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
     keyboard.doModal()
@@ -67,7 +69,7 @@ def find_location():
         text = keyboard.getText()
 
         log("Doing locations search for " + text)
-        locations, location_url_paths = get_bom_places_for(text)
+        locations, location_geohashes = get_bom_locations_for(text)
 
         # Now get them to choose an actual location
         dialog = xbmcgui.Dialog()
@@ -75,22 +77,22 @@ def find_location():
             selected = dialog.select(xbmc.getLocalizedString(396), locations)
             if selected != -1:
                 ADDON.setSetting(sys.argv[1], locations[selected])
-                ADDON.setSetting(sys.argv[1] + 'UrlPath', location_url_paths[selected])
+                ADDON.setSetting(sys.argv[1] + 'BOMGeoHash', location_geohashes[selected])
         # Or indicate we did not receive any locations
         else:
             dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))
 
 
-def find_bom_location():
-    """
-    Find a location (= BOM url path) - when the user inputs a postcode or suburb
-    """
-
-    keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
-    keyboard.doModal()
-
-    if keyboard.isConfirmed() and keyboard.getText() != '':
-        text = keyboard.getText()
-
-        log(f'Query BOM places for {text}')
-        places = get_bom_places_for(text)
+# def find_bom_location():
+#     """
+#     Find a location (= BOM url path) - when the user inputs a postcode or suburb
+#     """
+#
+#     keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
+#     keyboard.doModal()
+#
+#     if keyboard.isConfirmed() and keyboard.getText() != '':
+#         text = keyboard.getText()
+#
+#         log(f'Query BOM locations API for {text}')
+#         places = get_bom_locations_for(text)

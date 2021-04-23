@@ -21,13 +21,12 @@ def run(args):
     # SETTINGS
     # the addon is being called from the settings section where the user enters their postcodes
     if args[1].startswith('Location'):
-        find_location()
+        find_bom_locations()
 
     # FORECAST
     # script is being called in general use, not from the settings page
-    # sys.argv[1] has the current location number, so get the currently selected location and grab it's forecast
     else:
-        get_forecast()
+        get_weather()
 
     # Refresh the locations
     refresh_locations()

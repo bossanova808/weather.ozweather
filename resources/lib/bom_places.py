@@ -4,11 +4,12 @@ from bs4 import BeautifulSoup
 
 
 def get_bom_places_for(text):
+
     locations = []
     location_url_stems = []
 
     bom_url = 'http://www.bom.gov.au'
-    bom_places_url = f'{bom_url}/places/search/'
+    bom_places_url = f'{bom_url}/onboarding'
 
     # Search for 'test' in BOM places:
     # http://www.bom.gov.au/places/search/?q=test

@@ -108,12 +108,12 @@ def prepareBackgrounds(radarCode, backgroundsPath):
 # Builds the radar images given a BOM radar code like IDR023
 # the radar images are cached for four hours, backgrounds for a week (or always if updateRadarBackgrounds is false)
 
-def buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath):
+def build_images(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath):
 
     # grab the current time as as 12 digit 0 padded string
     timeNow = format(int(time.time()), '012d')
 
-    log("buildImages(%s)" % radarCode)
+    log("build_images(%s)" % radarCode)
     log("Overlay loop path: " + overlayLoopPath)
     log("Backgrounds path: " + backgroundsPath)
 
@@ -238,7 +238,7 @@ if __name__ == "__main__":
     radarCode = "IDR023"
     backgroundsPath = os.getcwd() + "/test-outputs/backgrounds/" + radarCode + "/"
     overlayLoopPath = os.getcwd() + "/test-outputs/loop/" + radarCode + "/"
-    buildImages(radarCode, True, backgroundsPath, overlayLoopPath)
+    build_images(radarCode, True, backgroundsPath, overlayLoopPath)
     log(os.listdir(backgroundsPath))
     log(os.listdir(overlayLoopPath))
 
@@ -247,6 +247,6 @@ if __name__ == "__main__":
     radarCode = "IDR00004"
     backgroundsPath = os.getcwd() + "/test-outputs/backgrounds/" + radarCode + "/"
     overlayLoopPath = os.getcwd() + "/test-outputs/loop/" + radarCode + "/"
-    buildImages(radarCode, True, backgroundsPath, overlayLoopPath)
+    build_images(radarCode, True, backgroundsPath, overlayLoopPath)
     log(os.listdir(backgroundsPath))
     log(os.listdir(overlayLoopPath))

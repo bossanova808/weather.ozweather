@@ -44,7 +44,7 @@ if not xbmc.getUserAgent():
     unit_testing = True
     KODI_VERSION = 'N/A'
 
-    print("No user agent, must be unit testing.")
+    print("\nNo user agent, must be unit testing.\n")
 
     def log(message, exception_instance=None, level=None):
         print(f'DEBUG: {message}')

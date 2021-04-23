@@ -4,8 +4,8 @@ import xbmcgui
 
 from resources.lib.common import *
 from resources.lib.locations import *
-from resources.lib.weatherzone import *
-from resources.lib.abcvideo import *
+from resources.lib.bom_forecast import *
+from resources.lib.abc_video import *
 from resources.lib.bom_radar import *
 
 
@@ -103,35 +103,36 @@ def clear_properties():
         log("********** Oz Weather Couldn't clear all the properties, sorry!!", inst)
 
 
-def forecast(urlPath, radarCode):
+def forecast(geohash, radar_code):
     """
-    The main forecast retrieval function
-    Does either a basic forecast or a more extended forecast with radar etc.
-    :param urlPath: the WeatherZone URL path (e.g. '/vic/melbourne/ascot-vale') for the location we're to get the forecast for
-    :param radarCode: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
+    The main weather data retrieval function
+    Does either a basic forecast, or a more extended forecast with radar etc.
+    :param geohash: the geohash for the location
+    :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
     extended_features = ADDON.getSetting('ExtendedFeaturesToggle')
 
-    log("Getting weather from [%s] with radar [%s], extended features is: [%s]" % (
-        urlPath, radarCode, str(extended_features)))
+    log(f'Getting weather for geohash {geohash} and radar code {radar_code}, extended features {extended_features}')
 
     # Get the radar images first - looks better on refreshes
     if extended_features == "true":
-        log("Getting radar images for " + radarCode)
+        log(f'Getting radar images for {radar_code}')
 
-        backgroundsPath = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radarCode + "/");
-        overlayLoopPath = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/currentloop/" + radarCode + "/");
+        backgrounds_path = xbmcvfs.translatePath(
+            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/");
+        overlay_loop_path = xbmcvfs.translatePath(
+            "special://profile/addon_data/weather.ozweather/currentloop/" + radar_code + "/");
 
-        updateRadarBackgrounds = ADDON.getSetting('BGDownloadToggle')
+        # Do they want us to periodically refresh radar backgrounds?  Default is yes...
+        # (this was added as some folks has issues and manually copied the backgrounds in....)
+        update_radar_backgrounds = ADDON.getSetting('BGDownloadToggle')
 
-        buildImages(radarCode, updateRadarBackgrounds, backgroundsPath, overlayLoopPath)
-        set_property(WEATHER_WINDOW, 'Radar', radarCode)
+        build_images(radar_code, update_radar_backgrounds, backgrounds_path, overlay_loop_path)
+        set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
-    # Get all the weather & forecast data from weatherzone
-    log("Getting the forecast data from https://weatherzone.com.au" + urlPath)
-    weather_data = getWeatherData(urlPath)
+    # Get all the weather & forecast data from the BOM API
+    log(f'Getting the forecast data for {geohash}')
+    weather_data = bom_forecast(geohash)
 
     for weather_key in sorted(weather_data):
         set_property(WEATHER_WINDOW, weather_key, weather_data[weather_key])
@@ -149,9 +150,10 @@ def forecast(urlPath, radarCode):
     set_property(WEATHER_WINDOW, 'Today.IsFetched', "true")
 
 
-def get_forecast():
+def get_weather():
     """
-    Get the latest forecast data for the currently chosen location
+    Get the latest observation, forecast and radar for the currently chosen location
+    (sys.argv[1] has the currently selected location number)
     """
 
     # Nice neat updates - clear out all set window data first...
@@ -159,7 +161,7 @@ def get_forecast():
 
     # Set basic properties/'brand'
     set_property(WEATHER_WINDOW, 'WeatherProviderLogo', xbmcvfs.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
-    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia (via WeatherZone)')
+    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia')
     set_property(WEATHER_WINDOW, 'WeatherVersion', ADDON_NAME + "-" + ADDON_VERSION)
 
     # Set what we updated and when
@@ -170,21 +172,15 @@ def get_forecast():
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
-    # Retrieve the currently chosen location & radar
-    location_url_path = ADDON.getSetting('Location%sUrlPath' % sys.argv[1])
+    # Retrieve the currently chosen location geohas & radar code
+    geohash = ADDON.getSetting(f'Location{sys.argv[1]}GeoHash')
+    radar = ADDON.getSetting('Radar{sys.argv[1]}')
 
-    # Old style paths (pre v0.8.5) must be updated to new
-    if not location_url_path:
-        location_url_path = ADDON.getSetting('Location%sid' % sys.argv[1])
-        location_url_path = location_url_path.replace('http://www.weatherzone.com.au', '')
-        ADDON.setSetting('Location%sUrlPath' % sys.argv[1], location_url_path)
-
-    radar = ADDON.getSetting('Radar%s' % sys.argv[1])
     # If we don't have a radar code, get the national radar by default
-    if radar == '':
+    if not radar:
         log(
             f'Radar code empty for location {location_url_path} so using default radar code IDR00004 (national radar)')
         radar = 'IDR00004'
 
     # Now scrape the weather data & radar images
-    forecast(location_url_path, radar)
+    forecast(geohash, radar)
