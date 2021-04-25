@@ -52,6 +52,30 @@ def utc_str_to_local_str(utc_str: str, utc_format: str = '%Y-%m-%dT%H:%M:%SZ', l
     return local_time.strftime(local_format).lstrip('0')
 
 
+# Convert a fire danger numerical rating to human friendly text
+# Fire danger rating may also be 'null'
+
+def fire_danger_to_text(fire_danger_float):
+    if fire_danger_float == 'null':
+        return "None"
+    elif 0.0 <= fire_danger_float <= 5.99:
+        return "Low"
+    elif 6 <= fire_danger_float <= 11.99:
+        return "Moderate"
+    elif 12.0 <= fire_danger_float <= 24.99:
+        return "High"
+    elif 25.0 <= fire_danger_float <= 49.99:
+        return "Very High"
+    elif 50.0 <= fire_danger_float <= 74.99:
+        return "Severe"
+    elif 75.0 <= fire_danger_float <= 99.99:
+        return "Extreme"
+    elif fire_danger_float >= 100.0:
+        return "Catastrophic"
+    else:
+        return "?"
+
+
 def bom_forecast(geohash):
 
     # The area hash is the geohash minus the last character
@@ -143,8 +167,13 @@ def bom_forecast(geohash):
     weather_data['Current.WindDirection'] = current_observations['wind']['direction']
     weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} km/h'
     weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]} km/h'
+    weather_data['Current.FireDanger'] = '0' if forecast_seven_days[0]['fire_danger'] == 'null' else forecast_seven_days[0]['fire_danger']
+    weather_data['Current.FireDangerText'] = fire_danger_to_text(forecast_seven_days[0]['fire_danger'])
+    weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = current_observations['rain_since_9am']
+
     # Missing data
     # weather_data['Current.DewPoint']
+    # weather_data['Current.Pressure']
 
     log(weather_data)
 
