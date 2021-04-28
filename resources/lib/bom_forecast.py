@@ -403,8 +403,12 @@ def bom_forecast(geohash):
             set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['temp_min'])
             # Chance & amount of rain
             set_keys(weather_data, i, ["RainChance", "ChancePrecipitation"], forecast_seven_days[i]['rain']['chance'])
-            amount = forecast_seven_days[i]['rain']['amount']['max'] or '0'
-            set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], amount)
+            amount_min = forecast_seven_days[i]['rain']['amount']['min'] or '0'
+            amount_max = forecast_seven_days[i]['rain']['amount']['max'] or '0'
+            if amount_min == 0 and amount_max == 0:
+                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], 'None')
+            else:
+                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], f'{amount_min} - {amount_max}mm')
             # UV - Predicted max, text for such, and the recommended 'Wear Sun Protection' period
             set_key(weather_data, i, 'UVMaxIndex',  forecast_seven_days[i]['uv']['max_index'])
             if forecast_seven_days[i]['uv']['category']:
@@ -449,7 +453,7 @@ def bom_forecast(geohash):
     # TO-DOs
     # 3 hourly forecast?
     # Rain 3 hour forecast?
-    
+
     return weather_data
 
 
