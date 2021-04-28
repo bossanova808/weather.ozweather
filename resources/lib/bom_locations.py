@@ -1,4 +1,4 @@
-from common import *
+from .common import *
 import requests
 
 
@@ -11,7 +11,7 @@ def get_bom_locations_for(text):
     try:
         r = requests.get(bom_locations_api, params={'search': text})
         for result in r.json()['data']:
-            locations.append(f'{result["name"]}, {result["state"]} {result["postcode"]}')
+            locations.append(f'{result["name"]}, {result["state"]} {result["postcode"]} ({result["geohash"]})')
             location_geohashes.append(result["geohash"])
 
         log(locations)

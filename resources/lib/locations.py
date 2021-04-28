@@ -82,17 +82,3 @@ def find_bom_locations():
         else:
             dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))
 
-
-# def find_bom_location():
-#     """
-#     Find a location (= BOM url path) - when the user inputs a postcode or suburb
-#     """
-#
-#     keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
-#     keyboard.doModal()
-#
-#     if keyboard.isConfirmed() and keyboard.getText() != '':
-#         text = keyboard.getText()
-#
-#         log(f'Query BOM locations API for {text}')
-#         places = get_bom_locations_for(text)

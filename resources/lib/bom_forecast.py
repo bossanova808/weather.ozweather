@@ -1,7 +1,11 @@
 import datetime
+import time
 
 import requests
-from common import *
+try:
+    from .common import *
+except:
+    from common import *
 
 
 """
@@ -194,6 +198,19 @@ NIGHT SUBSET:
 47 Thunder Showers/Night
 """
 
+
+# This is a hack fix for a wicked long standing Python bug...
+# See: https://forum.kodi.tv/showthread.php?tid=112916
+class ProxyDatetime(datetime.datetime):
+    @staticmethod
+    def strptime(date_string, format):
+        import time
+        return datetime.datetime(*(time.strptime(date_string, format)[0:6]))
+
+
+datetime.datetime = ProxyDatetime
+
+
 def set_key(weather_data, index, key, value):
     """
     Set a key - for old and new weather label support
@@ -228,6 +245,7 @@ def utc_str_to_local_datetime(utc_str: str, utc_format: str = '%Y-%m-%dT%H:%M:%S
     :param local_format: format of local time string
     :return: local time string
     """
+
     temp1 = datetime.datetime.strptime(utc_str, utc_format)
     temp2 = temp1.replace(tzinfo=datetime.timezone.utc)
     return temp2.astimezone()
@@ -360,7 +378,7 @@ def bom_forecast(geohash):
         weather_data['Current.WindSpeed'] = current_observations['wind']['speed_kilometre']
         weather_data['Current.WindDirection'] = current_observations['wind']['direction']
         weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} km/h'
-        weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]} km/h'
+        weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]}'
         weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = current_observations['rain_since_9am']
 
     if forecast_seven_days:

@@ -4,9 +4,10 @@ import xbmcgui
 
 from resources.lib.common import *
 from resources.lib.locations import *
-from resources.lib.bom_forecast import *
+from resources.lib.weatherzone import *
 from resources.lib.abc_video import *
 from resources.lib.bom_radar import *
+from resources.lib.bom_forecast import *
 
 
 def clear_properties():
@@ -103,16 +104,16 @@ def clear_properties():
         log("********** Oz Weather Couldn't clear all the properties, sorry!!", inst)
 
 
-def forecast(geohash, radar_code):
+def forecast(geohash, urlpath, radar_code):
     """
     The main weather data retrieval function
     Does either a basic forecast, or a more extended forecast with radar etc.
-    :param geohash: the geohash for the location
+    :param geohash: the BOM geohash for the location
+    :param urlpath: the WeatherZone url path if still using that...
     :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
     extended_features = ADDON.getSetting('ExtendedFeaturesToggle')
-
-    log(f'Getting weather for geohash {geohash} and radar code {radar_code}, extended features {extended_features}')
+    log(f'Extended features: {extended_features}')
 
     # Get the radar images first - looks better on refreshes
     if extended_features == "true":
@@ -131,8 +132,13 @@ def forecast(geohash, radar_code):
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
     # Get all the weather & forecast data from the BOM API
-    log(f'Getting the forecast data for {geohash}')
-    weather_data = bom_forecast(geohash)
+    if geohash:
+        log(f'Using the BOM API.  Getting weather data for {geohash}')
+        weather_data = bom_forecast(geohash)
+    else:
+        log(f'Scraping WeatherZone.  Using urlpath {urlpath}. '
+            f'User is encouraged to re-configure the addon as WeatherZone support will later be removed.')
+        weather_data = getWeatherData(urlpath)
 
     for weather_key in sorted(weather_data):
         set_property(WEATHER_WINDOW, weather_key, weather_data[weather_key])
@@ -152,8 +158,7 @@ def forecast(geohash, radar_code):
 
 def get_weather():
     """
-    Get the latest observation, forecast and radar for the currently chosen location
-    (sys.argv[1] has the currently selected location number)
+    Get the latest forecast data for the currently chosen location
     """
 
     # Nice neat updates - clear out all set window data first...
@@ -161,7 +166,7 @@ def get_weather():
 
     # Set basic properties/'brand'
     set_property(WEATHER_WINDOW, 'WeatherProviderLogo', xbmcvfs.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
-    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia')
+    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia (via WeatherZone)')
     set_property(WEATHER_WINDOW, 'WeatherVersion', ADDON_NAME + "-" + ADDON_VERSION)
 
     # Set what we updated and when
@@ -173,14 +178,15 @@ def get_weather():
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
     # Retrieve the currently chosen location geohas & radar code
-    geohash = ADDON.getSetting(f'Location{sys.argv[1]}GeoHash')
-    radar = ADDON.getSetting('Radar{sys.argv[1]}')
-
+    geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
+    urlpath = ADDON.getSetting(f'Location{sys.argv[1]}UrlPath')
+    radar = ADDON.getSetting(f'Radar{sys.argv[1]}')
     # If we don't have a radar code, get the national radar by default
     if not radar:
-        log(
-            f'Radar code empty for location {location_url_path} so using default radar code IDR00004 (national radar)')
         radar = 'IDR00004'
+        log(f'Radar code empty for location, so using default radar code {radar} (= national radar)')
+
+    log(f'Current location: geohash "{geohash}", urlpath "{urlpath}", radar {radar}')
 
     # Now scrape the weather data & radar images
-    forecast(geohash, radar)
+    forecast(geohash, urlpath, radar)

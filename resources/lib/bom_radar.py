@@ -9,6 +9,7 @@ import time
 import urllib.error
 import urllib.parse
 import urllib.request
+import urllib3
 
 # This little bit of code is only for unit testing.
 # When this module is run within Kodi, it will use the Kodi log function as usual

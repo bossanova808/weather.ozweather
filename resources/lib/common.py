@@ -94,6 +94,8 @@ else:
         :param name: Required.  Name of the property.
         :param value: Optional (defaults to "").  Set the property to this value.  An empty string clears the property.
         """
+        value = str(value)
+        log(f'Setting property {name} to value {value}')
         window.setProperty(name, value)
 
 

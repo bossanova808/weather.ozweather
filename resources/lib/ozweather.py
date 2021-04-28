@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import xbmcgui
 import socket
 
 from .common import *
@@ -25,6 +26,7 @@ def run(args):
 
     # FORECAST
     # script is being called in general use, not from the settings page
+    # sys.argv[1] has the current location number, so get the currently selected location and grab it's forecast
     else:
         get_weather()
 

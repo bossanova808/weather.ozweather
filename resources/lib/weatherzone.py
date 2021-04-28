@@ -341,7 +341,12 @@ def getWeatherData(urlPath):
         # The longer forecast text
         try:
             p = soup.find_all("p", class_="district-forecast")
-            weatherData["Current.ConditionLong"] = cleanLongDescription(p[0].text).strip()
+            weatherData["Current.ConditionLong"] = "PLEASE GO TO OZWEATHER SETTINGS AND RE-CONFIGURE YOUR LOCATIONS\n\n" \
+                                                   "Currently scraping WeatherZone data.  Unfortunately, WeatherZone is no longer supplying accurate " \
+                                                   "BOM forecast data.\n\nPlease visit the addon settings and re run the location search " \
+                                                   "so that the addon can retrieve the geohash for your location and then use the " \
+                                                   "BOM API for data directly.\n\n"
+            weatherData["Current.ConditionLong"] += cleanLongDescription(p[0].text).strip()
         except Exception as inst:
             log(str(inst))
             log("Exception in ConditionLong")
