@@ -11,9 +11,9 @@ def get_bom_locations_for(text):
     try:
         r = requests.get(bom_locations_api, params={'search': text})
         for result in r.json()['data']:
+            log(result)
             locations.append(f'{result["name"]}, {result["state"]} {result["postcode"]} ({result["geohash"]})')
             location_geohashes.append(result["geohash"])
-
         log(locations)
         log(location_geohashes)
 
@@ -35,3 +35,24 @@ if __name__ == "__main__":
         log(f'Testing location term "{place}"')
         get_bom_locations_for(place)
         log('')
+
+
+"""
+{
+    "data": {
+        "geohash": "r659gg5", 
+        "has_wave": true, 
+        "id": "Gosford-r659gg5", 
+        "latitude": -33.42521667480469, 
+        "longitude": 151.3414764404297, 
+        "marine_area_id": "NSW_MW009", 
+        "name": "Gosford", 
+        "state": "NSW", 
+        "tidal_point": "NSW_TP036", 
+        "timezone": "Australia/Sydney"
+    }, 
+    "metadata": {
+        "response_timestamp": "2021-04-28T04:50:20Z"
+    }
+}
+"""

@@ -10,6 +10,7 @@ import urllib.error
 import urllib.parse
 import urllib.request
 import urllib3
+from math import sin, cos, sqrt, atan2, radians
 
 # This little bit of code is only for unit testing.
 # When this module is run within Kodi, it will use the Kodi log function as usual
@@ -25,9 +26,106 @@ except ImportError:
         print(message)
 
 # Constants
-
 FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar/"
 HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
+# See https://github.com/theOzzieRat/bom-radar-card/blob/master/src/bom-radar-card.ts around line 130
+RADAR_LOCATIONS = [
+    (-35.661387, 149.512229),
+    (-33.700764, 151.209470),
+    (-29.620633, 152.963328),
+    (-29.496994, 149.850825),
+    (-31.024219, 150.192037),
+    (-32.729802, 152.025422),
+    (-29.038524, 167.941679),
+    (-35.158170, 147.456307),
+    (-34.262389, 150.875099),
+    (-37.855210, 144.755512),
+    (-34.28, 141.59),
+    (-37.887532, 147.575475),
+    (-35.990000, 142.010000),
+    (-36.029663, 146.022772),
+    (-19.885737, 148.075693),
+    (-27.717739, 153.240015),
+    (-16.818145, 145.662895),
+    (-23.549558, 148.239166),
+    (-23.855056, 151.262567),
+    (-25.957342, 152.576898),
+    (-23.439783, 144.282270),
+    (-21.117243, 149.217213),
+    (-27.606344, 152.540084),
+    (-16.670000, 139.170000),
+    (-20.711204, 139.555281),
+    (-19.419800, 146.550974),
+    (-26.440193, 147.349130),
+    (-12.666413, 141.924640),
+    (-16.287199, 149.964539),
+    (-34.617016, 138.468782),
+    (-43.112593, 147.805241),
+    (-41.179147, 145.579986),
+    (-23.795064, 133.888935),
+    (-12.455933, 130.926599),
+    (-12.274995, 136.819911),
+    (-14.510918, 132.447010),
+    (-11.648500, 133.379977),
+    (-34.941838, 117.816370),
+    (-17.948234, 122.235334),
+    (-24.887978, 113.669386),
+    (-20.653613, 116.683144),
+    (-31.777795, 117.952768),
+    (-33.830150, 121.891734),
+    (-28.804648, 114.697349),
+    (-25.033225, 128.301756),
+    (-30.784261, 121.454814),
+    (-22.103197, 113.999698),
+    (-33.096956, 119.008796),
+    (-32.391761, 115.866955),
+    (-20.371845, 118.631670),
+    (-30.358887, 116.305769),
+    (-15.451711, 128.120856),
+    (-35.329531, 138.502498),
+    (-32.129823, 133.696361),
+    (-37.747713, 140.774605),
+    (-31.155811, 136.804400),
+    (-18.228916, 127.662836),
+    (-29.971116, 146.813845)
+]
+
+
+def get_distance(point1, point2):
+    """
+    Given two (lat,long) tuples return the distance between them
+    https://stackoverflow.com/questions/57294120/calculating-distance-between-latitude-and-longitude-in-python
+    """
+    R = 6370
+    lat1 = radians(point1[0])
+    lon1 = radians(point1[1])
+    lat2 = radians(point2[0])
+    lon2 = radians(point2[1])
+
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+
+    a = sin(dlat / 2)**2 + cos(lat1) * cos(lat2) * sin(dlon / 2)**2
+    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    distance = R * c
+    return distance
+
+
+def closest_radar_to_lat_lon(point):
+    """
+    Given a lat/long tuple, return the closest radar (lat/lon) from our list of radars
+    """
+    closest_radar = (0,0)
+    closest_distance = 10000
+    for radar in RADAR_LOCATIONS:
+        distance = get_distance(point, radar)
+        log(f'Point {point}, radar {radar}, distance {distance}')
+        if distance < closest_distance:
+            log(f'Setting closest radar to {radar}')
+            closest_radar = radar
+            closest_distance = distance
+
+    return closest_radar
 
 
 # Downloads a radar background given a BOM radar code like IDR023 & filename

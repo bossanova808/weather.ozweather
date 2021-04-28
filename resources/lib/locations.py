@@ -1,8 +1,12 @@
 import xbmc
 import xbmcgui
+import requests
 
 from resources.lib.weatherzone import *
 from resources.lib.bom_locations import *
+from resources.lib.bom_radar import *
+
+
 
 
 def refresh_locations():
@@ -71,14 +75,37 @@ def find_bom_locations():
         log("Doing locations search for " + text)
         locations, location_geohashes = get_bom_locations_for(text)
 
-        # Now get them to choose an actual location
+        # Now get them to choose an actual location from the returned matched
         dialog = xbmcgui.Dialog()
-        if locations:
+
+        # None  found?
+        if not locations:
+            dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))
+        # Show the list, let the user choose
+        else:
             selected = dialog.select(xbmc.getLocalizedString(396), locations)
             if selected != -1:
+                # Get the full location info for the chosen geohash, notably lat & long
+                # Don't save the settings is this goes wrong
+                location_info_url = f'https://api.weather.bom.gov.au/v1/locations/{location_geohashes[selected]}'
+                try:
+                    location_info = requests.get(location_info_url).json()['data']
+                    log(location_info)
+                except:
+                    log("Error retrieving location info for geohash {location_geohashes[selected]}")
+                    raise
+
+                # Save the geohash and latitude and longitude of the location
                 ADDON.setSetting(sys.argv[1], locations[selected])
                 ADDON.setSetting(sys.argv[1] + 'BOMGeoHash', location_geohashes[selected])
-        # Or indicate we did not receive any locations
-        else:
-            dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))
+                ADDON.setSetting(sys.argv[1] + 'Lat', str(location_info['latitude']))
+                ADDON.setSetting(sys.argv[1] + 'Lon', str(location_info['longitude']))
+                # Use the lat, long to find the closest radar
+                radar = closest_radar_to_lat_lon((location_info['latitude'], location_info['longitude']))
+                log(f'Closest radar found: {radar}')
+                ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lat', str(radar[0]))
+                ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lon', str(radar[1]))
+
+
+
 
