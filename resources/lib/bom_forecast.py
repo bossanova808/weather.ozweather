@@ -43,6 +43,7 @@ Current.WindGust
 """
 
 WEATHER_CODES = {'clearing_shower': '39',
+                 'clear': '32',
                  'cloudy': '26',
                  'cloud_and_wind_increasing': '23',
                  'cloud_increasing': '26',
@@ -90,6 +91,7 @@ WEATHER_CODES = {'clearing_shower': '39',
                  'nt_unknown': 'na'}
 
 WEATHER_CODES_NIGHT = {'clearing_shower': '45',
+                       'clear': '31',
                        'cloudy': '29',
                        'cloud_and_wind_increasing': '27',
                        'cloud_increasing': '27',
@@ -346,31 +348,32 @@ def bom_forecast(geohash):
         log(f'Error retrieving seven day forecast from {bom_api_forecast_seven_days_url}')
         raise
 
-    # Get 3 Hourly Forecast
-    try:
-        r = requests.get(bom_api_forecast_three_hourly_url)
-        forecast_three_hourly = r.json()["data"]
-        log(forecast_three_hourly)
-
-    except Exception as inst:
-        log(f'Error retrieving three hourly forecast from {bom_api_forecast_three_hourly_url}')
-        raise
-
-    # Get Rain Forecast
-    try:
-        r = requests.get(bom_api_forecast_rain)
-        forecast_rain = r.json()["data"]
-        log(forecast_rain)
-
-    except Exception as inst:
-        log(f'Error retrieving rain forecast from {bom_api_forecast_rain}')
-        raise
+    # # Get 3 Hourly Forecast
+    # try:
+    #     r = requests.get(bom_api_forecast_three_hourly_url)
+    #     forecast_three_hourly = r.json()["data"]
+    #     log(forecast_three_hourly)
+    #
+    # except Exception as inst:
+    #     log(f'Error retrieving three hourly forecast from {bom_api_forecast_three_hourly_url}')
+    #     raise
+    #
+    # # Get Rain Forecast
+    # try:
+    #     r = requests.get(bom_api_forecast_rain)
+    #     forecast_rain = r.json()["data"]
+    #     log(forecast_rain)
+    #
+    # except Exception as inst:
+    #     log(f'Error retrieving rain forecast from {bom_api_forecast_rain}')
+    #     raise
 
     log('')
 
     # Gather the weather data into Kodi friendly labels
     weather_data = {}
 
+    # Current Observations
     if current_observations:
         weather_data['Current.Temperature'] = str(round(current_observations['temp']))
         weather_data['Current.FeelsLike'] = str(round(current_observations['temp_feels_like']))
@@ -379,8 +382,25 @@ def bom_forecast(geohash):
         weather_data['Current.WindDirection'] = current_observations['wind']['direction']
         weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} km/h'
         weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]}'
-        weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = current_observations['rain_since_9am']
+        weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = f'{current_observations["rain_since_9am"]} mm'
 
+    # Warnings
+    warnings_text = ""
+
+    if warnings:
+        for i, warning in enumerate(warnings):
+            warning_issued = utc_str_to_local_str(warning['issue_time'])
+            # Time signature on the expiry is different for some reason?!
+            # Remove the completely unnecessary fractions of a second...
+            warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'))
+            warning_text = f'** {warning["title"]} (issued at {warning_issued}, expires {warning_expires}) **'
+            warnings_text += warning_text
+            if i != len(warnings):
+                warnings_text += '\n\n'
+
+    weather_data['Current.WarningsText'] = warnings_text
+
+    # 7 Day Forecast
     if forecast_seven_days:
         weather_data['Current.Condition'] = forecast_seven_days[0]['short_text']
         weather_data['Current.ConditionLong'] = forecast_seven_days[0]['extended_text']
@@ -402,13 +422,20 @@ def bom_forecast(geohash):
             # Outlook / Condition (same thing)
             set_key(weather_data, i, "Outlook", forecast_seven_days[i]['short_text'])
             set_key(weather_data, i, "Condition", forecast_seven_days[i]['short_text'])
-            set_key(weather_data, i, "OutlookLong", forecast_seven_days[i]['extended_text'])
-            set_key(weather_data, i, "ConditionLong", forecast_seven_days[i]['extended_text'])
+            # Outlook / Condition (same thing) - extended text forecast.
+            # For the current day, for now, add the warnings in if there are any.
+            if i == 0 and warnings_text:
+                extended_text_plus_warnings = f'{forecast_seven_days[i]["extended_text"]}\n\n{warnings_text}'
+                set_key(weather_data, i, "OutlookLong", extended_text_plus_warnings)
+                set_key(weather_data, i, "ConditionLong", extended_text_plus_warnings)
+            else:
+                set_key(weather_data, i, "OutlookLong", forecast_seven_days[i]['extended_text'])
+                set_key(weather_data, i, "ConditionLong", forecast_seven_days[i]['extended_text'])
             # Weather icon (current day is different - we use night icons if it is night...)
             icon_code = "na"
             try:
                 if i == 0 and forecast_seven_days[i]['now']['is_night']:
-                    icon_code  = WEATHER_CODES_NIGHT[forecast_seven_days[i]['icon_descriptor']]
+                    icon_code = WEATHER_CODES_NIGHT[forecast_seven_days[i]['icon_descriptor']]
                 else:
                     icon_code = WEATHER_CODES[forecast_seven_days[i]['icon_descriptor']]
             except KeyError:
@@ -420,16 +447,17 @@ def bom_forecast(geohash):
             set_keys(weather_data, i, ["HighTemp", "HighTemperature"], forecast_seven_days[i]['temp_max'])
             set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['temp_min'])
             # Chance & amount of rain
-            set_keys(weather_data, i, ["RainChance", "ChancePrecipitation"], forecast_seven_days[i]['rain']['chance'])
+            set_keys(weather_data, i, ["RainChance", "ChancePrecipitation"], f'{forecast_seven_days[i]["rain"]["chance"]}%')
             amount_min = forecast_seven_days[i]['rain']['amount']['min'] or '0'
             amount_max = forecast_seven_days[i]['rain']['amount']['max'] or '0'
-            if amount_min == 0 and amount_max == 0:
+            if amount_min == '0' and amount_max == '0':
                 set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], 'None')
             else:
-                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], f'{amount_min} - {amount_max}mm')
+                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], f'{amount_min}-{amount_max}mm')
             # UV - Predicted max, text for such, and the recommended 'Wear Sun Protection' period
-            set_key(weather_data, i, 'UVMaxIndex',  forecast_seven_days[i]['uv']['max_index'])
+            set_key(weather_data, i, 'UVIndex',  f'{forecast_seven_days[i]["uv"]["max_index"]}')
             if forecast_seven_days[i]['uv']['category']:
+                set_key(weather_data, i, 'UVIndex', f'{forecast_seven_days[i]["uv"]["max_index"]} ({forecast_seven_days[i]["uv"]["category"].title()})')
                 set_key(weather_data, i, 'UVCategory', forecast_seven_days[i]['uv']['category'].title())
             else:
                 set_key(weather_data, i, 'UVCategory', "None")
@@ -442,19 +470,7 @@ def bom_forecast(geohash):
             else:
                 set_key(weather_data, i, 'UVEndProtection', 'N/A')
 
-        # Warnings -
-        warnings_text = ""
 
-        if warnings:
-            for i, warning in enumerate(warnings):
-                warning_issued = utc_str_to_local_str(warning['issue_time'])
-                warning_expires = utc_str_to_local_str(warning['expiry_time'])
-                warning_text = f'{warning["title"]} (issued at {warning_issued}, expires {warning_expires})'
-                warnings_text += warning_text
-                if i != len(warnings):
-                     warnings_text += '\n\n'
-
-        weather_data['Current.WarningsText'] = warnings_text
 
         # Cleanup & Data massaging
 
@@ -464,10 +480,10 @@ def bom_forecast(geohash):
 
 
 
-    # Missing data
-    # weather_data['Current.DewPoint']
-    # weather_data['Current.Pressure']
-    # weather_data['Current.FireDangerText'] -> use only FireDanger as is now text already
+        # Missing data - not available from the BOM API
+        weather_data['Current.DewPoint'] = "N/A"
+        weather_data['Current.Pressure'] = "N/A"
+        # weather_data['Current.FireDanger'] -> use only FireDanger as is now text already
     # TO-DOs
     # 3 hourly forecast?
     # Rain 3 hour forecast?

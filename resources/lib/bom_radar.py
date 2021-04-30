@@ -165,7 +165,7 @@ def downloadBackground(radarCode, fileName, backgroundsPath):
         # Ok get ready to retrieve some images
         imageFileRGB = backgroundsPath + outFileName
 
-        USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.9.0.1) Gecko/2008070208 Firefox/3.6"
+        USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
         headers = urllib3.util.request.make_headers(accept_encoding='gzip, deflate',
                                                     keep_alive=True,
                                                     user_agent=USER_AGENT)
