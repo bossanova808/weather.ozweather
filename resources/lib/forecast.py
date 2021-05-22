@@ -1,13 +1,7 @@
-import xbmc
-import xbmcvfs
-import xbmcgui
-
-from resources.lib.common import *
-from resources.lib.locations import *
-from resources.lib.weatherzone import *
-from resources.lib.abc_video import *
-from resources.lib.bom_radar import *
-from resources.lib.bom_forecast import *
+from resources.lib.weatherzone.weatherzone_forecast import *
+from resources.lib.abc.abc_video import *
+from resources.lib.bom.bom_radar import *
+from resources.lib.bom.bom_forecast import *
 
 
 def clear_properties():

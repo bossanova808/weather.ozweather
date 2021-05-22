@@ -1,12 +1,4 @@
-import xbmc
-import xbmcgui
-import requests
-
-from resources.lib.weatherzone import *
-from resources.lib.bom_locations import *
-from resources.lib.bom_radar import *
-
-
+from resources.lib.common import *
 
 
 def refresh_locations():
@@ -58,54 +50,4 @@ def refresh_locations():
         set_property(WEATHER_WINDOW, 'Radar3')
     # and set count of radars
     set_property(WEATHER_WINDOW, 'Radars', str(locations))
-
-
-def find_bom_locations():
-    """
-    Find BOM location(s) when the user inputs a postcode or suburb
-    What we need is actually a geohash we can then use with the BOM API
-    Save the chosen result, e.g. Ascot Vale, VIC 3032 and geohash r1r11df
-    """
-    keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
-    keyboard.doModal()
-
-    if keyboard.isConfirmed() and keyboard.getText() != '':
-        text = keyboard.getText()
-
-        log("Doing locations search for " + text)
-        locations, location_geohashes = get_bom_locations_for(text)
-
-        # Now get them to choose an actual location from the returned matched
-        dialog = xbmcgui.Dialog()
-
-        # None  found?
-        if not locations:
-            dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))
-        # Show the list, let the user choose
-        else:
-            selected = dialog.select(xbmc.getLocalizedString(396), locations)
-            if selected != -1:
-                # Get the full location info for the chosen geohash, notably lat & long
-                # Don't save the settings is this goes wrong
-                location_info_url = f'https://api.weather.bom.gov.au/v1/locations/{location_geohashes[selected]}'
-                try:
-                    location_info = requests.get(location_info_url).json()['data']
-                    log(location_info)
-                except:
-                    log("Error retrieving location info for geohash {location_geohashes[selected]}")
-                    raise
-
-                # Save the geohash and latitude and longitude of the location
-                ADDON.setSetting(sys.argv[1], locations[selected])
-                ADDON.setSetting(sys.argv[1] + 'BOMGeoHash', location_geohashes[selected])
-                ADDON.setSetting(sys.argv[1] + 'Lat', str(location_info['latitude']))
-                ADDON.setSetting(sys.argv[1] + 'Lon', str(location_info['longitude']))
-                # Use the lat, long to find the closest radar
-                radar = closest_radar_to_lat_lon((location_info['latitude'], location_info['longitude']))
-                log(f'Closest radar found: {radar}')
-                ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lat', str(radar[0]))
-                ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lon', str(radar[1]))
-
-
-
 

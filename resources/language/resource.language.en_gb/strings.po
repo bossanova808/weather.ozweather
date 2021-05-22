@@ -60,3 +60,34 @@ msgctxt "#32197"
 msgid "Periodically Update Radar Backgrounds?"
 msgstr ""
 
+msgctxt "#32200"
+msgid "BOM Locations"
+msgstr ""
+
+msgctxt "#32201"
+msgid "Legacy / Fallback"
+msgstr ""
+
+msgctxt "#32202"
+msgid "BOM Location 1"
+msgstr ""
+
+msgctxt "#32203"
+msgid "BOM Location 2"
+msgstr ""
+
+msgctxt "#32204"
+msgid "BOM Location 3"
+msgstr ""
+
+msgctxt "#32205"
+msgid "Extended Features"
+msgstr ""
+
+msgctxt "#32206"
+msgid "Weatherzone location used as a fallback only if BOM not available."
+msgstr "
+
+msgctxt "#32208"
+msgid "Enter postcode, suburb or area."
+msgstr "

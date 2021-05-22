@@ -1,11 +1,10 @@
 # -*- coding: utf-8 -*-
-
-import xbmcgui
 import socket
 
-from .common import *
-from .forecast import *
-from .locations import *
+from resources.lib.forecast import *
+from resources.lib.locations import *
+from resources.lib.bom.bom_location import *
+from resources.lib.weatherzone.weatherzone_location import *
 
 
 def run(args):
@@ -22,7 +21,10 @@ def run(args):
     # SETTINGS
     # the addon is being called from the settings section where the user enters their postcodes
     if args[1].startswith('Location'):
-        find_bom_locations()
+        if args[1].endswith('WeatherZone'):
+            find_weatherzone_location()
+        else:
+            find_bom_location()
 
     # FORECAST
     # script is being called in general use, not from the settings page
