@@ -3,7 +3,7 @@
 Handy utility functions for Kodi Addons
 By bossanova808
 Free in all senses....
-VERSION 0.1.7 2021-03-21
+VERSION 0.1.8 2021-05-23
 (For Kodi Matrix & later)
 """
 import sys
@@ -25,7 +25,7 @@ CWD = ADDON.getAddonInfo('path')
 LANGUAGE = ADDON.getLocalizedString
 PROFILE = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
 KODI_VERSION = xbmc.getInfoLabel('System.BuildVersion')
-USER_AGENT = "Mozilla/5.0 (Windows; U; Windows NT 5.1; fr; rv:1.9.0.1) Gecko/2008070208 Firefox/3.6"
+USER_AGENT = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/78.0.3904.108 Safari/537.36"
 HOME_WINDOW = xbmcgui.Window(10000)
 WEATHER_WINDOW = xbmcgui.Window(12600)
 
@@ -35,6 +35,17 @@ Determine if we are unit testing outside of Kodi, or actually running within Kod
 Because we're using Kodi stubs https://romanvm.github.io/Kodistubs/ we can't rely on 'import xbmc' failing
 So we use this hack - Kodi will return a user agent string, but Kodistrubs just returns and empty string.
 If we are unit testing, change logs -> print
+
+In other files, minimal code to make this work is:
+
+# Small hack to allow for unit testing - see common.py for explanation
+if not xbmc.getUserAgent():
+    sys.path.insert(0, '../../..') # modify this depending on actual level - assumes resources/lib/something/file.py
+
+from resources.lib.store import Store
+from resources.lib.common import *
+..etc
+
 """
 
 unit_testing = False

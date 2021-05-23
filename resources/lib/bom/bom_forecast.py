@@ -1,205 +1,18 @@
+# -*- coding: utf-8 -*-
 import datetime
-import time
-
+import sys
 import requests
-try:
-    from resources.lib.common import *
-except:
-    from common import *
+import xbmc
 
+# Small hack to allow for unit testing - see common.py for explanation
+if not xbmc.getUserAgent():
+    sys.path.insert(0, '../../..')
+
+from resources.lib.store import Store
+from resources.lib.common import *
 
 """
 (See bottom of this file for BOM API examples)
-
-KODI STANDARD Weather Info Labels
-(from https://kodi.wiki/view/InfoLabels#Weather_labels)
-
-** General:
-Location, 
-Updated, 
-WeatherProvider
-
-** Observations / Current:
-Current.Condition, 
-Current.Temperature, 
-Current.FeelsLike, 
-Current.UVIndex, 
-Current.Wind (From <wind dir.> at <speed> <unit>), 
-Current.WindSpeed, 
-Current.WindDirection, 
-Current.DewPoint, 
-Current.Humidity,
-
-** Forecast:
-Day[0-6].Title, 
-Day[0-6].HighTemp, 
-Day[0-6].LowTemp, 
-Day[0-6].Outlook, 
-
-OzWEATHER EXTENDED Info Labels
-Current.ConditionLong - longer text for the current day's forecast
-Current.WindGust
-
-"""
-
-WEATHER_CODES = {'clearing_shower': '39',
-                 'clear': '32',
-                 'cloudy': '26',
-                 'cloud_and_wind_increasing': '23',
-                 'cloud_increasing': '26',
-                 'drizzle': '11',
-                 'drizzle_clearing': '39',
-                 'fog': '20',
-                 'fog_then_sunny': '34',
-                 'frost_then_sunny': '34',
-                 'hazy': '21',
-                 'heavy_rain': '40',
-                 'heavy_showers': '12',
-                 'increasing_sunshine': '30',
-                 'late_shower': '45',
-                 'light_shower': '11',
-                 'late_thunder': '47',
-                 'mostly_cloudy': '26',
-                 'mostly_sunny': '34',
-                 'overcast': '26',
-                 'possible_shower': '11',
-                 'possible_thunderstorm': '37',
-                 'rain': '40',
-                 'rain_and_snow': '5',
-                 'rain_clearing': '39',
-                 'rain_developing': '12',
-                 'rain_tending to_snow': '5',
-                 'shower': '11',
-                 'showers': '11',
-                 'showers_easing': '11',
-                 'showers_increasing': '11',
-                 'snow': '41',
-                 'snowfalls_clearing': '5',
-                 'snow_developing': '13',
-                 'snow_showers': '41',
-                 'snow_tending to_rain': '5',
-                 'sunny': '32',
-                 'thunderstorms': '38',
-                 'thunderstorms': '38',
-                 'thunderstorms_clearing': '37',
-                 'windy': '23',
-                 'windy_with_rain': '2',
-                 'windy_with_showers': '2',
-                 'windy_with_snow': '43',
-                 'wind_and_rain_increasing': '2',
-                 'wind_and_showers_easing': '11',
-                 'unknown': 'na',
-                 'nt_unknown': 'na'}
-
-WEATHER_CODES_NIGHT = {'clearing_shower': '45',
-                       'clear': '31',
-                       'cloudy': '29',
-                       'cloud_and_wind_increasing': '27',
-                       'cloud_increasing': '27',
-                       'drizzle': '45',
-                       'drizzle_clearing': '45',
-                       'fog': '20',
-                       'fog_then_sunny': '33',
-                       'frost_then_sunny': '33',
-                       'hazy': '33',
-                       'heavy_rain': '47',
-                       'heavy_showers': '45',
-                       'increasing_sunshine': '31',
-                       'late_shower': '45',
-                       'light_shower': '45',
-                       'late_thunder': '47',
-                       'mostly_cloudy': '27',
-                       'mostly_sunny': '31',
-                       'overcast': '29',
-                       'possible_shower': '45',
-                       'possible_thunderstorm': '47',
-                       'rain': '45',
-                       'rain_and_snow': '46',
-                       'rain_clearing': '45',
-                       'rain_developing': '45',
-                       'rain_tending to_snow': '45',
-                       'shower': '45',
-                       'showers': '45',
-                       'showers_easing': '45',
-                       'showers_increasing': '45',
-                       'snow': '46',
-                       'snowfalls_clearing': '46',
-                       'snow_developing': '46',
-                       'snow_showers': '46',
-                       'snow_tending to_rain': '46',
-                       'sunny': '31',
-                       'thunderstorms': '47',
-                       'thunder-storms': '47',
-                       'thunderstorms_clearing': '47',
-                       'windy': '29',
-                       'windy_with_rain': '45',
-                       'windy_with_showers': '45',
-                       'windy_with_snow': '46',
-                       'wind_and_rain_increasing': '45',
-                       'wind_and_showers_easing': '45',
-                       'unknown': 'na',
-                       'nt_unknown': 'na'}
-
-"""
-These are the weather codes for XBMC is seems
-N/A Not Available
-0 Rain/Lightning
-01 Windy/Rain
-02 Same as 01
-03 Same as 00
-04 Same as 00
-05 Cloudy/Snow-Rain Mix
-06 Hail
-07 Icy/Clouds Rain-Snow
-08 Icy/Haze Rain
-09 Haze/Rain
-10 Icy/Rain
-11 Light Rain
-12 Moderate Rain
-13 Cloudy/Flurries
-14 Same as 13
-15 Flurries
-16 Same as 13
-17 Same as 00
-18 Same as 00
-19 Dust
-20 Fog
-21 Haze
-22 Smoke
-23 Windy
-24 Same as 23
-25 Frigid
-26 Mostly Cloudy
-27 Mostly Cloudy/Night
-28 Mostly Cloudy/Sunny
-29 Partly Cloudy/Night
-30 Partly Cloudy/Day
-31 Clear/Night
-32 Clear/Day
-33 Hazy/Night
-34 Hazy/Day
-35 Same as 00
-36 Hot!
-37 Lightning/Day
-38 Lightning
-39 Rain/Day
-40 Rain
-41 Snow
-42 Same as 41
-43 Windy/Snow
-44 Same as 30
-45 Rain/Night
-46 Snow/Night
-47 Thunder Showers/Night
-
-NIGHT SUBSET:
-27 Mostly Cloudy/Night
-29 Partly Cloudy/Night
-31 Clear/Night
-33 Hazy/Night
-45 Rain/Night
-46 Snow/Night
-47 Thunder Showers/Night
 """
 
 
@@ -254,6 +67,7 @@ def utc_str_to_local_datetime(utc_str: str, utc_format: str = '%Y-%m-%dT%H:%M:%S
     temp2 = temp1.replace(tzinfo=datetime.timezone.utc)
     return temp2.astimezone()
 
+
 def utc_str_to_local_str(utc_str: str, utc_format: str = '%Y-%m-%dT%H:%M:%SZ', local_format: str = '%I:%M %p'):
     """
     Given a UTC string, return a string with the local time in the given format
@@ -267,46 +81,27 @@ def utc_str_to_local_str(utc_str: str, utc_format: str = '%Y-%m-%dT%H:%M:%SZ', l
     return local_time.strftime(local_format).lstrip('0')
 
 
-# Convert a fire danger numerical rating to human friendly text
-# Fire danger rating may also be 'null'
-
-def fire_danger_to_text(fire_danger_float):
-
-    log(fire_danger_float)
-
-    if fire_danger_float == 'null':
-        return "None"
-    elif 0.0 <= fire_danger_float <= 5.99:
-        return "Low"
-    elif 6 <= fire_danger_float <= 11.99:
-        return "Moderate"
-    elif 12.0 <= fire_danger_float <= 24.99:
-        return "High"
-    elif 25.0 <= fire_danger_float <= 49.99:
-        return "Very High"
-    elif 50.0 <= fire_danger_float <= 74.99:
-        return "Severe"
-    elif 75.0 <= fire_danger_float <= 99.99:
-        return "Extreme"
-    elif fire_danger_float >= 100.0:
-        return "Catastrophic"
-    else:
-        return "?"
-
-
 def bom_forecast(geohash):
+    """
+    Return are information, current observations, warnings, and forecast for the given geohash
+    If we're unable to get the key data (current observations and forecast) then return False
+    ...will then fall back to scraping Weatherzone (if that is configured).
 
-    # The area hash is the geohash minus the last character
+    :param: geohash - the BOM location geohash
+    """
+
+    # The areahash is the geohash minus the last character
     areahash = geohash[:-1]
 
-    bom_api_url_geohash = f'https://api.weather.bom.gov.au/v1/locations/{geohash}'
-    bom_api_url_areahash = f'https://api.weather.bom.gov.au/v1/locations/{areahash}'
+    bom_api_url_geohash = f'{Store.BOM_API_LOCATIONS_URL}/{geohash}'
+    bom_api_url_areahash = f'{Store.BOM_API_LOCATIONS_URL}/{areahash}'
 
     bom_api_area_information_url = bom_api_url_geohash
     bom_api_warnings_url = f'{bom_api_url_geohash}/warnings'
 
     bom_api_current_observations_url = f'{bom_api_url_areahash}/observations'
     bom_api_forecast_seven_days_url = f'{bom_api_url_areahash}/forecasts/daily'
+    # FUTURE? - not yet used...
     bom_api_forecast_three_hourly_url = f'{bom_api_url_areahash}/forecasts/3-hourly'
     bom_api_forecast_rain = f'{bom_api_url_areahash}/forecast/rain'
 
@@ -318,7 +113,6 @@ def bom_forecast(geohash):
 
     except Exception as inst:
         log(f'Error retrieving area information from {bom_api_area_information_url}')
-        raise
 
     # Get current observations
     try:
@@ -328,7 +122,7 @@ def bom_forecast(geohash):
 
     except Exception as inst:
         log(f'Error retrieving current observations from {bom_api_current_observations_url}')
-        raise
+        return False
 
     # Get warnings
     try:
@@ -338,7 +132,6 @@ def bom_forecast(geohash):
 
     except Exception as inst:
         log(f'Error retrieving warnings from {bom_api_warnings_url}')
-        raise
 
     # Get 7 day forecast
     try:
@@ -348,8 +141,9 @@ def bom_forecast(geohash):
 
     except Exception as inst:
         log(f'Error retrieving seven day forecast from {bom_api_forecast_seven_days_url}')
-        raise
+        return False
 
+    # FUTURE?
     # # Get 3 Hourly Forecast
     # try:
     #     r = requests.get(bom_api_forecast_three_hourly_url)
@@ -437,9 +231,9 @@ def bom_forecast(geohash):
             icon_code = "na"
             try:
                 if i == 0 and forecast_seven_days[i]['now']['is_night']:
-                    icon_code = WEATHER_CODES_NIGHT[forecast_seven_days[i]['icon_descriptor']]
+                    icon_code = Store.WEATHER_CODES_NIGHT[forecast_seven_days[i]['icon_descriptor']]
                 else:
-                    icon_code = WEATHER_CODES[forecast_seven_days[i]['icon_descriptor']]
+                    icon_code = Store.WEATHER_CODES[forecast_seven_days[i]['icon_descriptor']]
             except KeyError:
                 log(f'Could not find icon code for BOM icon_descriptor: "{forecast_seven_days[i]["icon_descriptor"]}"')
 
@@ -472,23 +266,16 @@ def bom_forecast(geohash):
             else:
                 set_key(weather_data, i, 'UVEndProtection', 'N/A')
 
-
-
         # Cleanup & Data massaging
 
-        # Forecast min can be None (presumably as 'past the forecast'), so instead then use the 'temp_later' (i.e. minumum to come)
+        # Forecast min can be None (presumably as 'past the forecast'), so instead then use the 'temp_later' (i.e. minimum to come)
         if weather_data['Current.LowTemp'] == "None":
             set_keys(weather_data, 0, ["LowTemp", "LowTemperature"], forecast_seven_days[0]['now']['temp_later'])
 
-
-
-        # Missing data - not available from the BOM API
+        # Missing data that was available at Weatherzone but is not available from the BOM API
         weather_data['Current.DewPoint'] = "N/A"
         weather_data['Current.Pressure'] = "N/A"
         # weather_data['Current.FireDanger'] -> use only FireDanger as is now text already
-    # TO-DOs
-    # 3 hourly forecast?
-    # Rain 3 hour forecast?
 
     return weather_data
 
@@ -498,7 +285,7 @@ def bom_forecast(geohash):
 
 if __name__ == "__main__":
 
-    geohashes_to_test = ['r1r11df'] # ['r1r11df', 'r1f94ew']
+    geohashes_to_test = ['r1r11df', 'r1f94ew']
     for geohash in geohashes_to_test:
         log(f'Getting weather data from BOM for geohash "{geohash}"')
         weather_data = bom_forecast(geohash)

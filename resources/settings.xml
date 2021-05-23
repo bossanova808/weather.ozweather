@@ -44,7 +44,7 @@
 		<setting id="ExtendedFeaturesToggle" label="32194" type="bool" default="false"/>
    		<setting id="BGDownloadToggle" label="32197" type="bool" default="false" enable="!eq(-1,false)"/>
    		<!-- Best is mapped to trw in default.py -->
-		<setting id="ABCQuality" label ="32196" type ="labelenum" values="256k|512K|1000k|Best" default="Best" enable="!eq(-2,false)"/>
+		<setting id="ABCQuality" label ="32196" type ="labelenum" values="256k|512K|1000k" default="1000k" enable="!eq(-2,false)"/>
 		<setting id="Radar1" label="32155" type="text" default="IDR00004" enable="!eq(-3,false)"/>
 		<setting id="Radar2" label="32156" type="text" enable="!eq( -5,) + !eq(-4,false)" default=""/>
 		<setting id="Radar3" label="32157" type="text" enable="!eq( -6,) + !eq(-5,false)" default=""/>
@@ -60,7 +60,7 @@
 		<setting id="Location2WeatherZone" label="32112" type="action" action="RunScript($ID,Location2WeatherZone)" enable="!eq( -1,)" default=""/>
 		<setting id="Location3WeatherZone" label="32113" type="action" action="RunScript($ID,Location3WeatherZone)" enable="!eq( -1,)" default=""/>
 
-		<!-- HIDDEN SETTINGS - Weatherzone -->
+		<!-- HIDDEN SETTINGS - Weatherzone - left out WeatherZone in these names for backwards compatibility...-->
 		<setting id="Location1UrlPath" type="text" visible="false" default=""/>
 		<setting id="Location2UrlPath" type="text" visible="false" default=""/>
 		<setting id="Location3UrlPath" type="text" visible="false" default=""/>

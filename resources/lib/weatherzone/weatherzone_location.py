@@ -1,9 +1,13 @@
+import sys
 from urllib.parse import urlparse
 import requests
 from bs4 import BeautifulSoup
-
 import xbmc
 import xbmcgui
+
+# Small hack to allow for unit testing - see common.py for explanation
+if not xbmc.getUserAgent():
+    sys.path.insert(0, '../../..')
 
 from resources.lib.store import Store
 from resources.lib.common import *
@@ -54,6 +58,9 @@ def getLocationsForPostcodeOrSuburb(text):
     except Exception as inst:
         log("Exception processing locations in weatherzone.getLocationsForPostcodeOrSuburb" + str(inst))
         raise
+
+    log(locations)
+    log(location_url_paths)
 
     return locations, location_url_paths
 

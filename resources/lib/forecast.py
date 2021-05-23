@@ -98,18 +98,18 @@ def clear_properties():
         log("********** Oz Weather Couldn't clear all the properties, sorry!!", inst)
 
 
-def forecast(geohash, urlpath, radar_code):
+def forecast(geohash, url_path, radar_code):
     """
     The main weather data retrieval function
     Does either a basic forecast, or a more extended forecast with radar etc.
     :param geohash: the BOM geohash for the location
-    :param urlpath: the WeatherZone url path if still using that...
+    :param url_path: the WeatherZone url path if still using that...
     :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
     extended_features = ADDON.getSetting('ExtendedFeaturesToggle')
     log(f'Extended features: {extended_features}')
 
-    # Get the radar images first - looks better on refreshes
+    # Get the radar images first - because it looks better on refreshes
     if extended_features == "true":
         log(f'Getting radar images for {radar_code}')
 
@@ -125,19 +125,26 @@ def forecast(geohash, urlpath, radar_code):
         build_images(radar_code, update_radar_backgrounds, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
-    # Get all the weather & forecast data from the BOM API
+    # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...
     if geohash:
         log(f'Using the BOM API.  Getting weather data for {geohash}')
         weather_data = bom_forecast(geohash)
-    else:
-        log(f'Scraping WeatherZone.  Using urlpath {urlpath}. '
-            f'User is encouraged to re-configure the addon as WeatherZone support will later be removed.')
-        weather_data = getWeatherData(urlpath)
 
+    if not weather_data and url_path:
+        log(f'FALLBACK - Scraping Weatherzone.  Using url_path {url_path}. '
+            f'User is encouraged to re-configure the addon as WeatherZone support will later be removed.')
+        weather_data = getWeatherData(url_path)
+
+    # At this point, we should have _something_ - if not, log the issue and we're done...
+    if not weather_data:
+        log_info("Unable to get weather_data from BOM or from Weatherzone - internet connection issue or addon not configured?")
+        return
+
+    # We have weather_data - set all the properties on Kodi's weather window...
     for weather_key in sorted(weather_data):
         set_property(WEATHER_WINDOW, weather_key, weather_data[weather_key])
 
-    # Get the ABC video link
+    # Get the ABC 90 second weather video link if extended features is enabled
     if extended_features == "true":
         log("Getting the ABC weather video link")
         url = getABCWeatherVideoLink(ADDON.getSetting("ABCQuality"))
@@ -160,7 +167,7 @@ def get_weather():
 
     # Set basic properties/'brand'
     set_property(WEATHER_WINDOW, 'WeatherProviderLogo', xbmcvfs.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
-    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia (via WeatherZone)')
+    set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia')
     set_property(WEATHER_WINDOW, 'WeatherVersion', ADDON_NAME + "-" + ADDON_VERSION)
 
     # Set what we updated and when
@@ -171,16 +178,16 @@ def get_weather():
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
-    # Retrieve the currently chosen location geohas & radar code
+    # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
     geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
-    urlpath = ADDON.getSetting(f'Location{sys.argv[1]}UrlPath')
+    url_path = ADDON.getSetting(f'Location{sys.argv[1]}UrlPath')
     radar = ADDON.getSetting(f'Radar{sys.argv[1]}')
     # If we don't have a radar code, get the national radar by default
     if not radar:
         radar = 'IDR00004'
         log(f'Radar code empty for location, so using default radar code {radar} (= national radar)')
 
-    log(f'Current location: geohash "{geohash}", urlpath "{urlpath}", radar {radar}')
+    log(f'Current location: geohash "{geohash}", urlpath "{url_path}", radar {radar}')
 
     # Now scrape the weather data & radar images
-    forecast(geohash, urlpath, radar)
+    forecast(geohash, url_path, radar)

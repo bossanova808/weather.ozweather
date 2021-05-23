@@ -1,4 +1,10 @@
 import requests
+import sys
+import xbmc
+
+# Small hack to allow for unit testing - see common.py for explanation
+if not xbmc.getUserAgent():
+    sys.path.insert(0, '../../..')
 
 from resources.lib.store import Store
 from resources.lib.common import *
