@@ -1,10 +1,10 @@
 # -*- coding: utf-8 -*-
 import socket
 
-from resources.lib.forecast import *
-from resources.lib.locations import *
-from resources.lib.bom.bom_location import *
-from resources.lib.weatherzone.weatherzone_location import *
+from .forecast import *
+from .locations import *
+from .bom.bom_location import *
+from .weatherzone.weatherzone_location import *
 
 
 def run(args):

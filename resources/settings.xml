@@ -3,7 +3,7 @@
 	<section id="weather.ozweather">
 		<category id="bom locations" label="32200" help="">
 			<group id="1" label="32208">
-				<setting id="Location1" type="action" label="32202" help="">
+				<setting id="Location1" type="string" label="32202" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -13,7 +13,7 @@
 						<data>RunScript(weather.ozweather,Location1)</data>
 					</control>
 				</setting>
-				<setting id="Location2" type="action" label="32203" help="">
+				<setting id="Location2" type="string" label="32203" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -28,7 +28,7 @@
 						<data>RunScript(weather.ozweather,Location2)</data>
 					</control>
 				</setting>
-				<setting id="Location3" type="action" label="32204" help="">
+				<setting id="Location3" type="string" label="32204" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -386,7 +386,7 @@
 		</category>
 		<category id="legacy / fallback" label="32201" help="">
 			<group id="1" label="32206">
-				<setting id="Location1WeatherZone" type="action" label="32111" help="">
+				<setting id="Location1WeatherZone" type="string" label="32111" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -396,7 +396,7 @@
 						<data>RunScript(weather.ozweather,Location1WeatherZone)</data>
 					</control>
 				</setting>
-				<setting id="Location2WeatherZone" type="action" label="32112" help="">
+				<setting id="Location2WeatherZone" type="string" label="32112" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -411,7 +411,7 @@
 						<data>RunScript(weather.ozweather,Location2WeatherZone)</data>
 					</control>
 				</setting>
-				<setting id="Location3WeatherZone" type="action" label="32113" help="">
+				<setting id="Location3WeatherZone" type="string" label="32113" help="">
 					<level>0</level>
 					<default/>
 					<constraints>

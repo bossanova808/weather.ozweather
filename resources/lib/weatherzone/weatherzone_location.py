@@ -83,8 +83,8 @@ def find_weatherzone_location():
         if locations:
             selected = dialog.select(xbmc.getLocalizedString(396), locations)
             if selected != -1:
-                ADDON.setSetting(sys.argv[1], locations[selected])
-                ADDON.setSetting(sys.argv[1] + 'UrlPath', location_url_paths[selected])
+                ADDON.setSetting(sys.argv[1] + 'Weatherzone', locations[selected])
+                ADDON.setSetting(sys.argv[1] + 'WeatherzoneUrlPath', location_url_paths[selected])
         # Or indicate we did not receive any locations
         else:
             dialog.ok(ADDON_NAME, xbmc.getLocalizedString(284))

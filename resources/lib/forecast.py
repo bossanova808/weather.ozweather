@@ -1,7 +1,7 @@
-from resources.lib.weatherzone.weatherzone_forecast import *
-from resources.lib.abc.abc_video import *
-from resources.lib.bom.bom_radar import *
-from resources.lib.bom.bom_forecast import *
+from .weatherzone.weatherzone_forecast import *
+from .abc.abc_video import *
+from .bom.bom_radar import *
+from .bom.bom_forecast import *
 
 
 def clear_properties():
