@@ -92,32 +92,18 @@ def download_background(radar_code, file_name, backgrounds_path):
 
         log("Downloading missing background image....[%s] as [%s]" % (file_name, out_file_name))
 
-        # Ok get ready to retrieve some images
-        image_file_rgb = backgrounds_path + out_file_name
-
-        headers = urllib3.util.request.make_headers(accept_encoding='gzip, deflate',
-                                                    keep_alive=True,
-                                                    user_agent=USER_AGENT)
-
-        # Special case for national radar background
         if "background.png" in file_name and '00004' in file_name:
-            url_to_get = Store.BOM_RADAR_HTTPSTUB + 'IDE00035.background.png'
+            url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + 'IDE00035.background.png'
         else:
-            url_to_get = Store.BOM_RADAR_HTTPSTUB + file_name
+            url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
 
         try:
-            http = urllib3.PoolManager()
-            r = http.request('GET', url_to_get, preload_content=False, headers=headers)
-            with open(image_file_rgb, 'wb') as out:
-                while True:
-                    data = r.read(65536)
-                    if not data:
-                        break
-                    out.write(data)
-            r.release_conn()
+            radar_image = urllib.request.urlopen(url_to_get)
+            with open(backgrounds_path + "/" + out_file_name, "wb") as fh:
+                fh.write(radar_image.read())
 
         except Exception as e:
-            log(f'Failed to retrieve {url_to_get}', e)
+            log(f"Failed to retrieve radar background image: {url_to_get}, exception: {str(e)}")
 
 
 def prepare_backgrounds(radar_code, backgrounds_path):

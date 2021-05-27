@@ -126,6 +126,8 @@ def forecast(geohash, url_path, radar_code):
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
     # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...
+    weather_data = False
+
     if geohash:
         log(f'Using the BOM API.  Getting weather data for {geohash}')
         weather_data = bom_forecast(geohash)

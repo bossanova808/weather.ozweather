@@ -178,7 +178,7 @@ def bom_forecast(geohash):
         weather_data['Current.WindDirection'] = current_observations['wind']['direction']
         weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} km/h'
         weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]}'
-        weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = f'{current_observations["rain_since_9am"]} mm'
+        weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = f'{current_observations["rain_since_9am"]}'
 
     # Warnings
     warnings_text = ""

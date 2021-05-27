@@ -20,6 +20,7 @@ class Store:
     WEATHERZONE_SEARCH_URL = WEATHERZONE_URL + "/search/"
     # BOM RADAR
     BOM_RADAR_FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar/"
+    BOM_RADAR_BACKGROUND_FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar_transparencies/"
     BOM_RADAR_HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
     # See https://github.com/theOzzieRat/bom-radar-card/blob/master/src/bom-radar-card.ts around line 130
     BOM_RADAR_LOCATIONS = [
