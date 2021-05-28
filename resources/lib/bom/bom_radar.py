@@ -76,7 +76,7 @@ def download_background(radar_code, file_name, backgrounds_path):
         file_name = radar_code + "." + file_name
 
     # Delete backgrounds older than a week old
-    if os.path.isfile(backgrounds_path + out_file_name):
+    if os.path.isfile(backgrounds_path + out_file_name) and ADDON.getSetting('BGDownloadToggle'):
         file_creation = os.path.getmtime(backgrounds_path + out_file_name)
         now = time.time()
         week_ago = now - 7 * 60 * 60 * 24  # Number of seconds in a week
