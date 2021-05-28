@@ -72,7 +72,7 @@ def find_bom_location():
                     raise
 
                 # Save the geohash and latitude and longitude of the location
-                ADDON.setSetting(sys.argv[1], locations[selected])
+                ADDON.setSetting(sys.argv[1] + 'BOM', locations[selected])
                 ADDON.setSetting(sys.argv[1] + 'BOMGeoHash', location_geohashes[selected])
                 ADDON.setSetting(sys.argv[1] + 'Lat', str(location_info['latitude']))
                 ADDON.setSetting(sys.argv[1] + 'Lon', str(location_info['longitude']))

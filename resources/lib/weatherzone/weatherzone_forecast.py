@@ -99,7 +99,7 @@ def getWeatherData(url_path):
         # The longer forecast text
         try:
             p = soup.find_all("p", class_="district-forecast")
-            weather_data["Current.ConditionLong"] = "(USING WEATHERZONE DATA - BOM location not configured, or BOM API not available?).\n\n"
+            weather_data["Current.ConditionLong"] = "(FALLBACK WEATHERZONE DATA - BOM location not configured, or BOM API not available?).\n\n"
             weather_data["Current.ConditionLong"] += cleanLongDescription(p[0].text).strip()
         except Exception as inst:
             log(str(inst))

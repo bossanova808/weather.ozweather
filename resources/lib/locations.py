@@ -7,14 +7,21 @@ def refresh_locations():
     """
     log("Refreshing locations from settings")
 
-    location_setting1 = ADDON.getSetting('Location1')
+    location_setting1 = ADDON.getSetting('Location1BOM')
     location_fallback1 = ADDON.getSetting('Location1WeatherZone')
-    location_setting2 = ADDON.getSetting('Location2')
+    location_setting2 = ADDON.getSetting('Location2BOM')
     location_fallback2 = ADDON.getSetting('Location2WeatherZone')
-    location_setting3 = ADDON.getSetting('Location3')
+    location_setting3 = ADDON.getSetting('Location3BOM')
     location_fallback3 = ADDON.getSetting('Location3WeatherZone')
 
     locations = 0
+
+    log("location_setting1: " + location_setting1)
+    log("location_fallback1: " + location_fallback1)
+    log("location_setting2: " + location_setting2)
+    log("location_fallback2: " + location_fallback2)
+    log("location_setting3: " + location_setting3)
+    log("location_fallback3: " + location_fallback3)
 
     # If either the main location or the fall back is set, then enable the location
     # This is to cope with the transition period where folks will have the fallbacks set from their legacy settings

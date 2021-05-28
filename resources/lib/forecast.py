@@ -164,6 +164,15 @@ def get_weather():
     Get the latest forecast data for the currently chosen location
     """
 
+    # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
+    geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
+    url_path = ADDON.getSetting(f'Location{sys.argv[1]}WeatherzoneUrlPath')
+    radar = ADDON.getSetting(f'Radar{sys.argv[1]}')
+
+    if not geohash and not url_path:
+        log("No BOM location geohash or Weatherzone URL Path - can't retrieve weather data!")
+        return
+
     # Nice neat updates - clear out all set window data first...
     clear_properties()
 
@@ -180,10 +189,6 @@ def get_weather():
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
-    # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
-    geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
-    url_path = ADDON.getSetting(f'Location{sys.argv[1]}UrlPath')
-    radar = ADDON.getSetting(f'Radar{sys.argv[1]}')
     # If we don't have a radar code, get the national radar by default
     if not radar:
         radar = 'IDR00004'

@@ -3,7 +3,7 @@
 	<section id="weather.ozweather">
 		<category id="bom locations" label="32200" help="">
 			<group id="1" label="32208">
-				<setting id="Location1" type="string" label="32202" help="">
+				<setting id="Location1BOM" type="string" label="32202" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -13,7 +13,7 @@
 						<data>RunScript(weather.ozweather,Location1)</data>
 					</control>
 				</setting>
-				<setting id="Location2" type="string" label="32203" help="">
+				<setting id="Location2BOM" type="string" label="32203" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -28,7 +28,7 @@
 						<data>RunScript(weather.ozweather,Location2)</data>
 					</control>
 				</setting>
-				<setting id="Location3" type="string" label="32204" help="">
+				<setting id="Location3BOM" type="string" label="32204" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -426,7 +426,7 @@
 						<data>RunScript(weather.ozweather,Location3WeatherZone)</data>
 					</control>
 				</setting>
-				<setting id="Location1UrlPath" type="string" help="">
+				<setting id="Location1WeatherZoneUrlPath" type="string" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -441,7 +441,7 @@
 						<heading/>
 					</control>
 				</setting>
-				<setting id="Location2UrlPath" type="string" help="">
+				<setting id="Location2WeatherZoneUrlPath" type="string" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
@@ -456,7 +456,7 @@
 						<heading/>
 					</control>
 				</setting>
-				<setting id="Location3UrlPath" type="string" help="">
+				<setting id="Location3WeatherZoneUrlPath" type="string" help="">
 					<level>0</level>
 					<default/>
 					<constraints>
