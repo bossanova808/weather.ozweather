@@ -236,6 +236,8 @@ def bom_forecast(geohash):
                     icon_code = Store.WEATHER_CODES[forecast_seven_days[i]['icon_descriptor']]
             except KeyError:
                 log(f'Could not find icon code for BOM icon_descriptor: "{forecast_seven_days[i]["icon_descriptor"]}"')
+                # Pop the missing icon descriptor into the outlook to make it easier for people to report in the forum thread
+                set_key(weather_data, i, "Outlook", f"[{forecast_seven_days[i]['icon_descriptor']}] {forecast_seven_days[i]['short_text']}")
 
             set_keys(weather_data, i, ["OutlookIcon", "ConditionIcon"], f'{icon_code}.png')
             set_keys(weather_data, i, ["FanartCode"], icon_code)

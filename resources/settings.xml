@@ -21,7 +21,7 @@
 					</constraints>
 					<dependencies>
 						<dependency type="enable">
-							<condition operator="!is" setting="Location1"/>
+							<condition operator="!is" setting="Location1BOM"/>
 						</dependency>
 					</dependencies>
 					<control type="button" format="action">
@@ -36,7 +36,7 @@
 					</constraints>
 					<dependencies>
 						<dependency type="enable">
-							<condition operator="!is" setting="Location2"/>
+							<condition operator="!is" setting="Location2BOM"/>
 						</dependency>
 					</dependencies>
 					<control type="button" format="action">
