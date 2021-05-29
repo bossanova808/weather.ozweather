@@ -307,16 +307,6 @@
 					<default>false</default>
 					<control type="toggle"/>
 				</setting>
-				<setting id="BGDownloadToggle" type="boolean" label="32197" help="">
-					<level>0</level>
-					<default>false</default>
-					<dependencies>
-						<dependency type="enable">
-							<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="toggle"/>
-				</setting>
 				<setting id="ABCQuality" type="string" label="32196" help="">
 					<level>0</level>
 					<default>1000k</default>

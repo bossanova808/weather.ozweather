@@ -12,7 +12,7 @@ from resources.lib.store import Store
 from resources.lib.common import *
 
 
-def getABCWeatherVideoLink(quality):
+def get_abc_weather_video_link(quality):
 
     # Seems like the best/trw option has been removed, so just map these to 1000k
     if quality == "Best" or quality == "trw":
@@ -36,7 +36,7 @@ def getABCWeatherVideoLink(quality):
 # UNIT TESTING
 if __name__ == "__main__":
     log("\nTesting scraping of ABC Weather Video - here's the 'Best' link:\n")
-    log(getABCWeatherVideoLink("Best") + "\n")
+    log(get_abc_weather_video_link("Best") + "\n")
 
 
 # ABC VIDEO URL NOTES
