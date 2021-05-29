@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class Store:
     """
     Helper class to to provide a centralised store for CONSTANTS and globals
@@ -7,22 +8,22 @@ class Store:
     # https://docs.python.org/3/faq/programming.html#how-do-i-create-static-class-data-and-static-class-methods
 
     # CONSTANTS
-    # BOM places, scraping, - not currently used
-    BOM_URL = 'http://www.bom.gov.au'
-    BOM_API_URL = 'https://api.weather.bom.gov.au/v1'
-    BOM_API_LOCATIONS_URL = BOM_API_URL + '/locations'
-    # ABC WEATHER VIDEO
+    # ABC WEATHER VIDEO - scraping
     ABC_URL = "https://www.abc.net.au/news/newschannel/weather-in-90-seconds/"
     ABC_WEATHER_VIDEO_PATTERN = "//abcmedia.akamaized.net/news/news24/wins/(.+?)/WIN(.*?)_512k.mp4"
     ABC_STUB = "https://abcmedia.akamaized.net/news/news24/wins/"
-    # Weatherzone, scraping, legacy approach
+    # WEATHERZONE - scraping, only used as a fallback data source if BOM not configured or fails
     WEATHERZONE_URL = 'https://www.weatherzone.com.au'
     WEATHERZONE_SEARCH_URL = WEATHERZONE_URL + "/search/"
-    # BOM RADAR
+    # BOM - JSON API
+    BOM_URL = 'http://www.bom.gov.au'
+    BOM_API_URL = 'https://api.weather.bom.gov.au/v1'
+    BOM_API_LOCATIONS_URL = BOM_API_URL + '/locations'
+    # BOM - RADARS - FTP
     BOM_RADAR_FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar/"
     BOM_RADAR_BACKGROUND_FTPSTUB = "ftp://anonymous:someone%40somewhere.com@ftp.bom.gov.au//anon/gen/radar_transparencies/"
     BOM_RADAR_HTTPSTUB = "http://www.bom.gov.au/products/radar_transparencies/"
-    # See https://github.com/theOzzieRat/bom-radar-card/blob/master/src/bom-radar-card.ts around line 130
+    # For updates, see https://github.com/theOzzieRat/bom-radar-card/blob/master/src/bom-radar-card.ts around line 130
     BOM_RADAR_LOCATIONS = [
         (-35.661387, 149.512229),
         (-33.700764, 151.209470),
@@ -252,7 +253,7 @@ class Store:
     47 Thunder Showers/Night
     """
 
-
+    # Just a store!
     def __init__(self):
         pass
 

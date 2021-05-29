@@ -91,3 +91,11 @@ msgstr "
 msgctxt "#32208"
 msgid "Enter postcode, suburb or area."
 msgstr "
+
+msgctxt "#32209"
+msgid "Radar backgrounds not showing?  Try forcing a refresh"
+msgstr "
+
+msgctxt "#32210"
+msgid "Refresh all radar backgrounds on next weather fetch?"
+msgstr "

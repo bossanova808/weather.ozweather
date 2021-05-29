@@ -3,7 +3,7 @@ from .common import *
 
 def refresh_locations():
     """
-    Get the user's location and radar code choices from the addon settings and set them as window properties
+    Get the user's location and radar code choices from the addon settings, and set them as window properties
     """
     log("Refreshing locations from settings")
 
@@ -45,10 +45,13 @@ def refresh_locations():
     set_property(WEATHER_WINDOW, 'Locations', str(locations))
 
     log("Refreshing radar locations from settings")
+
     radar_setting1 = ADDON.getSetting('Radar1')
     radar_setting2 = ADDON.getSetting('Radar2')
     radar_setting3 = ADDON.getSetting('Radar3')
+
     radars = 0
+
     if radar_setting1 != '':
         radars += 1
         set_property(WEATHER_WINDOW, 'Radar1', radar_setting1)

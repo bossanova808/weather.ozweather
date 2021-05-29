@@ -106,23 +106,24 @@ def forecast(geohash, url_path, radar_code):
     :param url_path: the WeatherZone url path if still using that...
     :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
-    extended_features = ADDON.getSetting('ExtendedFeaturesToggle')
+    extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
     log(f'Extended features: {extended_features}')
+    purge_backgrounds = ADDON.getSettingBool('PurgeRadarBackgroundsOnNextRefresh')
+    log(f'Purge Backgrounds: {purge_backgrounds}')
+
+    # Has the user requested we refresh the radar backgrounds on next weather fetch?
+    if purge_backgrounds:
+        dump_all_radar_backgrounds()
+        ADDON.setSetting('PurgeRadarBackgroundsOnNextRefresh', 'false')
 
     # Get the radar images first - because it looks better on refreshes
-    if extended_features == "true":
+    if extended_features:
         log(f'Getting radar images for {radar_code}')
-
         backgrounds_path = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/");
+            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/")
         overlay_loop_path = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/currentloop/" + radar_code + "/");
-
-        # Do they want us to periodically refresh radar backgrounds?  Default is yes...
-        # (this was added as some folks has issues and manually copied the backgrounds in....)
-        update_radar_backgrounds = ADDON.getSetting('BGDownloadToggle')
-
-        build_images(radar_code, update_radar_backgrounds, backgrounds_path, overlay_loop_path)
+            "special://profile/addon_data/weather.ozweather/currentloop/" + radar_code + "/")
+        build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
     # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...

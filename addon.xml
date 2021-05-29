@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="weather.ozweather" name="Oz Weather" version="2.0.0" provider-name="Bossanova808">
+<addon id="weather.ozweather" name="Oz Weather" version="1.9.9" provider-name="Bossanova808">
 	<requires>
 		<import addon="xbmc.python" version="3.0.0"/>
     	<import addon="script.module.requests" version="2.22.0+matrix.1"/>
@@ -8,7 +8,7 @@
 	<extension point="xbmc.python.weather" library="default.py"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">Weather forecasting and radar images for Australia using Bureau of Meteorology data</summary>
-		<description lang="en_GB">Weather forecast data scraped from the Australian Bureau of Meteorology www.bom.gov.au.  For full features (e.g. animated radar) and make sure you install the replacement skin files - see information at the addon wiki (https://kodi.wiki/index.php?title=Add-on:Oz_Weather).</description>
+		<description lang="en_GB">Weather forecasting and radar images for Australia using Bureau of Meteorology data.  For full features (animated radars & ABC weather videos) - make sure you install the replacement skin files - see information at the addon wiki (https://kodi.wiki/index.php?title=Add-on:Oz_Weather).</description>
 		<disclaimer lang="en_GB">Use of this addon implies you agree to the following terms and conditions - http://reg.bom.gov.au/other/copyright.shtml and http://reg.bom.gov.au/other/disclaimer.shtml</disclaimer>
 		<platform>all</platform>
 		<language>en</language>
@@ -22,12 +22,12 @@
        		<fanart>fanart.jpg</fanart>
 		</assets>
 		<news>V2.0.0
-			- Note - addon must be reconfigured to work!!
-			- Add startup screen to alert user about need to re-configure
-			- Rewrite to use BOM data directly, remove WeatherZone as they are appear to no longer using BOM data
-			- Use BOM places
-			- Update settings to new Kodi format
-			- Modernise code
+			- N.B. If you have run a version before 2.0, please re-configure the addon to set-up your BOM locations!
+			- Rewrite to use BOM API directly, leave Weatherzone in as a fallback option if BOM not configured or available
+			- Add mechanism to manually purge radar backgrounds via addon settings
+			- Remove periodic refresh of backgrounds in favour of the above
+			- Update settings.xml to new Kodi format
+			- Modernise code throughout
     	</news>
 	</extension>
 </addon>

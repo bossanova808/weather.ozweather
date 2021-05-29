@@ -383,6 +383,13 @@
 					</control>
 				</setting>
 			</group>
+			<group id="2" label="32209">
+				<setting id="PurgeRadarBackgroundsOnNextRefresh" type="boolean" label="32210" help="">
+					<level>0</level>
+					<default>false</default>
+					<control type="toggle"/>
+				</setting>
+			</group>
 		</category>
 		<category id="legacy / fallback" label="32201" help="">
 			<group id="1" label="32206">

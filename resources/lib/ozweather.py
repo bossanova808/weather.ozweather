@@ -12,14 +12,15 @@ def run(args):
     This is 'main' basically.
     TWO MAJOR MODES - SETTINGS and FORECAST RETRIEVAL
 
-    @param args: sys.argv is passed through to here...
+    :param args: sys.argv is passed directly through
     """
 
     footprints()
     socket.setdefaulttimeout(100)
 
-    # TRANSLATE ANY OLD, pre-BOM API SETTINGS TO NEW FORMAT SETTINGS
+    # Translate old, pre BOM api settings to the new equivalents
     # The old Weatherzone locations now become the fallback settings
+    # (After a transition period (say after the Kodi N* release) - should remove this)
     if ADDON.getSetting('Location1'):
         ADDON.setSetting('Location1Weatherzone', ADDON.getSetting('Location1'))
         ADDON.setSetting('Location1', '')
@@ -39,7 +40,7 @@ def run(args):
         ADDON.setSetting('Location3WeatherzoneUrlPath', ADDON.getSetting('Location3UrlPath'))
         ADDON.setSetting('Location3UrlPath', '')
 
-    # CALLED FORM Kodi SETTINGS
+    # RUN MODE - ADDON CALLED FORM Kodi SETTINGS
     # the addon is being called from the settings section where the user enters their postcodes
     if args[1].startswith('Location'):
         if args[1].endswith('WeatherZone'):
@@ -47,9 +48,9 @@ def run(args):
         else:
             find_bom_location()
 
-    # FORECAST
+    # RUN MODE - GET WEATHER OBSERVATIONS AND FORECAST
     # script is being called in general use, not from the settings page
-    # sys.argv[1] has the current location number, so get the currently selected location and grab it's forecast
+    # sys.argv[1] has the current location number (e.g. '1'), so fetch the weather data
     else:
         get_weather()
 
