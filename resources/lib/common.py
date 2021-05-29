@@ -3,7 +3,7 @@
 Handy utility functions for Kodi Addons
 By bossanova808
 Free in all senses....
-VERSION 0.1.8 2021-05-23
+VERSION 0.2.0 2021-05-29
 (For Kodi Matrix & later)
 """
 import sys

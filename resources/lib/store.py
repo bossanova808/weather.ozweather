@@ -132,7 +132,6 @@ class Store:
                      'storm': '38',
                      'sunny': '32',
                      'thunderstorms': '38',
-                     'thunderstorms': '38',
                      'thunderstorms_clearing': '37',
                      'windy': '23',
                      'windy_with_rain': '2',
