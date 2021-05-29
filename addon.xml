@@ -8,7 +8,7 @@
 	<extension point="xbmc.python.weather" library="default.py"/>
 	<extension point="xbmc.addon.metadata">
 		<summary lang="en_GB">Weather forecasting and radar images for Australia using Bureau of Meteorology data</summary>
-		<description lang="en_GB">Weather forecasting and radar images for Australia using Bureau of Meteorology data.  For full features (animated radars & ABC weather videos) - make sure you install the replacement skin files - see information at the addon wiki (https://kodi.wiki/index.php?title=Add-on:Oz_Weather).</description>
+		<description lang="en_GB">Weather forecasting and radar images for Australia using Bureau of Meteorology data.  For full features (animated radars &amp; ABC weather videos) - make sure you install the replacement skin files - see information at the addon wiki (https://kodi.wiki/index.php?title=Add-on:Oz_Weather).</description>
 		<disclaimer lang="en_GB">Use of this addon implies you agree to the following terms and conditions - http://reg.bom.gov.au/other/copyright.shtml and http://reg.bom.gov.au/other/disclaimer.shtml</disclaimer>
 		<platform>all</platform>
 		<language>en</language>
