@@ -33,19 +33,19 @@ msgid "Weatherzone Location 3"
 msgstr ""
 
 msgctxt "#32155"
-msgid "Radar ID for Location 1 (e.g. IDR023)"
+msgid "Overrule Closest Radar ID for Location 1"
 msgstr ""
 
 msgctxt "#32156"
-msgid "Radar ID for Location 2"
+msgid "Overrule Closest Radar ID for Location 2"
 msgstr ""
 
 msgctxt "#32157"
-msgid "Radar ID for Location 3"
+msgid "Overrule Closest Radar ID for Location 3"
 msgstr ""
 
 msgctxt "#32194"
-msgid "Use extended features (long forecast, radar loop)"
+msgid "Use extended features (longer forecast, radar loop, ABC weather video)"
 msgstr ""
 
 msgctxt "#32195"
@@ -98,4 +98,12 @@ msgstr "
 
 msgctxt "#32210"
 msgid "Refresh all radar backgrounds on next weather fetch?"
+msgstr "
+
+msgctxt "#32211"
+msgid "Closest Radar "
+msgstr "
+
+msgctxt "#32212"
+msgid "If entered, these radar codes overrule the closest found."
 msgstr "

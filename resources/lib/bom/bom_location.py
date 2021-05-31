@@ -81,7 +81,7 @@ def find_bom_location():
                 log(f'Closest radar found: {radar}')
                 ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lat', str(radar[0]))
                 ADDON.setSetting('Radar' + sys.argv[1][-1] + 'Lon', str(radar[1]))
-
+                ADDON.setSetting(sys.argv[1] + 'ClosestRadar', f'{radar[2]} - {radar[3]}')
 
 ###########################################################
 # MAIN (only for unit testing outside of Kodi)

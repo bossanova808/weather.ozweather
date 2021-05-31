@@ -44,10 +44,10 @@ def closest_radar_to_lat_lon(point):
     """
     Given a lat/long tuple, return the closest radar (lat/lon) from our list of radars
     """
-    closest_radar = (0,0)
+    closest_radar = (0,0, "", "")
     closest_distance = 10000
     for radar in Store.BOM_RADAR_LOCATIONS:
-        distance = get_distance(point, radar)
+        distance = get_distance(point, (radar[0], radar[1]))
         log(f'Point {point}, radar {radar}, distance {distance}')
         if distance < closest_distance:
             log(f'Setting closest radar to {radar}')

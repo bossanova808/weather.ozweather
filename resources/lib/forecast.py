@@ -165,10 +165,18 @@ def get_weather():
     Get the latest forecast data for the currently chosen location
     """
 
+    log("*** Updating Weather Data ***")
+
     # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
     geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
     url_path = ADDON.getSetting(f'Location{sys.argv[1]}WeatherzoneUrlPath')
-    radar = ADDON.getSetting(f'Radar{sys.argv[1]}')
+    radar = ADDON.getSetting(f'Radar{sys.argv[1]}') or ADDON.getSetting(f'Location{sys.argv[1]}ClosestRadar')
+
+    # With the new closest radar system, the radar is store as e.g. 'Melbourne - IDR023' so strip the name off...
+    split_code = radar.split(' - ')
+    if len(split_code) > 1:
+        log(f"Radar code: transforming [{radar}] to: [{split_code[-1]}]")
+        radar = split_code[-1]
 
     if not geohash and not url_path:
         log("No BOM location geohash or Weatherzone URL Path - can't retrieve weather data!")
@@ -195,7 +203,7 @@ def get_weather():
         radar = 'IDR00004'
         log(f'Radar code empty for location, so using default radar code {radar} (= national radar)')
 
-    log(f'Current location: geohash "{geohash}", urlpath "{url_path}", radar {radar}')
+    log(f'Current location: BOM geohash "{geohash}", Weatherzone urlpath "{url_path}", radar code {radar}')
 
     # Now scrape the weather data & radar images
     forecast(geohash, url_path, radar)
