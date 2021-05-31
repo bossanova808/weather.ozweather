@@ -191,10 +191,13 @@ def get_weather():
     set_property(WEATHER_WINDOW, 'WeatherVersion', ADDON_NAME + "-" + ADDON_VERSION)
 
     # Set what we updated and when
-    set_property(WEATHER_WINDOW, 'Location', ADDON.getSetting('Location%s' % sys.argv[1]))
+    location_in_use = ADDON.getSetting(f'Location{sys.argv[1]}BOM') or ADDON.getSetting(f'Location{sys.argv[1]}WeatherZone')
+    location_in_use = location_in_use[0:location_in_use.index(' (')]
+
+    set_property(WEATHER_WINDOW, 'Location', location_in_use)
     set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m/%Y %H:%M"))
-    set_property(WEATHER_WINDOW, 'Current.Location', ADDON.getSetting('Location%s' % sys.argv[1]))
-    set_property(WEATHER_WINDOW, 'Forecast.City', ADDON.getSetting('Location%s' % sys.argv[1]))
+    set_property(WEATHER_WINDOW, 'Current.Location', location_in_use)
+    set_property(WEATHER_WINDOW, 'Forecast.City', location_in_use)
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
 
