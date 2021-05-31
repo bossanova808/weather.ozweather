@@ -192,7 +192,10 @@ def get_weather():
 
     # Set what we updated and when
     location_in_use = ADDON.getSetting(f'Location{sys.argv[1]}BOM') or ADDON.getSetting(f'Location{sys.argv[1]}WeatherZone')
-    location_in_use = location_in_use[0:location_in_use.index(' (')]
+    try:
+        location_in_use = location_in_use[0:location_in_use.index(' (')]
+    except ValueError:
+        pass
 
     set_property(WEATHER_WINDOW, 'Location', location_in_use)
     set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m/%Y %H:%M"))
