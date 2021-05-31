@@ -243,7 +243,20 @@ def bom_forecast(geohash):
             set_keys(weather_data, i, ["FanartCode"], icon_code)
             # Maxes, Mins
             set_keys(weather_data, i, ["HighTemp", "HighTemperature"], forecast_seven_days[i]['temp_max'])
-            set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['temp_min'])
+            # Apparently BOM stops supplying this at a certain time
+            # https://forum.kodi.tv/showthread.php?tid=116905&pid=3040450#pid3040450
+            # So in the evening, switch to using now -> temp_later
+            # Possible approaches :
+            # if i == 0 and forecast_seven_days[i]['now']['is_night']:
+            # now = datetime.datetime.now()
+            # sunrise = datetime.datetime.strptime(forecast_seven_days[0]['astronomical']['sunrise_time'], '%Y-%m-%dT%H:%M:%SZ')
+            # if i == 0 and now > sunrise:
+            # But....looks like the BOM actually has a built in clue...
+            if i == 0 and forecast_seven_days[i]['now']['later_label'] == 'Overnight Min':
+                log("Using now->temp_later as now->later_label is Overnight Min")
+                set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['now']['temp_later'])
+            else:
+                set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['temp_min'])
             # Chance & amount of rain
             set_keys(weather_data, i, ["RainChance", "ChancePrecipitation"], f'{forecast_seven_days[i]["rain"]["chance"]}%')
             amount_min = forecast_seven_days[i]['rain']['amount']['min'] or '0'
