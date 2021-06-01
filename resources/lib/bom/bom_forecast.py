@@ -175,8 +175,6 @@ def bom_forecast(geohash):
     #     log(f'Error retrieving rain forecast from {bom_api_forecast_rain}')
     #     raise
 
-    log('')
-
     # Gather the weather data into Kodi friendly labels
     weather_data = {}
 
@@ -186,7 +184,6 @@ def bom_forecast(geohash):
         location_timezone_text = area_information['timezone']
         log(f"Location timezone from BOM is {location_timezone_text}")
         location_timezone = pytz.timezone(location_timezone_text)
-        log(location_timezone)
 
     # Current Observations
     if current_observations:
@@ -244,35 +241,53 @@ def bom_forecast(geohash):
 
             # Weather icon (current day is different - we use night icons if it is night...)
             icon_code = "na"
+            # First, try and use the short text, to cope with BOM madness like:
+            # "icon_descriptor":"mostly_sunny","short_text":"Mostly cloudy."
+            icon_descriptor = forecast_seven_days[i]['icon_descriptor']
+            descriptor_from_short_text = forecast_seven_days[i]['short_text'].lower()
+            descriptor_from_short_text = descriptor_from_short_text.replace(' ', '_').replace('.', '').strip()
+            if descriptor_from_short_text in Store.WEATHER_CODES:
+                log("Using short text as icon descriptor as this is often more reliable than the actual icon_descriptor")
+                icon_descriptor = descriptor_from_short_text
             try:
                 if i == 0 and forecast_seven_days[i]['now']['is_night']:
-                    icon_code = Store.WEATHER_CODES_NIGHT[forecast_seven_days[i]['icon_descriptor']]
+                    icon_code = Store.WEATHER_CODES_NIGHT[icon_descriptor]
                 else:
-                    icon_code = Store.WEATHER_CODES[forecast_seven_days[i]['icon_descriptor']]
+                    icon_code = Store.WEATHER_CODES[icon_descriptor]
             except KeyError:
-                log(f'Could not find icon code for BOM icon_descriptor: "{forecast_seven_days[i]["icon_descriptor"]}"')
+                log(f'Could not find icon code for BOM icon_descriptor: {forecast_seven_days[i]["icon_descriptor"]} and from short text {descriptor_from_short_text}')
                 # Pop the missing icon descriptor into the outlook to make it easier for people to report in the forum thread
                 set_key(weather_data, i, "Outlook", f"[{forecast_seven_days[i]['icon_descriptor']}] {forecast_seven_days[i]['short_text']}")
 
+            log(f"Icon descriptor is: {icon_descriptor}, icon code is {icon_code}")
             set_keys(weather_data, i, ["OutlookIcon", "ConditionIcon"], f'{icon_code}.png')
             set_keys(weather_data, i, ["FanartCode"], icon_code)
 
             # Maxes, Mins
-            set_keys(weather_data, i, ["HighTemp", "HighTemperature"], forecast_seven_days[i]['temp_max'])
-            # Apparently BOM stops supplying this at a certain time
-            # https://forum.kodi.tv/showthread.php?tid=116905&pid=3040450#pid3040450
-            # So in the evening, switch to using now -> temp_later
-            # Possible approaches :
-            # if i == 0 and forecast_seven_days[i]['now']['is_night']:
-            # now = datetime.datetime.now()
-            # sunrise = datetime.datetime.strptime(forecast_seven_days[0]['astronomical']['sunrise_time'], '%Y-%m-%dT%H:%M:%SZ')
-            # if i == 0 and now > sunrise:
-            # But....looks like the BOM actually has a built in clue...
-            if i == 0 and forecast_seven_days[i]['now']['later_label'] == 'Overnight Min':
-                log("Using now->temp_later as now->later_label is Overnight Min")
-                set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['now']['temp_later'])
-            else:
-                set_keys(weather_data, i, ["LowTemp", "LowTemperature"], forecast_seven_days[i]['temp_min'])
+            # In general, jsut get this from the forecast
+            # But the BOM, bizarrely, removes the min/max for the current day
+            # Which is f-ing stupid, but there you go.
+            # Then there's this dance with the 'now' data as to what it means depending on the time
+            # Which is a thoroughly sh*t way to design an API...
+            temp_max = forecast_seven_days[i]['temp_max'] or ""
+            if i == 0 and not temp_max:
+                if forecast_seven_days[i]['now']['now_label'] == "Tomorrow's Max":
+                    log("Using now->temp_now as now->now_label is Tomorrow's Max")
+                    temp_max = forecast_seven_days[i]['now']['temp_now']
+                elif forecast_seven_days[i]['now']['later_label'] == "Tomorrow's Max":
+                    log("Using now->temp_later as now->later_label is Tomorrow's Max")
+                    temp_max = forecast_seven_days[i]['now']['temp_later']
+            set_keys(weather_data, i, ["HighTemp", "HighTemperature"], temp_max)
+
+            temp_min = forecast_seven_days[i]['temp_min'] or ""
+            if i == 0 and not temp_min:
+                if forecast_seven_days[i]['now']['now_label'] == 'Overnight Min':
+                    log("Using now->temp_now as now->now_label is Overnight Min")
+                    temp_min = forecast_seven_days[i]['now']['temp_now']
+                elif forecast_seven_days[i]['now']['later_label'] == 'Overnight Min':
+                    log("Using now->temp_later as now->later_label is Overnight Min")
+                    temp_min = forecast_seven_days[i]['now']['temp_later']
+            set_keys(weather_data, i, ["LowTemp", "LowTemperature"], temp_min)
 
             # Chance & amount of rain
             set_keys(weather_data, i, ["RainChance", "ChancePrecipitation"], f'{forecast_seven_days[i]["rain"]["chance"]}%')
