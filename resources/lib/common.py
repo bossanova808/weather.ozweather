@@ -107,9 +107,11 @@ else:
         """
         value = str(value)
         if value:
-            log(f'Setting property {name} to value {value}')
-        window.setProperty(name, value)
-
+            log(f'Setting window property {name} to value {value}')
+            window.setProperty(name, value)
+        else:
+            log(f'Clearing window property {name}')
+            window.clearProperty(name)
 
     def get_property(window, name):
         """

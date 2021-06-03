@@ -1,3 +1,5 @@
+import xbmcplugin
+
 from .weatherzone.weatherzone_forecast import *
 from .abc.abc_video import *
 from .bom.bom_radar import *
@@ -51,6 +53,10 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Current.Precipitation')
         set_property(WEATHER_WINDOW, 'Current.ChancePrecipitation')
         set_property(WEATHER_WINDOW, 'Current.SolarRadiation')
+        set_property(WEATHER_WINDOW, 'Current.NowLabel')
+        set_property(WEATHER_WINDOW, 'Current.NowValue')
+        set_property(WEATHER_WINDOW, 'Current.LaterLabel')
+        set_property(WEATHER_WINDOW, 'Current.LaterValue')
 
         set_property(WEATHER_WINDOW, 'Today.IsFetched', "false")
         set_property(WEATHER_WINDOW, 'Today.Sunrise')
@@ -106,6 +112,8 @@ def forecast(geohash, url_path, radar_code):
     :param url_path: the WeatherZone url path if still using that...
     :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
+    set_property(WEATHER_WINDOW, "Weather.IsFetched")
+
     extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
     log(f'Extended features: {extended_features}')
     purge_backgrounds = ADDON.getSettingBool('PurgeRadarBackgroundsOnNextRefresh')
@@ -167,6 +175,13 @@ def get_weather():
 
     log("*** Updating Weather Data ***")
 
+    if 'confluence' in xbmc.getSkinDir().lower():
+        set_property(WEATHER_WINDOW, 'SkinInUse', "confluence")
+    if 'estuary' in xbmc.getSkinDir().lower():
+        set_property(WEATHER_WINDOW, 'SkinInUse', "estuary")
+    if 'estouchy' in xbmc.getSkinDir().lower():
+        set_property(WEATHER_WINDOW, 'SkinInUse', "estouchy")
+
     # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
     geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
     url_path = ADDON.getSetting(f'Location{sys.argv[1]}WeatherzoneUrlPath')
@@ -198,11 +213,11 @@ def get_weather():
         pass
 
     set_property(WEATHER_WINDOW, 'Location', location_in_use)
-    set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m/%Y %H:%M"))
+    set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m %H:%M").lower())
     set_property(WEATHER_WINDOW, 'Current.Location', location_in_use)
     set_property(WEATHER_WINDOW, 'Forecast.City', location_in_use)
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
-    set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
+    set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m @ %H:%M").lower())
 
     # If we don't have a radar code, get the national radar by default
     if not radar:

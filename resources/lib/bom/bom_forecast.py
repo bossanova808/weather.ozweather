@@ -34,6 +34,9 @@ def set_key(weather_data, index, key, value):
     Set a key - for old and new weather label support
     """
 
+    if value == "":
+        return
+
     value = str(value)
 
     if index == 0:
@@ -50,6 +53,9 @@ def set_keys(weather_data, index, keys, value):
     """
     Set a group of keys at once - for old and new weather label support
     """
+    if value == "":
+        return
+
     for key in keys:
         set_key(weather_data, index, key, value)
 
@@ -220,7 +226,9 @@ def bom_forecast(geohash):
         weather_data['Current.Sunset'] = weather_data['Today.Sunset'] = utc_str_to_local_str(forecast_seven_days[0]['astronomical']['sunset_time'], time_zone=location_timezone)
         weather_data['Current.FireDanger'] = 'None' if not forecast_seven_days[0]['fire_danger'] else forecast_seven_days[0]['fire_danger']
         weather_data["Current.NowLabel"] = forecast_seven_days[0]['now']['now_label']
+        weather_data["Current.NowValue"] = forecast_seven_days[0]['now']['temp_now']
         weather_data["Current.LaterLabel"] = forecast_seven_days[0]['now']['later_label']
+        weather_data["Current.LaterValue"] = forecast_seven_days[0]['now']['temp_later']
 
         # For each day of the forecast...
         for i, forecast_day in enumerate(forecast_seven_days):
@@ -244,11 +252,12 @@ def bom_forecast(geohash):
             # First, try and use the short text, to cope with BOM madness like:
             # "icon_descriptor":"mostly_sunny","short_text":"Mostly cloudy."
             icon_descriptor = forecast_seven_days[i]['icon_descriptor']
-            descriptor_from_short_text = forecast_seven_days[i]['short_text'].lower()
-            descriptor_from_short_text = descriptor_from_short_text.replace(' ', '_').replace('.', '').strip()
-            if descriptor_from_short_text in Store.WEATHER_CODES:
-                log("Using short text as icon descriptor as this is often more reliable than the actual icon_descriptor")
-                icon_descriptor = descriptor_from_short_text
+            if forecast_seven_days[i]['short_text']:
+                descriptor_from_short_text = forecast_seven_days[i]['short_text'].lower()
+                descriptor_from_short_text = descriptor_from_short_text.replace(' ', '_').replace('.', '').strip()
+                if descriptor_from_short_text in Store.WEATHER_CODES:
+                    log("Using short text as icon descriptor as this is often more reliable than the actual icon_descriptor")
+                    icon_descriptor = descriptor_from_short_text
             try:
                 if i == 0 and forecast_seven_days[i]['now']['is_night']:
                     icon_code = Store.WEATHER_CODES_NIGHT[icon_descriptor]
@@ -264,7 +273,7 @@ def bom_forecast(geohash):
             set_keys(weather_data, i, ["FanartCode"], icon_code)
 
             # Maxes, Mins
-            # In general, jsut get this from the forecast
+            # In general, just get this from the forecast
             # But the BOM, bizarrely, removes the min/max for the current day
             # Which is f-ing stupid, but there you go.
             # Then there's this dance with the 'now' data as to what it means depending on the time
@@ -277,6 +286,8 @@ def bom_forecast(geohash):
                 elif forecast_seven_days[i]['now']['later_label'] == "Tomorrow's Max":
                     log("Using now->temp_later as now->later_label is Tomorrow's Max")
                     temp_max = forecast_seven_days[i]['now']['temp_later']
+            # if i == 0:
+            #     temp_max = ""
             set_keys(weather_data, i, ["HighTemp", "HighTemperature"], temp_max)
 
             temp_min = forecast_seven_days[i]['temp_min'] or ""
@@ -294,9 +305,9 @@ def bom_forecast(geohash):
             amount_min = forecast_seven_days[i]['rain']['amount']['min'] or '0'
             amount_max = forecast_seven_days[i]['rain']['amount']['max'] or '0'
             if amount_min == '0' and amount_max == '0':
-                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], 'None')
+                set_keys(weather_data, i, ["RainChanceAmount", "RainAmount", "Precipitation"], 'None')
             else:
-                set_keys(weather_data, i, ["RainChanceAmount", "Precipitation"], f'{amount_min}-{amount_max}mm')
+                set_keys(weather_data, i, ["RainChanceAmount", "RainAmount", "Precipitation"], f'{amount_min}-{amount_max}mm')
 
             # UV - Predicted max, text for such, and the recommended 'Wear Sun Protection' period
             set_key(weather_data, i, 'UVIndex',  f'{forecast_seven_days[i]["uv"]["max_index"]}')
@@ -319,6 +330,8 @@ def bom_forecast(geohash):
             # For the current day, add the warnings if there are any.
             if i == 0 and warnings_text:
                 extended_text = f'{extended_text}\n\n{warnings_text}'
+
+            extended_text += "add some more random text on the beginning so it just goes on and on"
 
             set_key(weather_data, i, "OutlookLong", extended_text)
             set_key(weather_data, i, "ConditionLong", extended_text)

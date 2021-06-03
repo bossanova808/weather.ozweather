@@ -220,7 +220,12 @@ def build_images(radar_code, backgrounds_path, overlay_loop_path):
     files = []
 
     log("Log in to BOM FTP")
-    ftp = ftplib.FTP("ftp.bom.gov.au")
+    try:
+        ftp = ftplib.FTP("ftp.bom.gov.au")
+    except:
+        return
+
+
     ftp.login("anonymous", "anonymous@anonymous.org")
     ftp.cwd("/anon/gen/radar/")
 
