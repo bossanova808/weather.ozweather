@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import datetime
 import ftplib
 import glob
 import os
@@ -164,11 +165,11 @@ def build_images(radar_code, backgrounds_path, overlay_loop_path):
     log("Overlay loop path: " + overlay_loop_path)
     log("Backgrounds path: " + backgrounds_path)
 
-    log("Deleting any radar overlays older than 2 hours (as BOM keeps last two hours, we do too)")
+    log("Deleting any radar overlays older than an hour, that's long enough to see what has passed plus not take too long to loop")
     current_files = glob.glob(overlay_loop_path + "/*.png")
     for count, file in enumerate(current_files):
         filetime = os.path.getmtime(file)
-        two_hours_ago = time.time() - (2 * 60 * 60)
+        two_hours_ago = time.time() - (1 * 60 * 60)
         if filetime < two_hours_ago:
             os.remove(file)
             log("Deleted aged radar image " + str(os.path.basename(file)))
@@ -248,6 +249,7 @@ def build_images(radar_code, backgrounds_path, overlay_loop_path):
             log("No files in BOM ftp directory!")
         else:
             log("Something wrong in the ftp bit of radar images")
+            log(str(resp))
 
     log("Download the files...")
     # ok now we need just the matching radar files...
@@ -266,6 +268,7 @@ def build_images(radar_code, backgrounds_path, overlay_loop_path):
                 output_file = time_now + "." + f
                 log("Retrieving new radar image: " + image_to_retrieve)
                 log("Output to file: " + output_file)
+
                 try:
                     radar_image = urllib.request.urlopen(image_to_retrieve)
                     with open(overlay_loop_path + "/" + output_file, "wb") as fh:

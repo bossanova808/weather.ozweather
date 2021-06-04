@@ -339,11 +339,9 @@ def bom_forecast(geohash):
             if i == 0 and warnings_text:
                 extended_text = f'{extended_text}\n\n{warnings_text}'
 
-            # TESTING for skin scrolling - REMOVE THIS!
-            extended_text += "add some more random text on the end so it just goes on and on\n"
-            extended_text += "add some more random text on the end so it just goes on and on\n"
-            extended_text += "add some more random text on the end so it just goes on and on\n"
-            extended_text += "add some more random text on the end so it just goes on and on\n"
+            # TESTING for skin scrolling - DON'T LEAVE THIS UNCOMMENTED!
+            # for j in range(0, 5):
+            #     extended_text += "add some more random text on the end so it just goes on and on\n"
 
             set_key(weather_data, i, "OutlookLong", extended_text)
             set_key(weather_data, i, "ConditionLong", extended_text)

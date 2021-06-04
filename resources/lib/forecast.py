@@ -12,13 +12,14 @@ def clear_properties():
     """
     log("Clearing all weather window properties")
     try:
+        set_property(WEATHER_WINDOW, 'Weather.IsFetched')
+        set_property(WEATHER_WINDOW, 'Daily.IsFetched')
+
         set_property(WEATHER_WINDOW, 'WeatherProviderLogo')
         set_property(WEATHER_WINDOW, 'WeatherProvider')
         set_property(WEATHER_WINDOW, 'WeatherVersion')
         set_property(WEATHER_WINDOW, 'Location')
         set_property(WEATHER_WINDOW, 'Updated')
-        set_property(WEATHER_WINDOW, 'Weather.IsFetched')
-        set_property(WEATHER_WINDOW, 'Daily.IsFetched')
         set_property(WEATHER_WINDOW, 'Radar')
         set_property(WEATHER_WINDOW, 'RadarOldest')
         set_property(WEATHER_WINDOW, 'RadarNewest')
@@ -27,6 +28,10 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Forecast.City')
         set_property(WEATHER_WINDOW, 'Forecast.Country')
         set_property(WEATHER_WINDOW, 'Forecast.Updated')
+        set_property(WEATHER_WINDOW, 'ForecastUpdated')
+        set_property(WEATHER_WINDOW, 'ForecastRegion')
+        set_property(WEATHER_WINDOW, 'ForecastType')
+        set_property(WEATHER_WINDOW, 'ObservationsUpdated')
 
         set_property(WEATHER_WINDOW, 'Current.IsFetched')
         set_property(WEATHER_WINDOW, 'Current.Location')
@@ -88,6 +93,7 @@ def clear_properties():
             set_property(WEATHER_WINDOW, 'Daily.%i.Title' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.RainChance' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.RainChanceAmount' % count)
+            set_property(WEATHER_WINDOW, 'Daily.%i.RainAmount' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.ChancePrecipitation' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.Precipitation' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.HighTemp' % count)
@@ -138,12 +144,22 @@ def forecast(geohash, url_path, radar_code):
 
         # Finally set some labels so we can see when the loop runs from, to
         list_of_loop_files = glob.glob(overlay_loop_path + "/*")
-        oldest_file = min(list_of_loop_files, key=os.path.getctime)
-        newest_file = max(list_of_loop_files, key=os.path.getctime)
-        oldest_dt = datetime.datetime.fromtimestamp(os.path.getctime(oldest_file))
-        newest_dt = datetime.datetime.fromtimestamp(os.path.getctime(newest_file))
-        set_property(WEATHER_WINDOW, 'RadarOldest', oldest_dt.strftime('%I:%M%p').lower())
-        set_property(WEATHER_WINDOW, 'RadarNewest', newest_dt.strftime('%I:%M%p').lower())
+        if list_of_loop_files:
+            oldest_file = list_of_loop_files[0]
+            newest_file = list_of_loop_files[-1]
+            # utc - get from filename of oldest and newest
+            utc_oldest = oldest_file.split('.')[4]
+            utc_newest = newest_file.split('.')[4]
+            log(f"utc_oldest {utc_oldest}")
+            log(f"utc_newest {utc_newest}")
+
+            time_oldest = utc_str_to_local_str(utc_oldest, "%Y%m%d%H%M")
+            time_newest = utc_str_to_local_str(utc_newest, "%Y%m%d%H%M")
+
+            oldest_dt = datetime.datetime.fromtimestamp(os.path.getctime(oldest_file))
+            newest_dt = datetime.datetime.fromtimestamp(os.path.getctime(newest_file))
+            set_property(WEATHER_WINDOW, 'RadarOldest', time_oldest)
+            set_property(WEATHER_WINDOW, 'RadarNewest', time_newest)
 
     # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...
     weather_data = False
