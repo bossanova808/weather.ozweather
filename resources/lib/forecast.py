@@ -4,6 +4,7 @@ from .weatherzone.weatherzone_forecast import *
 from .abc.abc_video import *
 from .bom.bom_radar import *
 from .bom.bom_forecast import *
+from pathlib import Path
 
 
 def clear_properties():
@@ -143,23 +144,26 @@ def forecast(geohash, url_path, radar_code):
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
         # Finally set some labels so we can see when the loop runs from, to
-        list_of_loop_files = glob.glob(overlay_loop_path + "/*")
-        if list_of_loop_files:
-            oldest_file = list_of_loop_files[0]
-            newest_file = list_of_loop_files[-1]
-            # utc - get from filename of oldest and newest
-            utc_oldest = oldest_file.split('.')[4]
-            utc_newest = newest_file.split('.')[4]
-            log(f"utc_oldest {utc_oldest}")
-            log(f"utc_newest {utc_newest}")
+        list_of_loop_files = glob.glob(overlay_loop_path + "*")
 
-            time_oldest = utc_str_to_local_str(utc_oldest, "%Y%m%d%H%M")
-            time_newest = utc_str_to_local_str(utc_newest, "%Y%m%d%H%M")
+        list_of_loop_files = list(filter(os.path.isfile, glob.glob(overlay_loop_path + "*")))
+        list_of_loop_files.sort(key=lambda x: os.path.getmtime(x))
 
-            oldest_dt = datetime.datetime.fromtimestamp(os.path.getctime(oldest_file))
-            newest_dt = datetime.datetime.fromtimestamp(os.path.getctime(newest_file))
-            set_property(WEATHER_WINDOW, 'RadarOldest', time_oldest)
-            set_property(WEATHER_WINDOW, 'RadarNewest', time_newest)
+        oldest_file = list_of_loop_files[0]
+        newest_file = list_of_loop_files[-1]
+        # utc - get from filename of oldest and newest - it's the last number before the .png
+        utc_oldest = oldest_file.split('.')[-2]
+        utc_newest = newest_file.split('.')[-2]
+        log(f"utc_oldest {utc_oldest}")
+        log(f"utc_newest {utc_newest}")
+
+        time_oldest = utc_str_to_local_str(utc_oldest, "%Y%m%d%H%M")
+        time_newest = utc_str_to_local_str(utc_newest, "%Y%m%d%H%M")
+
+        oldest_dt = datetime.datetime.fromtimestamp(os.path.getctime(oldest_file))
+        newest_dt = datetime.datetime.fromtimestamp(os.path.getctime(newest_file))
+        set_property(WEATHER_WINDOW, 'RadarOldest', time_oldest)
+        set_property(WEATHER_WINDOW, 'RadarNewest', time_newest)
 
     # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...
     weather_data = False
