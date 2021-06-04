@@ -17,16 +17,18 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'WeatherVersion')
         set_property(WEATHER_WINDOW, 'Location')
         set_property(WEATHER_WINDOW, 'Updated')
-        set_property(WEATHER_WINDOW, 'Weather.IsFetched', "false")
-        set_property(WEATHER_WINDOW, 'Daily.IsFetched', "false")
+        set_property(WEATHER_WINDOW, 'Weather.IsFetched')
+        set_property(WEATHER_WINDOW, 'Daily.IsFetched')
         set_property(WEATHER_WINDOW, 'Radar')
+        set_property(WEATHER_WINDOW, 'RadarOldest')
+        set_property(WEATHER_WINDOW, 'RadarNewest')
         set_property(WEATHER_WINDOW, 'Video.1')
 
         set_property(WEATHER_WINDOW, 'Forecast.City')
         set_property(WEATHER_WINDOW, 'Forecast.Country')
         set_property(WEATHER_WINDOW, 'Forecast.Updated')
 
-        set_property(WEATHER_WINDOW, 'Current.IsFetched', "false")
+        set_property(WEATHER_WINDOW, 'Current.IsFetched')
         set_property(WEATHER_WINDOW, 'Current.Location')
         set_property(WEATHER_WINDOW, 'Current.Condition')
         set_property(WEATHER_WINDOW, 'Current.ConditionLong')
@@ -43,8 +45,8 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Current.FeelsLike')
         set_property(WEATHER_WINDOW, 'Current.DewPoint')
         set_property(WEATHER_WINDOW, 'Current.UVIndex')
-        set_property(WEATHER_WINDOW, 'Current.OutlookIcon', "na.png")
-        set_property(WEATHER_WINDOW, 'Current.ConditionIcon', "na.png")
+        set_property(WEATHER_WINDOW, 'Current.OutlookIcon')
+        set_property(WEATHER_WINDOW, 'Current.ConditionIcon')
         set_property(WEATHER_WINDOW, 'Current.FanartCode')
         set_property(WEATHER_WINDOW, 'Current.Sunrise')
         set_property(WEATHER_WINDOW, 'Current.Sunset')
@@ -58,14 +60,14 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Current.LaterLabel')
         set_property(WEATHER_WINDOW, 'Current.LaterValue')
 
-        set_property(WEATHER_WINDOW, 'Today.IsFetched', "false")
+        set_property(WEATHER_WINDOW, 'Today.IsFetched')
         set_property(WEATHER_WINDOW, 'Today.Sunrise')
         set_property(WEATHER_WINDOW, 'Today.Sunset')
         set_property(WEATHER_WINDOW, 'Today.moonphase')
         set_property(WEATHER_WINDOW, 'Today.Moonphase')
 
         # and all the properties for the forecast
-        for count in range(0, 14):
+        for count in range(0, 8):
             set_property(WEATHER_WINDOW, 'Day%i.Title' % count)
             set_property(WEATHER_WINDOW, 'Day%i.RainChance' % count)
             set_property(WEATHER_WINDOW, 'Day%i.RainChanceAmount' % count)
@@ -77,8 +79,8 @@ def clear_properties():
             set_property(WEATHER_WINDOW, 'Day%i.LowTemperature' % count)
             set_property(WEATHER_WINDOW, 'Day%i.Outlook' % count)
             set_property(WEATHER_WINDOW, 'Day%i.LongOutlookDay' % count)
-            set_property(WEATHER_WINDOW, 'Day%i.OutlookIcon' % count, "na.png")
-            set_property(WEATHER_WINDOW, 'Day%i.ConditionIcon' % count, "na.png")
+            set_property(WEATHER_WINDOW, 'Day%i.OutlookIcon' % count )
+            set_property(WEATHER_WINDOW, 'Day%i.ConditionIcon' % count)
             set_property(WEATHER_WINDOW, 'Day%i.FanartCode' % count)
             set_property(WEATHER_WINDOW, 'Day%i.ShortDate' % count)
             set_property(WEATHER_WINDOW, 'Day%i.ShortDay' % count)
@@ -94,8 +96,8 @@ def clear_properties():
             set_property(WEATHER_WINDOW, 'Daily.%i.LowTemperature' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.Outlook' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.LongOutlookDay' % count)
-            set_property(WEATHER_WINDOW, 'Daily.%i.OutlookIcon' % count, "na.png")
-            set_property(WEATHER_WINDOW, 'Daily.%i.ConditionIcon' % count, "na.png")
+            set_property(WEATHER_WINDOW, 'Daily.%i.OutlookIcon' % count)
+            set_property(WEATHER_WINDOW, 'Daily.%i.ConditionIcon' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.FanartCode' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.ShortDate' % count)
             set_property(WEATHER_WINDOW, 'Daily.%i.ShortDay' % count)
@@ -133,6 +135,15 @@ def forecast(geohash, url_path, radar_code):
             "special://profile/addon_data/weather.ozweather/currentloop/" + radar_code + "/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
+
+        # Finally set some labels so we can see when the loop runs from, to
+        list_of_loop_files = glob.glob(overlay_loop_path + "/*")
+        oldest_file = min(list_of_loop_files, key=os.path.getctime)
+        newest_file = max(list_of_loop_files, key=os.path.getctime)
+        oldest_dt = datetime.datetime.fromtimestamp(os.path.getctime(oldest_file))
+        newest_dt = datetime.datetime.fromtimestamp(os.path.getctime(newest_file))
+        set_property(WEATHER_WINDOW, 'RadarOldest', oldest_dt.strftime('%I:%M%p').lower())
+        set_property(WEATHER_WINDOW, 'RadarNewest', newest_dt.strftime('%I:%M%p').lower())
 
     # Get all the weather & forecast data from the BOM API, fall back to weatherzone if there's issues...
     weather_data = False

@@ -34,8 +34,8 @@ def get_distance(point1, point2):
     d_lon = lon2 - lon1
     d_lat = lat2 - lat1
 
-    a = sin(d_lat / 2)**2 + cos(lat1) * cos(lat2) * sin(d_lon / 2)**2
-    c = 2 * atan2(sqrt(a), sqrt(1-a))
+    a = sin(d_lat / 2) ** 2 + cos(lat1) * cos(lat2) * sin(d_lon / 2) ** 2
+    c = 2 * atan2(sqrt(a), sqrt(1 - a))
     distance = R * c
     return distance
 
@@ -44,7 +44,7 @@ def closest_radar_to_lat_lon(point):
     """
     Given a lat/long tuple, return the closest radar (lat/lon) from our list of radars
     """
-    closest_radar = (0,0, "", "")
+    closest_radar = (0, 0, "", "")
     closest_distance = 10000
     for radar in Store.BOM_RADAR_LOCATIONS:
         distance = get_distance(point, (radar[0], radar[1]))
@@ -220,11 +220,21 @@ def build_images(radar_code, backgrounds_path, overlay_loop_path):
     files = []
 
     log("Log in to BOM FTP")
-    try:
-        ftp = ftplib.FTP("ftp.bom.gov.au")
-    except:
-        return
+    attempts = 0
+    ftp = None
 
+    # Try up to 3 times, with a seconds pause between each, to connect to BOM FTP
+    # (to try and get past very occasional 'too many users' errors)
+    while not ftp and attempts < 3:
+        try:
+            ftp = ftplib.FTP("ftp.bom.gov.au")
+        except:
+            attempts += 1
+            time.sleep(1)
+
+    if not ftp:
+        log("Failed after 3 attempt to connect to BOM FTP - can't update radar loop")
+        return
 
     ftp.login("anonymous", "anonymous@anonymous.org")
     ftp.cwd("/anon/gen/radar/")
@@ -289,7 +299,6 @@ if __name__ == "__main__":
 
     test_radars = ["IDR023", "IDR00004"]
     for test_radar in test_radars:
-
         backgrounds_path = os.getcwd() + "/test-outputs/backgrounds/" + test_radar + "/"
         overlay_loop_path = os.getcwd() + "/test-outputs/loop/" + test_radar + "/"
 
@@ -297,4 +306,3 @@ if __name__ == "__main__":
         build_images(test_radar, backgrounds_path, overlay_loop_path)
         log(os.listdir(backgrounds_path))
         log(os.listdir(overlay_loop_path))
-

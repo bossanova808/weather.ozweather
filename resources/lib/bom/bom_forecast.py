@@ -13,7 +13,7 @@ from resources.lib.store import Store
 from resources.lib.common import *
 
 """
-(See bottom of this file for BOM API examples)
+(See bottom of this file for BOM API output examples!)
 """
 
 
@@ -99,6 +99,9 @@ def bom_forecast(geohash):
     :param: geohash - the BOM location geohash
     """
 
+    # Gather the weather data into a dict from which we will later set all the Kodi labels
+    weather_data = {}
+
     # The areahash is the geohash minus the last character
     areahash = geohash[:-1]
 
@@ -110,7 +113,7 @@ def bom_forecast(geohash):
 
     bom_api_current_observations_url = f'{bom_api_url_areahash}/observations'
     bom_api_forecast_seven_days_url = f'{bom_api_url_areahash}/forecasts/daily'
-    # FUTURE? - not yet used...
+    # FUTURE? - these API end points exist, but are not yet used by OzWeather
     bom_api_forecast_three_hourly_url = f'{bom_api_url_areahash}/forecasts/3-hourly'
     bom_api_forecast_rain = f'{bom_api_url_areahash}/forecast/rain'
 
@@ -119,14 +122,19 @@ def bom_forecast(geohash):
     current_observations = None
     warnings = None
     forecast_seven_days = None
-    forecast_three_hourly = None
-    forecast_rain = None
+    # forecast_three_hourly = None
+    # forecast_rain = None
 
     # Get the area information
+    location_timezone = ""
     try:
         r = requests.get(bom_api_area_information_url)
         area_information = r.json()["data"]
         log(area_information)
+        if area_information:
+            location_timezone_text = area_information['timezone']
+            log(f"Location timezone from BOM is {location_timezone_text}")
+            location_timezone = pytz.timezone(location_timezone_text)
 
     except Exception as inst:
         log(f'Error retrieving area information from {bom_api_area_information_url}')
@@ -135,6 +143,7 @@ def bom_forecast(geohash):
     try:
         r = requests.get(bom_api_current_observations_url)
         current_observations = r.json()["data"]
+        weather_data['ObservationsUpdated'] = utc_str_to_local_str(r.json()["metadata"]["issue_time"], time_zone=location_timezone)
         log(current_observations)
 
     except Exception as inst:
@@ -154,6 +163,9 @@ def bom_forecast(geohash):
     try:
         r = requests.get(bom_api_forecast_seven_days_url)
         forecast_seven_days = r.json()["data"]
+        weather_data['ForecastUpdated'] = utc_str_to_local_str(r.json()["metadata"]["issue_time"], time_zone=location_timezone)
+        weather_data['ForecastRegion'] = r.json()["metadata"]["forecast_region"].title()
+        weather_data['ForecastType'] = r.json()["metadata"]["forecast_type"].title()
         log(forecast_seven_days)
 
     except Exception as inst:
@@ -181,34 +193,29 @@ def bom_forecast(geohash):
     #     log(f'Error retrieving rain forecast from {bom_api_forecast_rain}')
     #     raise
 
-    # Gather the weather data into Kodi friendly labels
-    weather_data = {}
 
+
+    # AREA INFORMATION
     # Better to show the times relative the location being viewed vs. the system location, which might be different.
-    location_timezone = ""
-    if area_information:
-        location_timezone_text = area_information['timezone']
-        log(f"Location timezone from BOM is {location_timezone_text}")
-        location_timezone = pytz.timezone(location_timezone_text)
 
-    # Current Observations
+
+    # CURRENT OBSERVATIONS
     if current_observations:
         weather_data['Current.Temperature'] = str(round(current_observations['temp']))
         weather_data['Current.FeelsLike'] = str(round(current_observations['temp_feels_like']))
         weather_data['Current.Humidity'] = current_observations['humidity']
         weather_data['Current.WindSpeed'] = current_observations['wind']['speed_kilometre']
         weather_data['Current.WindDirection'] = current_observations['wind']['direction']
-        weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} km/h'
+        weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} kph'
         weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]}'
         weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = f'{current_observations["rain_since_9am"]}'
 
-    # Warnings
+    # WARNINGS
     warnings_text = ""
-
     if warnings:
         for i, warning in enumerate(warnings):
             warning_issued = utc_str_to_local_str(warning['issue_time'], time_zone=location_timezone)
-            # Time signature on the expiry is different for some reason?!
+            # Time signature on the expiry here is different to all the other time signatures, for some BOM stupidity reason?!
             # Remove the completely unnecessary fractions of a second...
             warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'), time_zone=location_timezone)
             warning_text = f'** {warning["title"]} (issued at {warning_issued}, expires {warning_expires}) **'
@@ -218,7 +225,7 @@ def bom_forecast(geohash):
 
     weather_data['Current.WarningsText'] = warnings_text
 
-    # 7 Day Forecast
+    # 7 DAY FORECAST
     if forecast_seven_days:
         weather_data['Current.Condition'] = forecast_seven_days[0]['short_text']
         weather_data['Current.ConditionLong'] = forecast_seven_days[0]['extended_text']
@@ -234,22 +241,22 @@ def bom_forecast(geohash):
         for i, forecast_day in enumerate(forecast_seven_days):
 
             forecast_datetime = utc_str_to_local_datetime(forecast_seven_days[i]['date'], time_zone=location_timezone)
-
             # The names for days - short (Mon) and long (Monday)
             set_key(weather_data, i, "ShortDay", forecast_datetime.strftime('%a'))
             set_key(weather_data, i, "Title", forecast_datetime.strftime('%A'))
             set_key(weather_data, i, "LongDay", forecast_datetime.strftime('%A'))
             # Date (Apr 4)
             set_key(weather_data, i, "ShortDate", forecast_datetime.strftime('%b ') + forecast_datetime.strftime('%d').lstrip('0'))
-
             # Outlook / Condition (same thing)
             set_key(weather_data, i, "Outlook", forecast_seven_days[i]['short_text'])
             set_key(weather_data, i, "Condition", forecast_seven_days[i]['short_text'])
-            # OutlookLong / ConditionLong (same thing) - extended text forecast - see end of loop as we add warnings and sun protection info.
+            #  See end of loop for the extended forecast (OutlookLong, ConditionLong)
+            #  as we add warnings and sun protection info.OutlookLong / ConditionLong (same thing) - extended text forecast -
 
-            # Weather icon (current day is different - we use night icons if it is night...)
+            # Weather icon (icon for the current day is different - i.e. we use night icons if it is night...)
             icon_code = "na"
-            # First, try and use the short text, to cope with BOM madness like:
+            # By default, we use the icon_descriptor the BOM supplies
+            # However, preferentially try and use the short text, to cope with BOM madness like:
             # "icon_descriptor":"mostly_sunny","short_text":"Mostly cloudy."
             icon_descriptor = forecast_seven_days[i]['icon_descriptor']
             if forecast_seven_days[i]['short_text']:
@@ -258,6 +265,7 @@ def bom_forecast(geohash):
                 if descriptor_from_short_text in Store.WEATHER_CODES:
                     log("Using short text as icon descriptor as this is often more reliable than the actual icon_descriptor")
                     icon_descriptor = descriptor_from_short_text
+            # Now we have some sort of icon descriptor, try and get the actual icon_code
             try:
                 if i == 0 and forecast_seven_days[i]['now']['is_night']:
                     icon_code = Store.WEATHER_CODES_NIGHT[icon_descriptor]
@@ -278,6 +286,8 @@ def bom_forecast(geohash):
             # Which is f-ing stupid, but there you go.
             # Then there's this dance with the 'now' data as to what it means depending on the time
             # Which is a thoroughly sh*t way to design an API...
+            # All that being said, with the re-design of the skin files, we now use the 'now' info for the current day
+            # And not the forecast info, but left here for compatibility
             temp_max = forecast_seven_days[i]['temp_max'] or ""
             if i == 0 and not temp_max:
                 if forecast_seven_days[i]['now']['now_label'] == "Tomorrow's Max":
@@ -286,8 +296,6 @@ def bom_forecast(geohash):
                 elif forecast_seven_days[i]['now']['later_label'] == "Tomorrow's Max":
                     log("Using now->temp_later as now->later_label is Tomorrow's Max")
                     temp_max = forecast_seven_days[i]['now']['temp_later']
-            # if i == 0:
-            #     temp_max = ""
             set_keys(weather_data, i, ["HighTemp", "HighTemperature"], temp_max)
 
             temp_min = forecast_seven_days[i]['temp_min'] or ""
@@ -310,15 +318,15 @@ def bom_forecast(geohash):
                 set_keys(weather_data, i, ["RainChanceAmount", "RainAmount", "Precipitation"], f'{amount_min}-{amount_max}mm')
 
             # UV - Predicted max, text for such, and the recommended 'Wear Sun Protection' period
-            set_key(weather_data, i, 'UVIndex',  f'{forecast_seven_days[i]["uv"]["max_index"]}')
+            set_key(weather_data, i, 'UVIndex',  f'{forecast_seven_days[i]["uv"]["max_index"]}' or "")
             if forecast_seven_days[i]['uv']['category']:
-                set_key(weather_data, i, 'UVIndex', f'{forecast_seven_days[i]["uv"]["max_index"]} ({forecast_seven_days[i]["uv"]["category"].title()})')
-                set_key(weather_data, i, 'UVCategory', forecast_seven_days[i]['uv']['category'].title())
+                set_key(weather_data, i, 'UVIndex', f'{forecast_seven_days[i]["uv"]["max_index"]} ({forecast_seven_days[i]["uv"]["category"].title()})' or "")
+                set_key(weather_data, i, 'UVCategory', forecast_seven_days[i]['uv']['category'].title() or "")
             else:
                 set_key(weather_data, i, 'UVCategory', "None")
 
             # OutlookLong / Condition Long
-            extended_text = f'{forecast_seven_days[i]["extended_text"]}'
+            extended_text = f'{forecast_seven_days[i]["extended_text"]}' or ""
 
             # Add sun protection recommendation, if there is one
             if i == 0 and forecast_seven_days[i]['uv']['start_time'] and forecast_seven_days[i]['uv']['end_time']:
@@ -331,7 +339,11 @@ def bom_forecast(geohash):
             if i == 0 and warnings_text:
                 extended_text = f'{extended_text}\n\n{warnings_text}'
 
-            extended_text += "add some more random text on the beginning so it just goes on and on"
+            # TESTING for skin scrolling - REMOVE THIS!
+            extended_text += "add some more random text on the end so it just goes on and on\n"
+            extended_text += "add some more random text on the end so it just goes on and on\n"
+            extended_text += "add some more random text on the end so it just goes on and on\n"
+            extended_text += "add some more random text on the end so it just goes on and on\n"
 
             set_key(weather_data, i, "OutlookLong", extended_text)
             set_key(weather_data, i, "ConditionLong", extended_text)
@@ -341,7 +353,7 @@ def bom_forecast(geohash):
         # Missing data that was available at Weatherzone but is not available from the BOM API
         weather_data['Current.DewPoint'] = "N/A"
         weather_data['Current.Pressure'] = "N/A"
-        # weather_data['Current.FireDanger'] -> use only FireDanger as is now text already
+        weather_data['Current.FireDangerText'] = "" # -> use only FireDanger with the BOM as is now text already
 
     return weather_data
 
