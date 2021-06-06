@@ -29,6 +29,7 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Forecast.City')
         set_property(WEATHER_WINDOW, 'Forecast.Country')
         set_property(WEATHER_WINDOW, 'Forecast.Updated')
+
         set_property(WEATHER_WINDOW, 'ForecastUpdated')
         set_property(WEATHER_WINDOW, 'ForecastRegion')
         set_property(WEATHER_WINDOW, 'ForecastType')
@@ -121,7 +122,6 @@ def forecast(geohash, url_path, radar_code):
     :param url_path: the WeatherZone url path if still using that...
     :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
     """
-    set_property(WEATHER_WINDOW, "Weather.IsFetched")
 
     extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
     log(f'Extended features: {extended_features}')
@@ -201,17 +201,22 @@ def forecast(geohash, url_path, radar_code):
 
 def get_weather():
     """
-    Get the latest forecast data for the currently chosen location
+    Gets the latest observations, forecast and radar images for the currently chosen location
     """
 
     log("*** Updating Weather Data ***")
 
-    if 'confluence' in xbmc.getSkinDir().lower():
-        set_property(WEATHER_WINDOW, 'SkinInUse', "confluence")
-    if 'estuary' in xbmc.getSkinDir().lower():
-        set_property(WEATHER_WINDOW, 'SkinInUse', "estuary")
-    if 'estouchy' in xbmc.getSkinDir().lower():
-        set_property(WEATHER_WINDOW, 'SkinInUse', "estouchy")
+    # Nice neat updates - clear out all set window data first...
+    clear_properties()
+
+    # This is/was an attempt to use conditions in skins to basically auto-adapt the MyWeather.xml and all OzWeather
+    # components to the currently in use skin.  However not matter what I try I can't get the coditions to work
+    # in the skin files.
+    try:
+        skin_in_use = xbmc.getSkinDir().split('.')[1]
+        set_property(WEATHER_WINDOW, 'SkinInUse', skin_in_use)
+    except:
+        pass
 
     # Retrieve the currently chosen location geohash, backup weatherzone url_path, & radar code
     geohash = ADDON.getSetting(f'Location{sys.argv[1]}BOMGeoHash')
@@ -228,15 +233,22 @@ def get_weather():
         log("No BOM location geohash or Weatherzone URL Path - can't retrieve weather data!")
         return
 
-    # Nice neat updates - clear out all set window data first...
-    clear_properties()
+    # If we don't have a radar code, get the national radar by default
+    if not radar:
+        radar = 'IDR00004'
+        log(f'Radar code empty for location, so using default radar code {radar} (= national radar)')
+
+    log(f'Current location: BOM geohash "{geohash}", Weatherzone urlpath "{url_path}", radar code {radar}')
+
+    # Now scrape the weather data & radar images
+    forecast(geohash, url_path, radar)
 
     # Set basic properties/'brand'
     set_property(WEATHER_WINDOW, 'WeatherProviderLogo', xbmcvfs.translatePath(os.path.join(CWD, 'resources', 'banner.png')))
     set_property(WEATHER_WINDOW, 'WeatherProvider', 'Bureau of Meteorology Australia')
     set_property(WEATHER_WINDOW, 'WeatherVersion', ADDON_NAME + "-" + ADDON_VERSION)
 
-    # Set what we updated and when
+    # Set the location we updated
     location_in_use = ADDON.getSetting(f'Location{sys.argv[1]}BOM') or ADDON.getSetting(f'Location{sys.argv[1]}WeatherZone')
     try:
         location_in_use = location_in_use[0:location_in_use.index(' (')]
@@ -250,12 +262,3 @@ def get_weather():
     set_property(WEATHER_WINDOW, 'Forecast.Country', "Australia")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m @ %H:%M").lower())
 
-    # If we don't have a radar code, get the national radar by default
-    if not radar:
-        radar = 'IDR00004'
-        log(f'Radar code empty for location, so using default radar code {radar} (= national radar)')
-
-    log(f'Current location: BOM geohash "{geohash}", Weatherzone urlpath "{url_path}", radar code {radar}')
-
-    # Now scrape the weather data & radar images
-    forecast(geohash, url_path, radar)

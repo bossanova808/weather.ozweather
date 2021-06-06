@@ -125,7 +125,7 @@ def bom_forecast(geohash):
     # forecast_three_hourly = None
     # forecast_rain = None
 
-    # Get the area information
+    # Get the AREA INFORMATION, including the location's timezone so we can correctly show the location local times
     location_timezone = ""
     try:
         r = requests.get(bom_api_area_information_url)
@@ -139,7 +139,7 @@ def bom_forecast(geohash):
     except Exception as inst:
         log(f'Error retrieving area information from {bom_api_area_information_url}')
 
-    # Get current observations
+    # Get CURRENT OBSERVATIONS
     try:
         r = requests.get(bom_api_current_observations_url)
         current_observations = r.json()["data"]
@@ -150,7 +150,7 @@ def bom_forecast(geohash):
         log(f'Error retrieving current observations from {bom_api_current_observations_url}')
         return False
 
-    # Get warnings
+    # Get WARNINGS
     try:
         r = requests.get(bom_api_warnings_url)
         warnings = r.json()["data"]
@@ -159,7 +159,7 @@ def bom_forecast(geohash):
     except Exception as inst:
         log(f'Error retrieving warnings from {bom_api_warnings_url}')
 
-    # Get 7 day forecast
+    # Get 7 DAY FORECAST
     try:
         r = requests.get(bom_api_forecast_seven_days_url)
         forecast_seven_days = r.json()["data"]
@@ -173,7 +173,7 @@ def bom_forecast(geohash):
         return False
 
     # FUTURE?
-    # # Get 3 Hourly Forecast
+    # # Get 3 HOURLY FORECAST
     # try:
     #     r = requests.get(bom_api_forecast_three_hourly_url)
     #     forecast_three_hourly = r.json()["data"]
@@ -183,7 +183,7 @@ def bom_forecast(geohash):
     #     log(f'Error retrieving three hourly forecast from {bom_api_forecast_three_hourly_url}')
     #     raise
     #
-    # # Get Rain Forecast
+    # # Get RAIN FORECAST
     # try:
     #     r = requests.get(bom_api_forecast_rain)
     #     forecast_rain = r.json()["data"]
@@ -192,12 +192,6 @@ def bom_forecast(geohash):
     # except Exception as inst:
     #     log(f'Error retrieving rain forecast from {bom_api_forecast_rain}')
     #     raise
-
-
-
-    # AREA INFORMATION
-    # Better to show the times relative the location being viewed vs. the system location, which might be different.
-
 
     # CURRENT OBSERVATIONS
     if current_observations:
@@ -287,7 +281,7 @@ def bom_forecast(geohash):
             # Then there's this dance with the 'now' data as to what it means depending on the time
             # Which is a thoroughly sh*t way to design an API...
             # All that being said, with the re-design of the skin files, we now use the 'now' info for the current day
-            # And not the forecast info, but left here for compatibility
+            # And not the forecast info, but left here for compatibility (see Current.X above for what we do use now)
             temp_max = forecast_seven_days[i]['temp_max'] or ""
             if i == 0 and not temp_max:
                 if forecast_seven_days[i]['now']['now_label'] == "Tomorrow's Max":
@@ -346,12 +340,11 @@ def bom_forecast(geohash):
             set_key(weather_data, i, "OutlookLong", extended_text)
             set_key(weather_data, i, "ConditionLong", extended_text)
 
-        # Cleanup & Data massaging
-
+        # Cleanup & Final Data massaging
         # Missing data that was available at Weatherzone but is not available from the BOM API
         weather_data['Current.DewPoint'] = "N/A"
         weather_data['Current.Pressure'] = "N/A"
-        weather_data['Current.FireDangerText'] = "" # -> use only FireDanger with the BOM as is now text already
+        weather_data['Current.FireDangerText'] = ""  # -> use only FireDanger with the BOM as is now text already
 
     return weather_data
 

@@ -20,7 +20,7 @@ def run(args):
 
     # Translate old, pre BOM api settings to the new equivalents
     # The old Weatherzone locations now become the fallback settings
-    # (After a transition period (say after the Kodi N* release) - should remove this)
+    # (After a transition period (say after the Kodi N* release) - this should be removed)
     if ADDON.getSetting('Location1'):
         ADDON.setSetting('Location1Weatherzone', ADDON.getSetting('Location1'))
         ADDON.setSetting('Location1', '')
