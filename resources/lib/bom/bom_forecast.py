@@ -208,14 +208,20 @@ def bom_forecast(geohash):
     warnings_text = ""
     if warnings:
         for i, warning in enumerate(warnings):
-            warning_issued = utc_str_to_local_str(warning['issue_time'], time_zone=location_timezone)
-            # Time signature on the expiry here is different to all the other time signatures, for some BOM stupidity reason?!
-            # Remove the completely unnecessary fractions of a second...
-            warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'), time_zone=location_timezone)
-            warning_text = f'** {warning["title"]} (issued at {warning_issued}, expires {warning_expires}) **'
-            warnings_text += warning_text
-            if i != len(warnings):
-                warnings_text += '\n\n'
+            # Warnings header...
+            if i == 0 and area_information:
+                warnings_text = f"[B]Major Warnings[/B], current for {area_information['name']}:\n\n"
+            # Warnings body...only major warnings as we don't need every little message about sheep grazing etc..
+            if warning['warning_group_type'] == 'major':
+                warning_issued = utc_str_to_local_str(warning['issue_time'], time_zone=location_timezone)
+                # Time signature on the expiry is different for some reason?!
+                # Remove the completely unnecessary fractions of a second...
+                warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'), time_zone=location_timezone)
+                warning_text = f'- {warning["title"]} (issued {warning_issued}, expires {warning_expires})'
+                warnings_text += warning_text
+                warnings_text += '\n'
+                if i == len(warnings):
+                    warnings_text += '\n'
 
     weather_data['Current.WarningsText'] = warnings_text
 
