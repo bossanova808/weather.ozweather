@@ -102,6 +102,8 @@ def bom_forecast(geohash):
     # Gather the weather data into a dict from which we will later set all the Kodi labels
     weather_data = {}
 
+
+
     # The areahash is the geohash minus the last character
     areahash = geohash[:-1]
 
@@ -127,6 +129,9 @@ def bom_forecast(geohash):
 
     # Get the AREA INFORMATION, including the location's timezone so we can correctly show the location local times
     location_timezone = ""
+    # In case we can't get the localised now time, below...
+    now = datetime.datetime.now()
+
     try:
         r = requests.get(bom_api_area_information_url)
         area_information = r.json()["data"]
@@ -135,6 +140,8 @@ def bom_forecast(geohash):
             location_timezone_text = area_information['timezone']
             log(f"Location timezone from BOM is {location_timezone_text}")
             location_timezone = pytz.timezone(location_timezone_text)
+            # For any date comparisons - this is the localised now...
+            now = datetime.datetime.now(location_timezone)
 
     except Exception as inst:
         log(f'Error retrieving area information from {bom_api_area_information_url}')
@@ -213,15 +220,24 @@ def bom_forecast(geohash):
                 warnings_text = f"[B]Major Warnings[/B], current for {area_information['name']}:\n\n"
             # Warnings body...only major warnings as we don't need every little message about sheep grazing etc..
             if warning['warning_group_type'] == 'major':
-                warning_issued = utc_str_to_local_str(warning['issue_time'], time_zone=location_timezone)
+                # Don't really care when it was issue, if it hasn't expired, it's current, so show it..
+                # warning_issued = utc_str_to_local_str(warning['issue_time'], local_format='%d/%m %I:%M%p', time_zone=location_timezone)
                 # Time signature on the expiry is different for some reason?!
                 # Remove the completely unnecessary fractions of a second...
-                warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'), time_zone=location_timezone)
-                warning_text = f'- {warning["title"]} (issued {warning_issued}, expires {warning_expires})'
-                warnings_text += warning_text
-                warnings_text += '\n'
-                if i == len(warnings):
+                warning_expires = utc_str_to_local_str(warning['expiry_time'].replace('.000Z', 'Z'), local_format='%d/%m %I:%M%p', time_zone=location_timezone)
+                # Strip off the date if it is today...
+                if now.strftime('%d/%m %I:%M%p')[0:5] == warning_expires[0:5]:
+                    warning_expires = warning_expires[6:]
+                    warning_expires = warning_expires.lstrip('0')
+
+                # We filter out any expired warnings, cause...well, who cares after the fact?
+                warning_expires_dt = utc_str_to_local_datetime(warning['expiry_time'].replace('.000Z', 'Z'), time_zone=location_timezone)
+                if warning_expires_dt > now:
+                    warning_text = f'- {warning["title"]} (expires {warning_expires})'
+                    warnings_text += warning_text
                     warnings_text += '\n'
+                    if i == len(warnings):
+                        warnings_text += '\n'
 
     weather_data['Current.WarningsText'] = warnings_text
 
