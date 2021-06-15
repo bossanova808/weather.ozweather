@@ -151,6 +151,7 @@ def bom_forecast(geohash):
         r = requests.get(bom_api_current_observations_url)
         current_observations = r.json()["data"]
         weather_data['ObservationsUpdated'] = utc_str_to_local_str(r.json()["metadata"]["issue_time"], time_zone=location_timezone)
+        weather_data['ObservationsStation'] = r.json()["data"]['station']['name']
         log(current_observations)
 
     except Exception as inst:
@@ -203,21 +204,27 @@ def bom_forecast(geohash):
     # CURRENT OBSERVATIONS
     if current_observations:
         weather_data['Current.Temperature'] = str(round(current_observations['temp']))
-        weather_data['Current.FeelsLike'] = str(round(current_observations['temp_feels_like']))
-        weather_data['Current.Humidity'] = current_observations['humidity']
+        weather_data['Current.FeelsLike'] = str(round(current_observations['temp_feels_like'])) if current_observations['temp_feels_like'] else str(round(current_observations['temp']))
+        weather_data['Current.Humidity'] = current_observations['humidity'] or "?"
         weather_data['Current.WindSpeed'] = current_observations['wind']['speed_kilometre']
+        # Setting this custom tag as Kodi persistently is showing 0 for WindSpeed?
+        weather_data['Current.WindSpeedKmh'] = current_observations['wind']['speed_kilometre']
         weather_data['Current.WindDirection'] = current_observations['wind']['direction']
         weather_data['Current.Wind'] = f'From {current_observations["wind"]["direction"]} at {current_observations["wind"]["speed_kilometre"]} kph'
         weather_data['Current.WindGust'] = f'{current_observations["gust"]["speed_kilometre"]}'
-        weather_data["Current.Precipitation"] = weather_data["Current.RainSince9"] = f'{current_observations["rain_since_9am"]}'
+        weather_data['Current.Precipitation'] = weather_data["Current.RainSince9"] = current_observations["rain_since_9am"] or 0
 
     # WARNINGS
     warnings_text = ""
+    # Any data missing type warnings?
+    if current_observations['temp_feels_like'] is None:
+        warnings_text += "(N.B. Your chosen BOM location does not provide a 'Feels Like' value, consider trying nearby locations - using current temp. for feels like).\n\n"
+
     if warnings:
         for i, warning in enumerate(warnings):
             # Warnings header...
             if i == 0 and area_information:
-                warnings_text = f"[B]Major Warnings[/B], current for {area_information['name']}:\n\n"
+                warnings_text += f"[B]Major Warnings[/B], current for {area_information['name']}:\n\n"
             # Warnings body...only major warnings as we don't need every little message about sheep grazing etc..
             if warning['warning_group_type'] == 'major':
                 # Don't really care when it was issue, if it hasn't expired, it's current, so show it..

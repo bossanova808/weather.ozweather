@@ -41,6 +41,8 @@ def clear_properties():
         set_property(WEATHER_WINDOW, 'Current.ConditionLong')
         set_property(WEATHER_WINDOW, 'Current.Temperature')
         set_property(WEATHER_WINDOW, 'Current.Wind')
+        set_property(WEATHER_WINDOW, 'Current.WindSpeed')
+        set_property(WEATHER_WINDOW, 'Current.WindSpeedKmh')
         set_property(WEATHER_WINDOW, 'Current.WindDirection')
         set_property(WEATHER_WINDOW, 'Current.WindDegree')
         set_property(WEATHER_WINDOW, 'Current.WindGust')

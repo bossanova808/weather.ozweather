@@ -3,7 +3,7 @@
 Handy utility functions for Kodi Addons
 By bossanova808
 Free in all senses....
-VERSION 0.2.1 2021-06-06
+VERSION 0.2.2 2021-06-15
 (For Kodi Matrix & later)
 """
 import sys
@@ -105,6 +105,9 @@ else:
         :param name: Required.  Name of the property.
         :param value: Optional (defaults to "").  Set the property to this value.  An empty string clears the property.
         """
+        if value is None:
+            window.clearProperty(name)
+
         value = str(value)
         if value:
             log(f'Setting window property {name} to value {value}')
