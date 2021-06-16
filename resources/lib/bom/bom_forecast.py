@@ -205,7 +205,7 @@ def bom_forecast(geohash):
     if current_observations:
         weather_data['Current.Temperature'] = str(round(current_observations['temp']))
         weather_data['Current.FeelsLike'] = str(round(current_observations['temp_feels_like'])) if current_observations['temp_feels_like'] else str(round(current_observations['temp']))
-        weather_data['Current.Humidity'] = current_observations['humidity'] or "?"
+        weather_data['Current.Humidity'] = current_observations['humidity'] or "0"
         weather_data['Current.WindSpeed'] = current_observations['wind']['speed_kilometre']
         # Setting this custom tag as Kodi persistently is showing 0 for WindSpeed?
         weather_data['Current.WindSpeedKmh'] = current_observations['wind']['speed_kilometre']
