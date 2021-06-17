@@ -197,8 +197,9 @@ def forecast(geohash, url_path, radar_code):
 
     # And announce everything is fetched..
     set_property(WEATHER_WINDOW, "Weather.IsFetched", "true")
+    set_property(WEATHER_WINDOW, "Daily.IsFetched", "true")
+    set_property(WEATHER_WINDOW, "Today.IsFetched", "true")
     set_property(WEATHER_WINDOW, 'Forecast.Updated', time.strftime("%d/%m/%Y %H:%M"))
-    set_property(WEATHER_WINDOW, 'Today.IsFetched', "true")
 
 
 def get_weather():
