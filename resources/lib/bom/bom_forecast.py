@@ -273,7 +273,6 @@ def bom_forecast(geohash):
 
     weather_data['Current.WarningsText'] = warnings_text
 
-
     # 7 DAY FORECAST
     if forecast_seven_days:
         weather_data['Current.Condition'] = forecast_seven_days[0]['short_text']
