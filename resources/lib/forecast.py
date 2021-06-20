@@ -184,7 +184,7 @@ def forecast(geohash, url_path, radar_code):
 
     # At this point, we should have _something_ - if not, log the issue and we're done...
     if not weather_data:
-        log_info("Unable to get weather_data from BOM or from Weatherzone - internet connection issue or addon not configured?")
+        log("Unable to get weather_data from BOM OR from Weatherzone - internet connection issue or addon not configured?", level=xbmc.LOGINFO)
         return
 
     # We have weather_data - set all the properties on Kodi's weather window...

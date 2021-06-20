@@ -3,7 +3,7 @@
 Handy utility functions for Kodi Addons
 By bossanova808
 Free in all senses....
-VERSION 0.2.2 2021-06-15
+VERSION 0.2.3 2021-06-21
 (For Kodi Matrix & later)
 """
 import sys
@@ -62,10 +62,6 @@ if not xbmc.getUserAgent():
         if exception_instance:
             print(f'EXCPT: {traceback.format_exc(exception_instance)}')
 
-    def log_info(message, exception_instance=None):
-        log(f'INFO : {message}')
-        if exception_instance:
-            print(f'EXCPT: {traceback.format_exc(exception_instance)}')
 
 else:
 
@@ -75,7 +71,7 @@ else:
 
         :param message: required, the message to log
         :param exception_instance: optional, an instance of some Exception
-        :param level: optional, the Kodi log level to use, default LOGDEBUG
+        :param level: optional, the Kodi log level to use, default LOGDEBUG but can override with level=xbmc.LOGINFO
         """
 
         message = f'### {ADDON_NAME} {ADDON_VERSION} - {message}'
@@ -85,16 +81,6 @@ else:
             xbmc.log(message, level)
         else:
             xbmc.log(message_with_exception, level)
-
-
-    def log_info(message, exception_instance=None):
-        """
-        Log a message at the LOGINFO level, i.e. even if Kodi debugging is not turned on. Use very sparingly.
-
-        :param message: required, the message to log
-        :param exception_instance: optional, an instance of some Exception
-        """
-        log(message, exception_instance, level=xbmc.LOGINFO)
 
     def set_property(window, name, value=""):
         """
@@ -193,10 +179,10 @@ def footprints(startup=True):
     :param startup: optional, default True.  If true, log the startup of an addon, otherwise log the exit.
     """
     if startup:
-        log_info(f'Starting...')
-        log_info(f'Kodi Version: {KODI_VERSION}')
-        log_info(f'Addon arguments: {ADDON_ARGUMENTS}')
+        log(f'Starting...', level=xbmc.LOGINFO)
+        log(f'Kodi Version: {KODI_VERSION}', level=xbmc.LOGINFO)
+        log(f'Addon arguments: {ADDON_ARGUMENTS}', level=xbmc.LOGINFO)
     else:
-        log_info(f'Exiting...')
+        log(f'Exiting...', level=xbmc.LOGINFO)
 
 
