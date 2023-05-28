@@ -186,7 +186,7 @@ def forecast(geohash, radar_code):
     # Get the ABC 90-second weather video link if extended features is enabled
     if extended_features:
         log("Getting the ABC weather video link")
-        url = get_abc_weather_video_link(ADDON.getSetting("ABCQuality"))
+        url = get_abc_weather_video_link()
         if url:
             set_property(WEATHER_WINDOW, 'Video.1', url)
 

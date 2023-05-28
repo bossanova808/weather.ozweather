@@ -9,9 +9,11 @@ class Store:
 
     # CONSTANTS
     # ABC WEATHER VIDEO - scraping
-    ABC_URL = "https://www.abc.net.au/news/newschannel/weather-in-90-seconds/"
-    ABC_WEATHER_VIDEO_PATTERN = "//abcmedia.akamaized.net/news/news24/wins/(.+?)/WIN(.*?)_512k.mp4"
-    ABC_STUB = "https://abcmedia.akamaized.net/news/news24/wins/"
+    ABC_URL = "https://www.abc.net.au/news/weather"
+    ABC_STUB = "https://mediacore-live-production.akamaized.net/video"
+    ABC_WEATHER_VIDEO_PATTERN = "//mediacore-live-production.akamaized.net/video/(.+?)/(.+?)/(.+?)/(.+?).mp4"
+    # ABC_WEATHER_VIDEO_PATTERN = "//abcmedia.akamaized.net/news/news24/wins/(.+?)/WIN(.*?)_512k.mp4"
+    # https://mediacore-live-production.akamaized.net/video/01/im/Z/0m.mp4
     # BOM - JSON API
     BOM_URL = 'http://www.bom.gov.au'
     BOM_API_URL = 'https://api.weather.bom.gov.au/v1'
