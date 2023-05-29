@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+# noinspection SpellCheckingInspection
 class Store:
     """
     Helper class to provide a centralised store for CONSTANTS and globals
@@ -11,7 +12,7 @@ class Store:
     # ABC WEATHER VIDEO - scraping
     ABC_URL = "https://www.abc.net.au/news/weather"
     ABC_STUB = "https://mediacore-live-production.akamaized.net/video"
-    # https://mediacore-live-production.akamaized.net/video/01/im/Z/0m.mp4
+    # 2023 version - E.g. https://mediacore-live-production.akamaized.net/video/01/im/Z/0m.mp4
     ABC_WEATHER_VIDEO_PATTERN = r"https://mediacore-live-production.akamaized.net/video/(.+?)/(.+?)/(.+?)/(.+?)\.mp"
     # BOM - JSON API
     BOM_URL = 'http://www.bom.gov.au'

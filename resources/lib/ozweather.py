@@ -1,8 +1,11 @@
 # -*- coding: utf-8 -*-
 import socket
 
+# noinspection PyPackages
 from .forecast import *
+# noinspection PyPackages
 from .locations import *
+# noinspection PyPackages
 from .bom.bom_location import *
 
 
@@ -28,7 +31,7 @@ def run(args):
     else:
         get_weather()
 
-    # If location settings have changed, this kick starts an update
+    # If location settings have changed, this kick-starts an update
     refresh_locations()
 
     # and close out...

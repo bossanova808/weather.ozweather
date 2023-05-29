@@ -11,7 +11,7 @@ if not xbmc.getUserAgent():
 from resources.lib.store import Store
 from resources.lib.common import *
 
-
+# See bottom of this file for notes on matching the video links (& Store.py for the regex)
 def get_abc_weather_video_link():
 
     try:
@@ -19,7 +19,7 @@ def get_abc_weather_video_link():
         videos = re.findall(Store.ABC_WEATHER_VIDEO_PATTERN, r.text)
 
         # for video in videos:
-        #     print(video)
+        #     log(video)
 
         try:
             url = f'{Store.ABC_STUB}/{videos[1][0]}/{videos[1][1]}/{videos[1][2]}/{videos[1][3]}.mp4'
@@ -39,14 +39,15 @@ if __name__ == "__main__":
     log(get_abc_weather_video_link())
 
 
-# ABC VIDEO URL NOTES
-# 2023
+# > 2023_05 - CURRENT ABC VIDEO URL NOTES
 # view the source on: https://www.abc.net.au/news/weather
 # search for 'mp4'
+# Regex in Store.py used to match the URL format
+# Multiple matches will be found - first is a definition/download link (.mpg)
+# 2nd is the highest quality stream (720p) - the one we want.
 # https://mediacore-live-production.akamaized.net/video/01/im/Z/0m.mp4
-# the 0m is the quality
 
-#### LEGACY INFO:
+# < 2023_05 - LEGACY INFO
 # note date and quality level variables...
 # view source on https://www.abc.net.au/news/newschannel/weather-in-90-seconds/ and find mp4 to see this list,
 # the end of the URL can change regularly
