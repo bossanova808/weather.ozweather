@@ -16,12 +16,13 @@ def get_abc_weather_video_link():
 
     try:
         r = requests.get(Store.ABC_URL)
-        video = re.findall(Store.ABC_WEATHER_VIDEO_PATTERN, r.text)
+        videos = re.findall(Store.ABC_WEATHER_VIDEO_PATTERN, r.text)
 
-        # print(video)
+        # for video in videos:
+        #     print(video)
 
         try:
-            url = f'{Store.ABC_STUB}/{video[0][0]}/{video[0][1]}/{video[0][2]}/0m.mp4'
+            url = f'{Store.ABC_STUB}/{videos[1][0]}/{videos[1][1]}/{videos[1][2]}/{videos[1][3]}.mp4'
             return url
         except Exception as inst:
             log("Couldn't get ABC video URL from scraped page: " + str(inst))
