@@ -11,6 +11,22 @@ if not xbmc.getUserAgent():
 from resources.lib.store import Store
 from resources.lib.common import *
 
+
+def scrape_and_play_abc_weather_video():
+    """
+    On-demand scrape the current ABC video URL and then play it back, with appropriate metadata/art etc.
+    """
+    url = get_abc_weather_video_link()
+    # Construct an offscreen list item with metadata...
+    item = xbmcgui.ListItem(path=url)
+    item.setProperty('mimetype', 'video/mpeg')
+    item.setInfo('Video', {	'title' : 'ABC Weather In 90 Seconds'})
+    item.setArt({'thumb': f'{CWD}/resources/ABC.png'})
+    # ...and then play it, fullscreen
+    xbmc.Player().play(url, item, False)
+    pass
+
+
 # See bottom of this file for notes on matching the video links (& Store.py for the regex)
 def get_abc_weather_video_link():
 
