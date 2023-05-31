@@ -29,7 +29,7 @@ def run(args):
 
     # RUN MODE - ADDON CALLED FORM Kodi SETTINGS
     # the addon is being called from the settings section where the user enters their postcodes
-    if args[1].startswith('ABC'):
+    elif args[1].startswith('ABC'):
         scrape_and_play_abc_weather_video()
 
     # RUN MODE - GET WEATHER OBSERVATIONS AND FORECAST
