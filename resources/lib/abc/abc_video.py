@@ -41,12 +41,14 @@ def get_abc_weather_video_link():
         json_object = json.loads(json_string.string)
 
         # log(json_object)
-        # Put into: https://jsonhero.io/j/JU0I9LB4AlLU
+        # Put the json blob into: https://jsonhero.io/j/JU0I9LB4AlLU
         # Gives a path to the needed video as:
         # $.props.pageProps.channelpage.components.0.component.props.list.3.player.config.sources.1.file
-
-        url = json_object['props']['pageProps']['channelpage']['components'][0]['component']['props']['list'][3]['player']['config']['sources'][1]['file']
-        return url
+        # Rather than grab the URL directly (as place in array might change), grab all the available URLs and get the best quality from it
+        # See: https://github.com/bossanova808/weather.ozweather/commit/e6158d704fc160808bf66220da711805860d85c7
+        data = json_object['props']['pageProps']['channelpage']['components'][0]['component']['props']['list'][3]
+        urls = [x for x in data['player']['config']['sources'] if x['type'] == 'video/mp4']
+        return sorted(urls, key=lambda x: x['bitrate'], reverse=True)[0]['file']
 
     except Exception as inst:
         log("Couldn't get ABC video URL from scraped page: " + str(inst))
