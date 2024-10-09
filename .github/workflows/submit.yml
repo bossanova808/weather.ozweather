@@ -21,8 +21,8 @@ jobs:
         addon-id: weather.ozweather
       env: # Make sure you create the below secrets (GH_TOKEN and EMAIL)
         GH_USERNAME: ${{ github.actor }}
-        GH_TOKEN: ${{secrets.GH_TOKEN}}
-        EMAIL: ${{secrets.EMAIL}}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
+        EMAIL: ${{ secrets.EMAIL }}
     - name: Create Github Release
       id: create_release
       uses: actions/create-release@v1.0.0
