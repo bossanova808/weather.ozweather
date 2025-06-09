@@ -1,4 +1,4 @@
-v2.1.4 Minor fixes
+v2.1.5 Minor fixes
 - Fix feels like calculation when data not returned by BOM, and Current.Wind
 
 v2.1.3
