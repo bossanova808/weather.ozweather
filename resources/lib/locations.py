@@ -1,4 +1,5 @@
-from bossanova808.utilities import *
+from bossanova808.constants import ADDON, WEATHER_WINDOW
+from bossanova808.utilities import set_property
 from bossanova808.logger import Logger
 
 

@@ -10,7 +10,7 @@ from .bom.bom_location import *
 # noinspection PyPackages
 from .abc.abc_video import *
 
-from bossanova808.utilities import *
+from bossanova808.logger import Logger
 
 
 def run(args):
@@ -21,7 +21,7 @@ def run(args):
     :param args: sys.argv is passed directly through
     """
 
-    footprints()
+    Logger.start()
     socket.setdefaulttimeout(100)
 
     # RUN MODE - ADDON CALLED FORM Kodi SETTINGS
@@ -44,4 +44,4 @@ def run(args):
     refresh_locations()
 
     # and close out...
-    footprints(startup=False)
+    Logger.stop()
