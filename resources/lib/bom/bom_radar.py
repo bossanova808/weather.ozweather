@@ -112,25 +112,31 @@ def download_background(radar_code, file_name, path):
     #         log("Using cached background - " + out_file_name)
 
     # Download the backgrounds only if we don't have them yet
-    if not os.path.isfile(path + out_file_name):
+    if not os.path.isfile(os.path.join(path, out_file_name)):
 
         Logger.debug("Downloading missing background image....[%s] as [%s]" % (file_name, out_file_name))
 
         # Prefer local copy for national background when available; otherwise fall back to remote fetch
         if file_name == 'IDR00004.background.png' and CWD:
-            Logger.debug("Copying local copy of national radar background")
             src = os.path.join(CWD, "resources", "IDR00004.background.png")
             dst = os.path.join(path, "background.png")
-            shutil.copy(src, dst)
-        else:
-            url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
-            try:
-                with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
-                    dst = os.path.join(path, out_file_name)
-                    with open(dst, "wb") as fh:
-                        fh.write(radar_image.read())
-            except Exception as e:
-                Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
+            if os.path.isfile(src):
+                Logger.debug("Copying bundled national radar background")
+                try:
+                    shutil.copy(src, dst)
+                    return  # done
+                except Exception as e:
+                    Logger.warning(f"Local copy of national radar background failed: {e} — falling back to remote")
+            else:
+                Logger.debug("Bundled national radar background not found — falling back to remote")
+                url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
+                try:
+                    with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
+                        dst = os.path.join(path, out_file_name)
+                        with open(dst, "wb") as fh:
+                            fh.write(radar_image.read())
+                except Exception as e:
+                    Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
 
     else:
         Logger.debug(f"Using cached {out_file_name}")
@@ -234,42 +240,22 @@ def build_images(radar_code, path, loop_path):
 
     # Try up to 3 times, with a seconds pause between each, to connect to BOM FTP
     # (to try and get past very occasional 'too many users' errors)
-    while not ftp and attempts < 3:
-        # noinspection PyBroadException
+    files = []
+    for attempts in range(3):
         try:
-            # Unfortunately no FTPS or HTTPS alternative known...
-            ftp = ftplib.FTP("ftp.bom.gov.au", timeout=15)
-        except:
-            attempts += 1
-            time.sleep(1)
-
-    if not ftp:
-        Logger.error("Failed after 3 attempt to connect to BOM FTP - can't update radar loop")
-        return
-
-    ftp.login("anonymous", "anonymous@anonymous.org")
-    ftp.cwd("/anon/gen/radar/")
-
-    Logger.debug("Get files list")
-    # connected, so let's get the list
-    try:
-        # BOM FTP still, in 2021, does not support the nicer mdst() operation
-        files = ftp.nlst()
-        files.sort(reverse=True)
-        try:
-            ftp.quit()
+            # Unfortunately no FTPS/HTTPS alternative known...
+            with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
+                ftp.login("anonymous", "anonymous@anonymous.org")
+                ftp.cwd("/anon/gen/radar/")
+                files = ftp.nlst()
+                files.sort(reverse=True)
+                break
         except Exception as e:
-            Logger.debug(f"FTP quit() failed: {e}")
-            try:
-                ftp.close()
-            except Exception:
-                Logger.debug("FTP close() also failed; ignoring")
-    except ftplib.error_perm as resp:
-        if str(resp) == "550 No files found":
-            Logger.error("No files in BOM ftp directory!")
-        else:
-            Logger.error("Something wrong in the ftp bit of radar images")
-            Logger.error(str(resp))
+            if attempts < 2:
+                time.sleep(1)
+            else:
+                Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {e}")
+                return
 
     Logger.debug("Download new files, and rename existing files, to avoid Kodi caching issues with the animated radar")
     # OK now we need just the matching radar files...
