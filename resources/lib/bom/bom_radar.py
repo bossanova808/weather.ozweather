@@ -67,8 +67,7 @@ def dump_all_radar_backgrounds(all_backgrounds_path=None):
     Remove the entire radar backgrounds folder, so that new ones will be pulled on next weather data refresh
     """
     if all_backgrounds_path is None:
-        all_backgrounds_path = xbmcvfs.translatePath(
-                "special://profile/addon_data/weather.ozweather/radarbackgrounds/")
+        all_backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
         # Little pause to make sure this is complete before any refresh...
@@ -128,8 +127,8 @@ def download_background(radar_code, file_name, path):
             try:
                 with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
                     dst = os.path.join(path, out_file_name)
-                with open(dst, "wb") as fh:
-                    fh.write(radar_image.read())
+                    with open(dst, "wb") as fh:
+                        fh.write(radar_image.read())
             except Exception as e:
                 Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
 
