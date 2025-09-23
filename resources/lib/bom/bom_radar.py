@@ -246,12 +246,11 @@ def build_images(radar_code, path, loop_path):
         try:
             Logger.debug("Log in to BOM FTP")
             with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
-                with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
-                    ftp.login("anonymous", "anonymous@anonymous.org")
-                    ftp.cwd("/anon/gen/radar/")
-                    files = ftp.nlst(f"{radar_code}*")
-                    files.sort(reverse=True)
-                    break
+                ftp.login("anonymous", "anonymous@anonymous.org")
+                ftp.cwd("/anon/gen/radar/")
+                files = ftp.nlst(f"{radar_code}*")
+                files.sort(reverse=True)
+                break
         except ftplib.all_errors as e:
             last_err = e
             if attempt < 2:
