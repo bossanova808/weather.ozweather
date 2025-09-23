@@ -1,7 +1,8 @@
-# -*- coding: utf-8 -*-
 import requests
 import sys
 import xbmc
+import xbmcgui
+import json
 from bs4 import BeautifulSoup
 
 # Allow for unit testing this file
@@ -12,7 +13,8 @@ if not xbmc.getUserAgent():
     sys.path.insert(0, '../../../../script.module.bossanova808/resources/lib')
 
 from resources.lib.store import Store
-from bossanova808.utilities import *
+from bossanova808.constants import CWD
+from bossanova808.logger import Logger
 
 
 def scrape_and_play_abc_weather_video():

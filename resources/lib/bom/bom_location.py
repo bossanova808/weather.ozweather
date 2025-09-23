@@ -1,16 +1,18 @@
 import requests
 import sys
 import xbmc
+import xbmcgui
 
 # Allow for unit testing this file
 # This brings this addon's resources, and bossanova808 module stuff into scope
-# (when running this module outside Kodi)
+# (only when running this module *outside* of Kodi)
 if not xbmc.getUserAgent():
     sys.path.insert(0, '../../..')
     sys.path.insert(0, '../../../../script.module.bossanova808/resources/lib')
 
-from resources.lib.bom.bom_radar import *
-from bossanova808.utilities import *
+from resources.lib.store import Store
+from resources.lib.bom.bom_radar import closest_radar_to_lat_lon
+from bossanova808.constants import ADDON, ADDON_NAME, TRANSLATE
 from bossanova808.logger import Logger
 
 
@@ -45,7 +47,7 @@ def find_bom_location():
     What we need is actually a geohash we can then use with the BOM API
     Save the chosen result, e.g. Ascot Vale, VIC 3032 and geohash r1r11df
     """
-    keyboard = xbmc.Keyboard('', LANGUAGE(32195), False)
+    keyboard = xbmc.Keyboard('', TRANSLATE(32195), False)
     keyboard.doModal()
 
     if keyboard.isConfirmed() and keyboard.getText() != '':

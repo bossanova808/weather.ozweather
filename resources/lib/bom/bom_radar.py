@@ -10,6 +10,7 @@ import urllib.parse
 import urllib.request
 from math import sin, cos, sqrt, atan2, radians
 import xbmc
+import xbmcvfs
 
 # Allow for unit testing this file
 # This brings this addon's resources, and bossanova808 module stuff into scope
@@ -18,7 +19,7 @@ if not xbmc.getUserAgent():
     sys.path.insert(0, '../../..')
     sys.path.insert(0, '../../../../script.module.bossanova808/resources/lib')
 
-from bossanova808.utilities import *
+from bossanova808.constants import CWD
 from bossanova808.logger import Logger
 from resources.lib.store import Store
 

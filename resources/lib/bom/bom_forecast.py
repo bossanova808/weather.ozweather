@@ -14,7 +14,6 @@ if not xbmc.getUserAgent():
     sys.path.insert(0, '../../../../script.module.bossanova808/resources/lib')
 
 from resources.lib.store import Store
-from bossanova808.utilities import *
 from bossanova808.logger import Logger
 
 """
@@ -121,9 +120,9 @@ def bom_forecast(geohash):
 
     bom_api_current_observations_url = f'{bom_api_url_areahash}/observations'
     bom_api_forecast_seven_days_url = f'{bom_api_url_areahash}/forecasts/daily'
-    # FUTURE? - these API end points exist, but are not yet used by OzWeather
-    # bom_api_forecast_three_hourly_url = f'{bom_api_url_areahash}/forecasts/3-hourly'
-    # bom_api_forecast_rain = f'{bom_api_url_areahash}/forecast/rain'
+    # FUTURE? - these API end points exist, but are not yet actually used by OzWeather
+    # bom_api_forecast_three_hourly_url = f"{bom_api_url_areahash}/forecasts/3-hourly"
+    # bom_api_forecast_rain = f"{bom_api_url_areahash}/forecast/rain"
 
     # Holders for the BOM JSON API results...
     area_information = None
@@ -285,7 +284,7 @@ def bom_forecast(geohash):
 
     weather_data['Current.WarningsText'] = warnings_text
 
-    # 7 DAY FORECAST
+    # 7-DAY FORECAST
     if forecast_seven_days:
         weather_data['Current.Condition'] = forecast_seven_days[0]['short_text']
         weather_data['Current.ConditionLong'] = forecast_seven_days[0]['extended_text']
