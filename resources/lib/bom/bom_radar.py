@@ -68,7 +68,7 @@ def dump_all_radar_backgrounds(all_backgrounds_path=None):
     """
     if all_backgrounds_path is None:
         all_backgrounds_path = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/radarbackgrounds/")
+                "special://profile/addon_data/weather.ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
         # Little pause to make sure this is complete before any refresh...
@@ -117,24 +117,21 @@ def download_background(radar_code, file_name, path):
 
         Logger.debug("Downloading missing background image....[%s] as [%s]" % (file_name, out_file_name))
 
-        if file_name == 'IDR00004.background.png':
-            # Special case: national radar background periodically seems to be missing from BOM ftp?  Use a local copy...
+        # Prefer local copy for national background when available; otherwise fall back to remote fetch
+        if file_name == 'IDR00004.background.png' and CWD:
             Logger.debug("Copying local copy of national radar background")
-            # No need to do this if we're unit testing outside Kodi
-            if CWD:
-                src = os.path.join(CWD, "resources", "IDR00004.background.png")
-                dst = os.path.join(path, "background.png")
-                shutil.copy(src, dst)
+            src = os.path.join(CWD, "resources", "IDR00004.background.png")
+            dst = os.path.join(path, "background.png")
+            shutil.copy(src, dst)
         else:
             url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
-
             try:
-                radar_image = urllib.request.urlopen(url_to_get, timeout=15)
-                with open(path + "/" + out_file_name, "wb") as fh:
+                with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
+                    dst = os.path.join(path, out_file_name)
+                with open(dst, "wb") as fh:
                     fh.write(radar_image.read())
-
             except Exception as e:
-                Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {str(e)}")
+                Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
 
     else:
         Logger.debug(f"Using cached {out_file_name}")
@@ -241,6 +238,7 @@ def build_images(radar_code, path, loop_path):
     while not ftp and attempts < 3:
         # noinspection PyBroadException
         try:
+            # Unfortunately no FTPS or HTTPS alternative known...
             ftp = ftplib.FTP("ftp.bom.gov.au", timeout=15)
         except:
             attempts += 1
@@ -261,8 +259,12 @@ def build_images(radar_code, path, loop_path):
         files.sort(reverse=True)
         try:
             ftp.quit()
-        except Exception:
-            pass
+        except Exception as e:
+            Logger.debug(f"FTP quit() failed: {e}")
+            try:
+                ftp.close()
+            except Exception:
+                Logger.debug("FTP close() also failed; ignoring")
     except ftplib.error_perm as resp:
         if str(resp) == "550 No files found":
             Logger.error("No files in BOM ftp directory!")
@@ -295,9 +297,10 @@ def build_images(radar_code, path, loop_path):
                     Logger.debug("Output to file: " + output_file)
 
                     try:
-                        radar_image = urllib.request.urlopen(image_to_retrieve, timeout=15)
-                        with open(loop_path + "/" + output_file, "wb") as fh:
-                            fh.write(radar_image.read())
+                        with urllib.request.urlopen(image_to_retrieve, timeout=15) as radar_image:
+                            dst = os.path.join(loop_path, output_file)
+                            with open(dst, "wb") as fh:
+                                fh.write(radar_image.read())
 
                     except Exception as e:
                         Logger.error(f"Failed to retrieve radar image: {image_to_retrieve}, exception: {str(e)}")

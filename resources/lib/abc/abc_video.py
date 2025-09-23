@@ -42,8 +42,9 @@ def get_abc_weather_video_link():
         bs = BeautifulSoup(r.text, "html.parser")
         json_string = bs.find("script", {'type': 'application/json', "id": "__NEXT_DATA__"})
         if not json_string or not json_string.string:
-            Logger.error("ABC __NEXT_DATA__ script not found on page")
-            raise ValueError("ABC __NEXT_DATA__ script not found on page")
+            error_msg = "ABC __NEXT_DATA__ script not found on page, couldn't extract ABC weather video link"
+            Logger.error(error_msg)
+            raise ValueError(error_msg)
         json_object = json.loads(json_string.string)
         # Logger.debug(json_object)
         # Put the json blob into: https://jsonhero.io/j/JU0I9LB4AlLU
