@@ -31,7 +31,7 @@ def run(args):
         if arg.startswith('Location'):
             find_bom_location()
 
-        # RUN MODE - ADDON CALLED FORM Kodi SETTINGS
+        # RUN MODE - ADDON CALLED FROM Kodi SETTINGS
         # the addon is being called from the settings section where the user enters their postcodes
         elif arg.startswith('ABC'):
             scrape_and_play_abc_weather_video()

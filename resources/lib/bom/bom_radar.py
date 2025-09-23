@@ -122,12 +122,14 @@ def download_background(radar_code, file_name, path):
             Logger.debug("Copying local copy of national radar background")
             # No need to do this if we're unit testing outside Kodi
             if CWD:
-                shutil.copy(f"{CWD}/resources/IDR00004.background.png", f"{path}/background.png")
+                src = os.path.join(CWD, "resources", "IDR00004.background.png")
+                dst = os.path.join(path, "background.png")
+                shutil.copy(src, dst)
         else:
             url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
 
             try:
-                radar_image = urllib.request.urlopen(url_to_get)
+                radar_image = urllib.request.urlopen(url_to_get, timeout=15)
                 with open(path + "/" + out_file_name, "wb") as fh:
                     fh.write(radar_image.read())
 
@@ -239,7 +241,7 @@ def build_images(radar_code, path, loop_path):
     while not ftp and attempts < 3:
         # noinspection PyBroadException
         try:
-            ftp = ftplib.FTP("ftp.bom.gov.au")
+            ftp = ftplib.FTP("ftp.bom.gov.au", timeout=15)
         except:
             attempts += 1
             time.sleep(1)
@@ -257,6 +259,10 @@ def build_images(radar_code, path, loop_path):
         # BOM FTP still, in 2021, does not support the nicer mdst() operation
         files = ftp.nlst()
         files.sort(reverse=True)
+        try:
+            ftp.quit()
+        except Exception:
+            pass
     except ftplib.error_perm as resp:
         if str(resp) == "550 No files found":
             Logger.error("No files in BOM ftp directory!")
@@ -289,7 +295,7 @@ def build_images(radar_code, path, loop_path):
                     Logger.debug("Output to file: " + output_file)
 
                     try:
-                        radar_image = urllib.request.urlopen(image_to_retrieve)
+                        radar_image = urllib.request.urlopen(image_to_retrieve, timeout=15)
                         with open(loop_path + "/" + output_file, "wb") as fh:
                             fh.write(radar_image.read())
 

@@ -47,11 +47,7 @@ def set_key(weather_data, index, key, value):
 
     if index == 0:
         weather_data['Current.' + key] = value.strip()
-        weather_data['Current.' + key] = value.strip()
-
     weather_data['Day' + str(index) + '.' + key] = value.strip()
-    weather_data['Day' + str(index) + '.' + key] = value.strip()
-    weather_data['Daily.' + str(index + 1) + '.' + key] = value.strip()
     weather_data['Daily.' + str(index + 1) + '.' + key] = value.strip()
 
 
@@ -138,7 +134,7 @@ def bom_forecast(geohash):
     now = datetime.datetime.now()
 
     try:
-        r = requests.get(bom_api_area_information_url)
+        r = requests.get(bom_api_area_information_url, timeout=15)
         area_information = r.json()["data"]
         Logger.debug(area_information)
         if area_information:
@@ -152,7 +148,7 @@ def bom_forecast(geohash):
 
     # Get CURRENT OBSERVATIONS
     try:
-        r = requests.get(bom_api_current_observations_url)
+        r = requests.get(bom_api_current_observations_url, timeout=15)
         current_observations = r.json()["data"]
         weather_data['ObservationsUpdated'] = utc_str_to_local_str(r.json()["metadata"]["issue_time"], time_zone=location_timezone)
         weather_data['ObservationsStation'] = r.json()["data"]['station']['name']
@@ -172,7 +168,7 @@ def bom_forecast(geohash):
 
     # Get 7-DAY FORECAST
     try:
-        r = requests.get(bom_api_forecast_seven_days_url)
+        r = requests.get(bom_api_forecast_seven_days_url, timeout=15)
         forecast_seven_days = r.json()["data"]
         weather_data['ForecastUpdated'] = utc_str_to_local_str(r.json()["metadata"]["issue_time"], time_zone=location_timezone)
         weather_data['ForecastRegion'] = r.json()["metadata"]["forecast_region"].title()
@@ -186,7 +182,7 @@ def bom_forecast(geohash):
     # FUTURE?
     # # Get 3 HOURLY FORECAST
     # try:
-    #     r = requests.get(bom_api_forecast_three_hourly_url)
+    #     r = requests.get(bom_api_forecast_three_hourly_url, timeout=15)
     #     forecast_three_hourly = r.json()["data"]
     #     log(forecast_three_hourly)
     #
@@ -196,7 +192,7 @@ def bom_forecast(geohash):
     #
     # # Get RAIN FORECAST
     # try:
-    #     r = requests.get(bom_api_forecast_rain)
+    #     r = requests.get(bom_api_forecast_rain, timeout=15)
     #     forecast_rain = r.json()["data"]
     #     log(forecast_rain)
     #

@@ -23,8 +23,11 @@ def scrape_and_play_abc_weather_video():
     """
     url = get_abc_weather_video_link()
     # Construct an offscreen list item with metadata...
+    if not url:
+        xbmcgui.Dialog().notification("OzWeather", "Couldn't retrieve ABC weather video - sorry!", xbmcgui.NOTIFICATION_ERROR, 4000)
+        return
     item = xbmcgui.ListItem(path=url)
-    item.setProperty('mimetype', 'video/mpeg')
+    item.setProperty('mimetype', 'video/mp4')
     item.setInfo('Video', {'title': 'ABC Weather In 90 Seconds'})
     item.setArt({'thumb': f'{CWD}/resources/weather-in-90-seconds.png'})
     # ...and then play it, fullscreen
@@ -35,9 +38,12 @@ def scrape_and_play_abc_weather_video():
 # See bottom of this file for notes on matching the video links (& Store.py for the regex)
 def get_abc_weather_video_link():
     try:
-        r = requests.get(Store.ABC_URL)
+        r = requests.get(Store.ABC_URL, timeout=15)
         bs = BeautifulSoup(r.text, "html.parser")
         json_string = bs.find("script", {'type': 'application/json', "id": "__NEXT_DATA__"})
+        if not json_string or not json_string.string:
+            Logger.error("ABC __NEXT_DATA__ script not found on page")
+            raise ValueError("ABC __NEXT_DATA__ script not found on page")
         json_object = json.loads(json_string.string)
         # Logger.debug(json_object)
         # Put the json blob into: https://jsonhero.io/j/JU0I9LB4AlLU
@@ -50,7 +56,7 @@ def get_abc_weather_video_link():
         return sorted(urls, key=lambda x: x['bitrate'], reverse=True)[0]['file']
 
     except Exception as inst:
-        Logger.error("Couldn't get ABC video URL from scraped page: " + str(inst))
+        Logger.error(f"Couldn't get ABC video URL from scraped page: {inst}")
         return ""
 
 

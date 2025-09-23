@@ -25,7 +25,7 @@ def get_bom_locations_for(text):
     location_geohashes = []
 
     try:
-        r = requests.get(Store.BOM_API_LOCATIONS_URL, params={'search': text})
+        r = requests.get(Store.BOM_API_LOCATIONS_URL, params={'search': text}, timeout=15)
         for result in r.json()['data']:
             Logger.debug(result)
             locations.append(f'{result["name"]}, {result["state"]} {result["postcode"]} ({result["geohash"]})')
@@ -70,10 +70,10 @@ def find_bom_location():
                 # Don't save the settings is this goes wrong
                 location_info_url = f'https://api.weather.bom.gov.au/v1/locations/{location_geohashes[selected]}'
                 try:
-                    location_info = requests.get(location_info_url).json()['data']
+                    location_info = requests.get(location_info_url, timeout=15).json()['data']
                     Logger.debug(location_info)
                 except:
-                    Logger.debug("Error retrieving location info for geohash {location_geohashes[selected]}")
+                    Logger.debug(f"Error retrieving location info for geohash {location_geohashes[selected]}")
                     raise
 
                 # Save the geohash and latitude and longitude of the location
