@@ -124,17 +124,25 @@ def download_background(radar_code, file_name, path):
                 try:
                     shutil.copy(src, os.path.join(path, "background.png"))
                     return
-                except Exception as e:
+                except (OSError, shutil.Error) as e:
                     Logger.warning(f"Local copy of national radar background failed: {e} — will attempt remote fetch")
 
-        # Fallback: fetch from BOM for all backgrounds
-        url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
+        # Fallback: fetch from BOM for all backgrounds (FTP first, then HTTP)
+        ftp_url = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
+        dst = os.path.join(path, out_file_name)
         try:
-            with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
-                with open(os.path.join(path, out_file_name), "wb") as fh:
+            with urllib.request.urlopen(ftp_url, timeout=15) as radar_image:
+                with open(dst, "wb") as fh:
                     fh.write(radar_image.read())
         except (urllib.error.URLError, socket.timeout) as e:
-            Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
+            Logger.warning(f"FTP fetch failed for background {ftp_url}: {e} — trying HTTP")
+            http_url = Store.BOM_RADAR_HTTPSTUB + os.path.basename(ftp_url)
+            try:
+                with urllib.request.urlopen(http_url, timeout=15) as radar_image:
+                    with open(dst, "wb") as fh:
+                        fh.write(radar_image.read())
+            except (urllib.error.URLError, socket.timeout) as e2:
+                Logger.error(f"Failed to retrieve radar background via FTP and HTTP: {ftp_url} | {http_url}, exception: {e2}")
 
     else:
         Logger.debug(f"Using cached {out_file_name}")
@@ -238,13 +246,12 @@ def build_images(radar_code, path, loop_path):
         try:
             Logger.debug("Log in to BOM FTP")
             with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
-                ftp.login("anonymous", "anonymous@anonymous.org")
-                ftp.cwd("/anon/gen/radar/")
-                # Optionally reduce payload:
-                # files = ftp.nlst(f"{radar_code}*")
-                files = ftp.nlst()
-                files.sort(reverse=True)
-                break
+                with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
+                    ftp.login("anonymous", "anonymous@anonymous.org")
+                    ftp.cwd("/anon/gen/radar/")
+                    files = ftp.nlst(f"{radar_code}*")
+                    files.sort(reverse=True)
+                    break
         except ftplib.all_errors as e:
             last_err = e
             if attempt < 2:
