@@ -5,6 +5,7 @@ import shutil
 import sys
 import os
 import time
+import socket
 import urllib.error
 import urllib.parse
 import urllib.request
@@ -113,30 +114,27 @@ def download_background(radar_code, file_name, path):
 
     # Download the backgrounds only if we don't have them yet
     if not os.path.isfile(os.path.join(path, out_file_name)):
-
         Logger.debug("Downloading missing background image....[%s] as [%s]" % (file_name, out_file_name))
 
-        # Prefer local copy for national background when available; otherwise fall back to remote fetch
+        # Try bundled national background first (if available)
         if file_name == 'IDR00004.background.png' and CWD:
             src = os.path.join(CWD, "resources", "IDR00004.background.png")
-            dst = os.path.join(path, "background.png")
             if os.path.isfile(src):
                 Logger.debug("Copying bundled national radar background")
                 try:
-                    shutil.copy(src, dst)
-                    return  # done
+                    shutil.copy(src, os.path.join(path, "background.png"))
+                    return
                 except Exception as e:
-                    Logger.warning(f"Local copy of national radar background failed: {e} — falling back to remote")
-            else:
-                Logger.debug("Bundled national radar background not found — falling back to remote")
-                url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
-                try:
-                    with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
-                        dst = os.path.join(path, out_file_name)
-                        with open(dst, "wb") as fh:
-                            fh.write(radar_image.read())
-                except Exception as e:
-                    Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
+                    Logger.warning(f"Local copy of national radar background failed: {e} — will attempt remote fetch")
+
+        # Fallback: fetch from BOM for all backgrounds
+        url_to_get = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
+        try:
+            with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
+                with open(os.path.join(path, out_file_name), "wb") as fh:
+                    fh.write(radar_image.read())
+        except Exception as e:
+            Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
 
     else:
         Logger.debug(f"Using cached {out_file_name}")
@@ -241,9 +239,8 @@ def build_images(radar_code, path, loop_path):
     # Try up to 3 times, with a seconds pause between each, to connect to BOM FTP
     # (to try and get past very occasional 'too many users' errors)
     files = []
-    for attempts in range(3):
+    for attempt in range(3):
         try:
-            # Unfortunately no FTPS/HTTPS alternative known...
             with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
                 ftp.login("anonymous", "anonymous@anonymous.org")
                 ftp.cwd("/anon/gen/radar/")
@@ -251,11 +248,11 @@ def build_images(radar_code, path, loop_path):
                 files.sort(reverse=True)
                 break
         except Exception as e:
-            if attempts < 2:
+            if attempt < 2:
                 time.sleep(1)
-            else:
-                Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {e}")
-                return
+    else:
+        Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {e}")
+        return
 
     Logger.debug("Download new files, and rename existing files, to avoid Kodi caching issues with the animated radar")
     # OK now we need just the matching radar files...
@@ -283,12 +280,11 @@ def build_images(radar_code, path, loop_path):
 
                     try:
                         with urllib.request.urlopen(image_to_retrieve, timeout=15) as radar_image:
-                            dst = os.path.join(loop_path, output_file)
-                            with open(dst, "wb") as fh:
+                            with open(os.path.join(loop_path, output_file), "wb") as fh:
                                 fh.write(radar_image.read())
+                    except (urllib.error.URLError, socket.timeout) as e:
+                        Logger.error(f"Failed to retrieve radar image: {image_to_retrieve}, exception: {e}")
 
-                    except Exception as e:
-                        Logger.error(f"Failed to retrieve radar image: {image_to_retrieve}, exception: {str(e)}")
             else:
                 Logger.debug("Using cached radar image: " + time_now + "." + f)
 
