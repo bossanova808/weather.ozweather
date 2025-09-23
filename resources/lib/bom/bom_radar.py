@@ -114,7 +114,7 @@ def download_background(radar_code, file_name, path):
 
     # Download the backgrounds only if we don't have them yet
     if not os.path.isfile(os.path.join(path, out_file_name)):
-        Logger.debug("Downloading missing background image....[%s] as [%s]" % (file_name, out_file_name))
+        Logger.debug(f"Downloading missing background image....[{file_name}] as [{out_file_name}]")
 
         # Try bundled national background first (if available)
         if file_name == 'IDR00004.background.png' and CWD:
@@ -133,7 +133,7 @@ def download_background(radar_code, file_name, path):
             with urllib.request.urlopen(url_to_get, timeout=15) as radar_image:
                 with open(os.path.join(path, out_file_name), "wb") as fh:
                     fh.write(radar_image.read())
-        except Exception as e:
+        except (urllib.error.URLError, socket.timeout) as e:
             Logger.error(f"Failed to retrieve radar background image: {url_to_get}, exception: {e}")
 
     else:
@@ -230,28 +230,27 @@ def build_images(radar_code, path, loop_path):
     # first we retrieve a list of the available files via ftp
 
     Logger.debug("Download the radar loop")
-    files = []
-
-    Logger.debug("Log in to BOM FTP")
-    attempts = 0
-    ftp = None
 
     # Try up to 3 times, with a seconds pause between each, to connect to BOM FTP
-    # (to try and get past very occasional 'too many users' errors)
-    files = []
+    # (to try and get past _very_ occasional 'too many users' errors)
+    last_err = None
     for attempt in range(3):
         try:
+            Logger.debug("Log in to BOM FTP")
             with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
                 ftp.login("anonymous", "anonymous@anonymous.org")
                 ftp.cwd("/anon/gen/radar/")
+                # Optionally reduce payload:
+                # files = ftp.nlst(f"{radar_code}*")
                 files = ftp.nlst()
                 files.sort(reverse=True)
                 break
-        except Exception as e:
+        except ftplib.all_errors as e:
+            last_err = e
             if attempt < 2:
                 time.sleep(1)
     else:
-        Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {e}")
+        Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {last_err}")
         return
 
     Logger.debug("Download new files, and rename existing files, to avoid Kodi caching issues with the animated radar")
