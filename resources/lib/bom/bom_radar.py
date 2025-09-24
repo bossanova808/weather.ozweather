@@ -24,6 +24,32 @@ from bossanova808.logger import Logger
 from resources.lib.store import Store
 
 
+def _download_to_path(url, dst_path, timeout=15):
+    """
+    Download from URL to destination path atomically with proper cleanup.
+
+    :param url: URL to download from
+    :param dst_path: Destination file path
+    :param timeout: Request timeout in seconds
+    :raises: urllib.error.URLError, socket.timeout, OSError on failure
+    """
+    tmp_path = dst_path + ".tmp"
+    try:
+        with urllib.request.urlopen(url, timeout=timeout) as response:
+            data = response.read()
+        with open(tmp_path, "wb") as fh:
+            fh.write(data)
+        os.replace(tmp_path, dst_path)
+    except (urllib.error.URLError, socket.timeout, OSError):
+        # Clean up any partial file
+        try:
+            if os.path.exists(tmp_path):
+                os.remove(tmp_path)
+        except OSError:
+            pass
+        raise
+
+
 # noinspection PyPep8Naming
 def get_distance(point1, point2):
     """
@@ -97,22 +123,6 @@ def download_background(radar_code, file_name, path):
         # Append the radar code
         file_name = radar_code + "." + file_name
 
-    # No longer do this - as this trips up the BOMs filter
-    # New approach - if file is missing, then try get it
-    # If it is not missing, don't do anything....but user can purge old/stale files manually in the addon settings
-
-    # # Delete backgrounds older than a week old
-    # if os.path.isfile(backgrounds_path + out_file_name) and ADDON.getSetting('BGDownloadToggle'):
-    #     file_creation = os.path.getmtime(backgrounds_path + out_file_name)
-    #     now = time.time()
-    #     week_ago = now - 7 * 60 * 60 * 24  # Number of seconds in a week
-    #     # log ("file creation: " + str(file_creation) + " week_ago " + str(week_ago))
-    #     if file_creation < week_ago:
-    #         log("Backgrounds stale (> one week) - refreshing - " + out_file_name)
-    #         os.remove(backgrounds_path + out_file_name)
-    #     else:
-    #         log("Using cached background - " + out_file_name)
-
     # Download the backgrounds only if we don't have them yet
     if not os.path.isfile(os.path.join(path, out_file_name)):
         Logger.debug(f"Downloading missing background image....[{file_name}] as [{out_file_name}]")
@@ -131,24 +141,15 @@ def download_background(radar_code, file_name, path):
         # Fallback: fetch from BOM for all backgrounds (FTP first, then HTTP)
         ftp_url = Store.BOM_RADAR_BACKGROUND_FTPSTUB + file_name
         dst = os.path.join(path, out_file_name)
+
         try:
-            with urllib.request.urlopen(ftp_url, timeout=15) as radar_image:
-                data = radar_image.read()
-            tmp = dst + ".tmp"
-            with open(tmp, "wb") as fh:
-                fh.write(data)
-            os.replace(tmp, dst)
-        except (urllib.error.URLError, socket.timeout) as e:
+            _download_to_path(ftp_url, dst)
+        except (urllib.error.URLError, socket.timeout, OSError) as e:
             Logger.warning(f"FTP fetch failed for background {ftp_url}: {e} — trying HTTP")
             http_url = Store.BOM_RADAR_HTTPSTUB + os.path.basename(ftp_url)
             try:
-                with urllib.request.urlopen(http_url, timeout=15) as radar_image:
-                    data = radar_image.read()
-                tmp = dst + ".tmp"
-                with open(tmp, "wb") as fh:
-                    fh.write(data)
-                os.replace(tmp, dst)
-            except (urllib.error.URLError, socket.timeout) as e2:
+                _download_to_path(http_url, dst)
+            except (urllib.error.URLError, socket.timeout, OSError) as e2:
                 Logger.error(f"Failed to retrieve radar background via FTP and HTTP: {ftp_url} | {http_url}, exception: {e2}")
 
     else:
@@ -281,7 +282,8 @@ def build_images(radar_code, path, loop_path):
     #  which is why we can test here with the current time_now to see if we already have the images)
     if loop_pic_names:
         for f in loop_pic_names:
-            if not os.path.isfile(loop_path + time_now + "." + f):
+            candidate = os.path.join(loop_path, f"{time_now}.{f}")
+            if not os.path.isfile(candidate):
                 # ignore the composite gif...
                 if f[-3:] == "png":
                     image_to_retrieve = Store.BOM_RADAR_FTPSTUB + f
