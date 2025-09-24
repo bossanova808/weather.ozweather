@@ -291,16 +291,11 @@ def build_images(radar_code, path, loop_path):
                     Logger.debug("Retrieving new radar image: " + image_to_retrieve)
                     Logger.debug("Output to file: " + output_file)
 
+                    dst = os.path.join(loop_path, output_file)
                     try:
-                        with urllib.request.urlopen(image_to_retrieve, timeout=15) as radar_image:
-                            data = radar_image.read()
-                        dst = os.path.join(loop_path, output_file)
-                        tmp = dst + ".tmp"
-                        with open(tmp, "wb") as fh:
-                            fh.write(data)
-                        os.replace(tmp, dst)
+                        _download_to_path(image_to_retrieve, dst)
                         Logger.debug(f"Successfully downloaded radar image: {f}")
-                    except (urllib.error.URLError, socket.timeout) as e:
+                    except (urllib.error.URLError, socket.timeout, OSError) as e:
                         Logger.error(f"Failed to retrieve radar loop image via FTP: {image_to_retrieve}, exception: {e}")
                         continue
 
