@@ -1,13 +1,21 @@
-from bossanova808.constants import *
-from bossanova808.utilities import *
+import os
+import glob
+import time
+import sys
+
+import xbmc
+import xbmcvfs
+
+from bossanova808.constants import ADDON, ADDON_NAME, ADDON_VERSION, WEATHER_WINDOW, CWD
+from bossanova808.utilities import set_property
 from bossanova808.logger import Logger
 
 # noinspection PyPackages
-from .abc.abc_video import *
+from .abc.abc_video import get_abc_weather_video_link
 # noinspection PyPackages
-from .bom.bom_radar import *
+from .bom.bom_radar import dump_all_radar_backgrounds, build_images
 # noinspection PyPackages
-from .bom.bom_forecast import *
+from .bom.bom_forecast import bom_forecast, utc_str_to_local_str
 
 
 def clear_properties():
@@ -147,10 +155,10 @@ def forecast(geohash, radar_code):
     # Get the radar images first - because it looks better on refreshes
     if extended_features:
         Logger.debug(f'Getting radar images for {radar_code}')
-        backgrounds_path = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/")
-        overlay_loop_path = xbmcvfs.translatePath(
-            "special://profile/addon_data/weather.ozweather/currentloop/" + radar_code + "/")
+        # Use shared storage for radar backgrounds (persistent data) as profiles often share weather locales
+        backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/")
+        # Use temp storage for radar loop images (they expire after 1 hour anyway)
+        overlay_loop_path = xbmcvfs.translatePath("special://temp/weather.ozweather/currentloop/" + radar_code + "/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
