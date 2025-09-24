@@ -11,8 +11,9 @@ import urllib.parse
 import urllib.request
 from math import sin, cos, sqrt, atan2, radians
 import xbmc
+import xbmcvfs
 
-# Allow for unit testing this file
+# Allow for unit testing this file (remember to install kodistubs!)
 # This brings this addon's resources, and bossanova808 module stuff into scope
 # (when running this module outside Kodi)
 if not xbmc.getUserAgent():
@@ -93,8 +94,6 @@ def dump_all_radar_backgrounds(all_backgrounds_path=None):
     Remove the entire radar backgrounds folder, so that new ones will be pulled on next weather data refresh
     """
     if all_backgrounds_path is None:
-        # (Import locally so as not to break module tests running outside of Kodi)
-        import xbmcvfs
         all_backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
