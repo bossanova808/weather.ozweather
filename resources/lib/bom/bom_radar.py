@@ -263,6 +263,7 @@ def build_images(radar_code, path, loop_path):
             time.sleep(0.5 * (2 ** attempt))
     else:
         Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {last_err}")
+        return
 
     Logger.debug("Download new files, and rename existing files, to avoid Kodi caching issues with the animated radar")
     # OK now we need just the matching radar files...
@@ -290,8 +291,12 @@ def build_images(radar_code, path, loop_path):
 
                     try:
                         with urllib.request.urlopen(image_to_retrieve, timeout=15) as radar_image:
-                            with open(os.path.join(loop_path, output_file), "wb") as fh:
-                                fh.write(radar_image.read())
+                            data = radar_image.read()
+                        dst = os.path.join(loop_path, output_file)
+                        tmp = dst + ".tmp"
+                        with open(tmp, "wb") as fh:
+                            fh.write(data)
+                        os.replace(tmp, dst)
                         Logger.debug(f"Successfully downloaded radar image: {f}")
                     except (urllib.error.URLError, socket.timeout) as e:
                         Logger.error(f"Failed to retrieve radar loop image via FTP: {image_to_retrieve}, exception: {e}")
