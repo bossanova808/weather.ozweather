@@ -6,7 +6,7 @@ import requests
 import math
 import xbmc
 
-# Allow for unit testing this file
+# Allow for unit testing this file e (remember to install kodistubs!)
 # This brings this addon's resources, and bossanova808 module stuff into scope
 # (when running this module outside Kodi)
 if not xbmc.getUserAgent():

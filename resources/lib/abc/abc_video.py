@@ -5,7 +5,7 @@ import xbmcgui
 import json
 from bs4 import BeautifulSoup
 
-# Allow for unit testing this file
+# Allow for unit testing this file (remember to install kodistubs!)
 # This brings this addon's resources, and bossanova808 module stuff into scope
 # (when running this module outside Kodi)
 if not xbmc.getUserAgent():
