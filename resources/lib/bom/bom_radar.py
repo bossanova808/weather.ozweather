@@ -11,7 +11,6 @@ import urllib.parse
 import urllib.request
 from math import sin, cos, sqrt, atan2, radians
 import xbmc
-import xbmcvfs
 
 # Allow for unit testing this file
 # This brings this addon's resources, and bossanova808 module stuff into scope
@@ -68,6 +67,8 @@ def dump_all_radar_backgrounds(all_backgrounds_path=None):
     Remove the entire radar backgrounds folder, so that new ones will be pulled on next weather data refresh
     """
     if all_backgrounds_path is None:
+        # (Import locally so as not to break module tests running outside of Kodi)
+        import xbmcvfs
         all_backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
@@ -132,15 +133,21 @@ def download_background(radar_code, file_name, path):
         dst = os.path.join(path, out_file_name)
         try:
             with urllib.request.urlopen(ftp_url, timeout=15) as radar_image:
-                with open(dst, "wb") as fh:
-                    fh.write(radar_image.read())
+                data = radar_image.read()
+            tmp = dst + ".tmp"
+            with open(tmp, "wb") as fh:
+                fh.write(data)
+            os.replace(tmp, dst)
         except (urllib.error.URLError, socket.timeout) as e:
             Logger.warning(f"FTP fetch failed for background {ftp_url}: {e} — trying HTTP")
             http_url = Store.BOM_RADAR_HTTPSTUB + os.path.basename(ftp_url)
             try:
                 with urllib.request.urlopen(http_url, timeout=15) as radar_image:
-                    with open(dst, "wb") as fh:
-                        fh.write(radar_image.read())
+                    data = radar_image.read()
+                tmp = dst + ".tmp"
+                with open(tmp, "wb") as fh:
+                    fh.write(data)
+                os.replace(tmp, dst)
             except (urllib.error.URLError, socket.timeout) as e2:
                 Logger.error(f"Failed to retrieve radar background via FTP and HTTP: {ftp_url} | {http_url}, exception: {e2}")
 
@@ -239,12 +246,11 @@ def build_images(radar_code, path, loop_path):
 
     Logger.debug("Download the radar loop")
 
-    # Try up to 3 times, with a seconds pause between each, to connect to BOM FTP
+    # Try up to 3 times, with an exponential pause between each, to connect to BOM FTP
     # (to try and get past _very_ occasional 'too many users' errors)
     last_err = None
     for attempt in range(3):
         try:
-            Logger.debug("Log in to BOM FTP")
             with ftplib.FTP("ftp.bom.gov.au", timeout=15) as ftp:
                 ftp.login("anonymous", "anonymous@anonymous.org")
                 ftp.cwd("/anon/gen/radar/")
@@ -253,11 +259,10 @@ def build_images(radar_code, path, loop_path):
                 break
         except ftplib.all_errors as e:
             last_err = e
-            if attempt < 2:
-                time.sleep(1)
+            # 0.5s, 1s, 2s
+            time.sleep(0.5 * (2 ** attempt))
     else:
         Logger.error(f"Failed after 3 attempts to connect/list BOM FTP: {last_err}")
-        return
 
     Logger.debug("Download new files, and rename existing files, to avoid Kodi caching issues with the animated radar")
     # OK now we need just the matching radar files...
@@ -287,8 +292,10 @@ def build_images(radar_code, path, loop_path):
                         with urllib.request.urlopen(image_to_retrieve, timeout=15) as radar_image:
                             with open(os.path.join(loop_path, output_file), "wb") as fh:
                                 fh.write(radar_image.read())
+                        Logger.debug(f"Successfully downloaded radar image: {f}")
                     except (urllib.error.URLError, socket.timeout) as e:
-                        Logger.error(f"Failed to retrieve radar image: {image_to_retrieve}, exception: {e}")
+                        Logger.error(f"Failed to retrieve radar loop image via FTP: {image_to_retrieve}, exception: {e}")
+                        continue
 
             else:
                 Logger.debug("Using cached radar image: " + time_now + "." + f)
