@@ -135,10 +135,13 @@ def clear_properties():
 # noinspection PyShadowingNames
 def forecast(geohash, radar_code):
     """
-    The main weather data retrieval function
-    Does either a basic forecast, or a more extended forecast with radar etc.
-    :param geohash: the BOM geohash for the location
-    :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
+    Retrieve forecast data from the BOM and populate Kodi weather window properties.
+    
+    Performs an optional extended update: may purge stored radar backgrounds, build radar background and loop images for the supplied radar code, set loop time labels from generated image filenames, fetch an ABC weather video link, and write all retrieved weather and status properties to the weather window (including fetch flags and update timestamp).
+    
+    Parameters:
+        geohash (str): BOM geohash for the location.
+        radar_code (str): BOM radar code (e.g. 'IDR063') used to build radar backgrounds and loop images.
     """
 
     extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
