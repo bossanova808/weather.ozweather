@@ -91,10 +91,15 @@ def closest_radar_to_lat_lon(point):
 
 def dump_all_radar_backgrounds(all_backgrounds_path=None):
     """
-    Remove the entire radar backgrounds folder, so that new ones will be pulled on next weather data refresh
+    Remove the radar backgrounds directory so fresh backgrounds are fetched on the next refresh.
+    
+    If `all_backgrounds_path` is None the default path "special://temp/ozweather/radarbackgrounds/" is used. If the directory exists it is removed and the function waits briefly to ensure removal completes.
+    
+    Parameters:
+        all_backgrounds_path (str | None): Filesystem path to the radar backgrounds directory to remove. If None, the default special temp path is used.
     """
     if all_backgrounds_path is None:
-        all_backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/")
+        all_backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
         # Little pause to make sure this is complete before any refresh...

@@ -135,10 +135,13 @@ def clear_properties():
 # noinspection PyShadowingNames
 def forecast(geohash, radar_code):
     """
-    The main weather data retrieval function
-    Does either a basic forecast, or a more extended forecast with radar etc.
-    :param geohash: the BOM geohash for the location
-    :param radar_code: the BOM radar code (e.g. 'IDR063') to retrieve the radar loop for
+    Retrieve forecast data from the BOM and populate Kodi weather window properties.
+    
+    Performs an optional extended update: may purge stored radar backgrounds, build radar background and loop images for the supplied radar code, set loop time labels from generated image filenames, fetch an ABC weather video link, and write all retrieved weather and status properties to the weather window (including fetch flags and update timestamp).
+    
+    Parameters:
+        geohash (str): BOM geohash for the location.
+        radar_code (str): BOM radar code (e.g. 'IDR063') used to build radar backgrounds and loop images.
     """
 
     extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
@@ -155,10 +158,11 @@ def forecast(geohash, radar_code):
     # Get the radar images first - because it looks better on refreshes
     if extended_features:
         Logger.debug(f'Getting radar images for {radar_code}')
-        # Use shared storage for radar backgrounds (persistent data) as profiles often share weather locales
-        backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/")
-        # Use temp storage for radar loop images (they expire after 1 hour anyway)
-        overlay_loop_path = xbmcvfs.translatePath("special://temp/weather.ozweather/currentloop/" + radar_code + "/")
+        # Use a shared cache for all radar data (backgrounds and current loop images)
+        # Kodi does not routinely clear this on exit (so the backgrounds are conserved as desired)
+        # OzWeather takes care of deleting the ephemeral (loop) images as needed
+        backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/" + radar_code + "/")
+        overlay_loop_path = xbmcvfs.translatePath("special://temp/ozweather/currentloop/" + radar_code + "/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
