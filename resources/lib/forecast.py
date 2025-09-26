@@ -155,9 +155,10 @@ def forecast(geohash, radar_code):
     # Get the radar images first - because it looks better on refreshes
     if extended_features:
         Logger.debug(f'Getting radar images for {radar_code}')
-        # Use shared storage for radar backgrounds (persistent data) as profiles often share weather locales
+        # Use a shared cache for all radar data (backgrounds and current loop images)
+        # Kodi does not routinely clear this on exit (so the backgrounds are conserved as desired)
+        # OzWeather takes care of deleting the ephemeral (loop) images as needed
         backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/" + radar_code + "/")
-        # Use temp storage for radar loop images (they expire after 1 hour anyway)
         overlay_loop_path = xbmcvfs.translatePath("special://temp/ozweather/currentloop/" + radar_code + "/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
