@@ -94,7 +94,7 @@ def dump_all_radar_backgrounds(all_backgrounds_path=None):
     Remove the entire radar backgrounds folder, so that new ones will be pulled on next weather data refresh
     """
     if all_backgrounds_path is None:
-        all_backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/")
+        all_backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/")
     if os.path.isdir(all_backgrounds_path):
         shutil.rmtree(all_backgrounds_path)
         # Little pause to make sure this is complete before any refresh...

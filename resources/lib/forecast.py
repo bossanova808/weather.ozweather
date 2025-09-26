@@ -156,9 +156,9 @@ def forecast(geohash, radar_code):
     if extended_features:
         Logger.debug(f'Getting radar images for {radar_code}')
         # Use shared storage for radar backgrounds (persistent data) as profiles often share weather locales
-        backgrounds_path = xbmcvfs.translatePath("special://home/addon_data/weather.ozweather/radarbackgrounds/" + radar_code + "/")
+        backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/" + radar_code + "/")
         # Use temp storage for radar loop images (they expire after 1 hour anyway)
-        overlay_loop_path = xbmcvfs.translatePath("special://temp/weather.ozweather/currentloop/" + radar_code + "/")
+        overlay_loop_path = xbmcvfs.translatePath("special://temp/ozweather/currentloop/" + radar_code + "/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
