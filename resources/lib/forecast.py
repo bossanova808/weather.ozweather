@@ -2,6 +2,7 @@ import os
 import glob
 import time
 import sys
+import shutil
 
 import xbmc
 import xbmcvfs
@@ -13,7 +14,7 @@ from bossanova808.logger import Logger
 # noinspection PyPackages
 from .abc.abc_video import get_abc_weather_video_link
 # noinspection PyPackages
-from .bom.bom_radar import dump_all_radar_backgrounds, build_images
+from .bom.bom_radar import build_images
 # noinspection PyPackages
 from .bom.bom_forecast import bom_forecast, utc_str_to_local_str
 
@@ -146,23 +147,27 @@ def forecast(geohash, radar_code):
 
     extended_features = ADDON.getSettingBool('ExtendedFeaturesToggle')
     Logger.debug(f'Extended features: {extended_features}')
-    purge_backgrounds = ADDON.getSettingBool('PurgeRadarBackgroundsOnNextRefresh')
-    Logger.debug(f'Purge Backgrounds: {purge_backgrounds}')
 
-    # Has the user requested we refresh the radar backgrounds on next weather fetch?
-    if purge_backgrounds:
-        Logger.info("Purging all radar backgrounds")
-        dump_all_radar_backgrounds()
+    # Has the user requested we refresh the radar data on next weather fetch?
+    purge_radar_backgrounds = ADDON.getSettingBool('PurgeRadarBackgroundsOnNextRefresh')
+    if purge_radar_backgrounds:
+        Logger.info("Purging all radar background per user request")
+        if os.path.isdir(xbmcvfs.translatePath("special://temp/ozweather/backgrounds")):
+            shutil.rmtree(xbmcvfs.translatePath("special://temp/ozweather/backgrounds"))
+            # Little pause to make sure this is complete before any weather refresh...
+            time.sleep(0.5)
         ADDON.setSetting('PurgeRadarBackgroundsOnNextRefresh', 'false')
 
     # Get the radar images first - because it looks better on refreshes
     if extended_features:
         Logger.debug(f'Getting radar images for {radar_code}')
-        # Use a shared cache for all radar data (backgrounds and current loop images)
+        # Use cache for all radar data (backgrounds and current loop images)
         # Kodi does not routinely clear this on exit (so the backgrounds are conserved as desired)
         # OzWeather takes care of deleting the ephemeral (loop) images as needed
-        backgrounds_path = xbmcvfs.translatePath("special://temp/ozweather/radarbackgrounds/" + radar_code + "/")
-        overlay_loop_path = xbmcvfs.translatePath("special://temp/ozweather/currentloop/" + radar_code + "/")
+        # Seems the best place, see: https://forum.kodi.tv/showthread.php?tid=382805
+        # (If the cache is cleared at any point, OzWeather will then re-download what it needs).
+        backgrounds_path = xbmcvfs.translatePath(f"special://temp/ozweather/backgrounds/{radar_code}/")
+        overlay_loop_path = xbmcvfs.translatePath(f"special://temp/ozweather/loop/{radar_code}/")
         build_images(radar_code, backgrounds_path, overlay_loop_path)
         set_property(WEATHER_WINDOW, 'Radar', radar_code)
 
