@@ -5,7 +5,7 @@
     	<import addon="script.module.requests" version="2.22.0+matrix.1"/>
     	<import addon="script.module.beautifulsoup4" version="4.8.2+matrix.1"/>
 		<import addon="script.module.pytz" version="3.0+matrix.2"/>
-		<import addon="script.module.bossanova808" version="1.0.0"/>
+		<import addon="script.module.bossanova808" version="1.0.2"/>
 	</requires>
 	<extension point="xbmc.python.weather" library="default.py"/>
 	<extension point="xbmc.addon.metadata">
