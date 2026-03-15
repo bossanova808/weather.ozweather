@@ -712,8 +712,6 @@
 						<dependencies>
 							<dependency type="enable">
 								<and>
-<!-- original						<condition operator="!is" setting="Location2BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-5,false)</condition> -->
 									<condition operator="!is" setting="Location3BOMGeoHash"/>
 									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
 								</and>
@@ -732,8 +730,8 @@
 						<dependencies>
 							<dependency type="enable">
 								<and>
-									<condition operator="!is" setting="Location2BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-5,false)</condition>
+									<condition operator="!is" setting="Location4BOMGeoHash"/>
+									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -750,8 +748,8 @@
 						<dependencies>
 							<dependency type="enable">
 								<and>
-									<condition operator="!is" setting="Location2BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-5,false)</condition>
+									<condition operator="!is" setting="Location5BOMGeoHash"/>
+									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -768,8 +766,8 @@
 						<dependencies>
 							<dependency type="enable">
 								<and>
-									<condition operator="!is" setting="Location2BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-5,false)</condition>
+									<condition operator="!is" setting="Location6BOMGeoHash"/>
+									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
 								</and>
 							</dependency>
 						</dependencies>
