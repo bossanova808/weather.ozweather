@@ -111,3 +111,7 @@ msgstr ""
 msgctxt "#32212"
 msgid "If entered, these radar codes overrule the closest found."
 msgstr ""
+
+msgctxt "#32213"
+msgid "Troubleshooting"
+msgstr ""
