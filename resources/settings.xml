@@ -632,36 +632,6 @@
 		</category>
 		<category id="extended features" label="32207" help="">
 			<group id="1">
-				<!-- <setting id="Location1BOMGeoHash" type="string" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading/>
-					</control>
-				</setting>
-				<setting id="Location2BOMGeoHash" type="string" help="">
-					<level>0</level>
-					<default/>
-					<constraints>
-						<allowempty>true</allowempty>
-					</constraints>
-					<dependencies>
-						<dependency type="visible">
-							<condition on="property" name="InfoBool">false</condition>
-						</dependency>
-					</dependencies>
-					<control type="edit" format="string">
-						<heading/>
-					</control>
-				</setting> -->
 				<setting id="ExtendedFeaturesToggle" type="boolean" label="32194" help="">
 					<level>0</level>
 					<default>false</default>
