@@ -638,7 +638,7 @@
 					<control type="toggle"/>
 				</setting>
 					<group id="55" label="32212">
-
+					
 					</group>
 					<setting id="Radar1" type="string" label="32151" help="">
 						<level>0</level>
@@ -665,7 +665,7 @@
 							<dependency type="enable">
 								<and>
 									<condition operator="!is" setting="Location2BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+									<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -683,7 +683,7 @@
 							<dependency type="enable">
 								<and>
 									<condition operator="!is" setting="Location3BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+									<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -701,7 +701,7 @@
 							<dependency type="enable">
 								<and>
 									<condition operator="!is" setting="Location4BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+									<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -719,7 +719,7 @@
 							<dependency type="enable">
 								<and>
 									<condition operator="!is" setting="Location5BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+									<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
 								</and>
 							</dependency>
 						</dependencies>
@@ -737,7 +737,7 @@
 							<dependency type="enable">
 								<and>
 									<condition operator="!is" setting="Location6BOMGeoHash"/>
-									<condition on="property" name="InfoBool"> !eq(-4,false)</condition>
+									<condition operator="!is" setting="ExtendedFeaturesToggle">false</condition>
 								</and>
 							</dependency>
 						</dependencies>
