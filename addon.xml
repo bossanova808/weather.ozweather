@@ -25,6 +25,7 @@
 		</assets>
 		<news>v2.1.7 
 - Increase locations support from 3 to 6 (implemented by spin35)
+- Update to latest radar list scraped from BOM site
     	</news>
 	</extension>
 </addon>
