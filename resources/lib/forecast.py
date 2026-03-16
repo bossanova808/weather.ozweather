@@ -280,6 +280,7 @@ def get_weather():
         pass
 
     set_property(WEATHER_WINDOW, 'Location', location_in_use)
+    set_property(WEATHER_WINDOW, 'LocationIndex', {sys.argv[1]})
     set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m %H:%M").lower())
     set_property(WEATHER_WINDOW, 'Current.Location', location_in_use)
     set_property(WEATHER_WINDOW, 'Forecast.City', location_in_use)
