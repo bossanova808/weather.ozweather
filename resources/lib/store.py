@@ -103,6 +103,8 @@ class Store:
         (-11.6494, 133.38, "Warruwi", "IDR773")
     ]
 
+    RADAR_LOOKUP = {code: name for _, _, name, code in BOM_RADAR_LOCATIONS}
+
     DAYS = {"Mon": "Monday",
             "Tue": "Tuesday",
             "Wed": "Wednesday",

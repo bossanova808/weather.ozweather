@@ -7,7 +7,7 @@ def refresh_locations():
     """
     Get the user's location and radar code choices from the addon settings, and set them as window properties
     """
-    Logger.info("Refreshing locations from settings")
+    Logger.info("Refreshing weather locations from settings")
 
     location1 = ADDON.getSetting('Location1BOM') or ""
     location2 = ADDON.getSetting('Location2BOM') or ""
