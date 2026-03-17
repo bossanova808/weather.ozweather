@@ -283,7 +283,7 @@ def get_weather():
 
     set_property(WEATHER_WINDOW, 'Location', location_in_use)
     set_property(WEATHER_WINDOW, 'LocationIndex', sys.argv[1])
-    set_property(WEATHER_WINDOW, 'RadarLocation', Store.RADAR_LOOKUP[radar] )
+    set_property(WEATHER_WINDOW, 'RadarLocation', Store.get_radar_name(radar))
     set_property(WEATHER_WINDOW, 'LocationGeohash', geohash)
     set_property(WEATHER_WINDOW, 'Updated', time.strftime("%d/%m %H:%M").lower())
     set_property(WEATHER_WINDOW, 'Current.Location', location_in_use)

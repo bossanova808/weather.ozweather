@@ -103,7 +103,13 @@ class Store:
         (-11.6494, 133.38, "Warruwi", "IDR773")
     ]
 
-    RADAR_LOOKUP = {code: name for _, _, name, code in BOM_RADAR_LOCATIONS}
+    @staticmethod
+    def get_radar_name(radar_code):
+        prefix = radar_code[:-1]  # Strip the last digit (range selector)
+        for _, _, name, code in Store.BOM_RADAR_LOCATIONS:
+            if code[:-1] == prefix:
+                return name
+        return None
 
     DAYS = {"Mon": "Monday",
             "Tue": "Tuesday",
