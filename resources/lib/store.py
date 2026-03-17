@@ -100,11 +100,13 @@ class Store:
         (-12.46, 130.93, "Darwin/Berrimah", "IDR633"),
         (-12.27, 136.82, "Gove", "IDR1123"),
         (-14.51, 132.45, "Katherine/Tindal", "IDR423"),
-        (-11.6494, 133.38, "Warruwi", "IDR773")
+        (-11.6494, 133.38, "Warruwi", "IDR773"),
     ]
 
     # The -1 here removes the range from the radar (1,2,3,4 at the end of IDR02, for example)
     RADAR_LOOKUP = {code[:-1]: name for _, _, name, code in BOM_RADAR_LOCATIONS}
+    # Manually add the name for this special radar that is not returned in the scraped list
+    RADAR_LOOKUP["IDR0000"] = "National"
 
     DAYS = {"Mon": "Monday",
             "Tue": "Tuesday",
