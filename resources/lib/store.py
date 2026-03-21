@@ -103,10 +103,24 @@ class Store:
         (-11.6494, 133.38, "Warruwi", "IDR773"),
     ]
 
+    # RADAR location and range lookups...
     # The -1 here removes the range from the radar (1,2,3,4 at the end of IDR02, for example)
-    RADAR_LOOKUP = {code[:-1]: name for _, _, name, code in BOM_RADAR_LOCATIONS}
+    RADAR_LOCATION = {code[:-1]: name for _, _, name, code in BOM_RADAR_LOCATIONS}
     # Manually add the name for this special radar that is not returned in the scraped list
-    RADAR_LOOKUP["IDR0000"] = "National"
+    RADAR_LOCATION["IDR0000"] = "National"
+    # The last digit indicates the range of the radar
+    RADAR_RANGE_MAP = {
+        "1": "512km",
+        "2": "256km",
+        "3": "128km",
+        "4": "64km",
+    }
+    # Convenience method to return the range if known (including a range of 'National' for the whole-country radar)
+    @staticmethod
+    def RADAR_RANGE(radar_code):
+        if radar_code == "IDR00004":
+            return "National"
+        return Store.RADAR_RANGE_MAP.get(radar_code[-1], "?Range")
 
     DAYS = {"Mon": "Monday",
             "Tue": "Tuesday",
