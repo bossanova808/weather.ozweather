@@ -142,143 +142,169 @@ class Store:
     #   - Day/night split: day uses sun icons (32=sunny, 34=fair/partly sunny),
     #     night uses moon icons (31=clear night, 33=fair night)
 
-    WEATHER_CODES = {
-        # === Modern BOM REST API icon_descriptor values ===
-        'sunny': '32',  # Sunny
-        'clear': '32',  # Clear (daytime = sunny)
-        'mostly_sunny': '34',  # Mostly sunny / fair (day)
-        'partly_cloudy': '30',  # Partly cloudy (day)
-        'cloudy': '26',  # Cloudy
-        'overcast': '26',  # Overcast / cloudy
-        'haze': '21',  # Haze
-        'hazy': '21',  # Hazy
-        'fog': '20',  # Fog
-        'frost': '25',  # Frost (cold/clear)
-        'dust': '19',  # Dust
-        'dusty': '19',  # Dusty
-        'wind': '23',  # Windy
-        'windy': '23',  # Windy
-        'light_shower': '11',  # Light shower
-        'light_showers': '11',  # Light showers
-        'shower': '11',  # Shower
-        'showers': '11',  # Showers
-        'heavy_shower': '12',  # Heavy shower
-        'heavy_showers': '12',  # Heavy showers
-        'light_rain': '11',  # Light rain (closer to showers than pouring)
-        'rain': '40',  # Rain
-        'heavy_rain': '40',  # Heavy rain
-        'snow': '16',  # Snow
-        'storm': '38',  # Storm / thunderstorm
-        'storms': '38',  # Storms
-        'tropical_cyclone': '1',  # Tropical cyclone
-        'cyclone': '1',  # Cyclone
+    WEATHER_CODES = {'clearing_shower': '39',
+                     'clear': '32',
+                     'cloudy': '26',
+                     'cloud_and_wind_increasing': '23',
+                     'cloud_increasing': '26',
+                     'drizzle': '11',
+                     'drizzle_clearing': '39',
+                     'fog': '20',
+                     'fog_then_sunny': '34',
+                     'frost_then_sunny': '34',
+                     'hazy': '21',
+                     'heavy_rain': '40',
+                     'heavy_showers': '12',
+                     'increasing_sunshine': '30',
+                     'late_shower': '45',
+                     'light_shower': '11',
+                     'late_thunder': '47',
+                     'mostly_cloudy': '26',
+                     'mostly_sunny': '34',
+                     'overcast': '26',
+                     'possible_shower': '11',
+                     'possible_thunderstorm': '37',
+                     'rain': '40',
+                     'rain_and_snow': '5',
+                     'rain_clearing': '39',
+                     'rain_developing': '12',
+                     'light_rain': '12',
+                     'rain_tending to_snow': '5',
+                     'shower': '11',
+                     'showers': '11',
+                     'showers_easing': '11',
+                     'showers_increasing': '11',
+                     'snow': '41',
+                     'snowfalls_clearing': '5',
+                     'snow_developing': '13',
+                     'snow_showers': '41',
+                     'snow_tending to_rain': '5',
+                     'storm': '38',
+                     'sunny': '32',
+                     'thunderstorms': '38',
+                     'thunderstorms_clearing': '37',
+                     'windy': '23',
+                     'windy_with_rain': '2',
+                     'windy_with_showers': '2',
+                     'windy_with_snow': '43',
+                     'wind_and_rain_increasing': '2',
+                     'wind_and_showers_easing': '11',
+                     'unknown': 'na',
+                     'nt_unknown': 'na'}
 
-        # === Legacy BOM FTP/XML descriptors (retained for compatibility) ===
-        'clearing_shower': '39',
-        'cloud_and_wind_increasing': '23',
-        'cloud_increasing': '26',
-        'drizzle': '9',  # was '11' (showers); drizzle = code 9
-        'drizzle_clearing': '39',
-        'fog_then_sunny': '34',
-        'frost_then_sunny': '34',
-        'heavy_showers': '12',
-        'increasing_sunshine': '30',
-        'late_shower': '39',
-        'late_thunder': '37',
-        'mostly_cloudy': '28',  # was '26'; 28=mostly cloudy day
-        'possible_shower': '11',
-        'possible_thunderstorm': '37',
-        'rain_and_snow': '5',
-        'rain_clearing': '39',
-        'rain_developing': '12',
-        'rain_tending to_snow': '5',
-        'showers_easing': '11',
-        'showers_increasing': '11',
-        'snowfalls_clearing': '5',
-        'snow_developing': '13',
-        'snow_showers': '41',
-        'snow_tending to_rain': '5',
-        'thunderstorms': '38',
-        'thunderstorms_clearing': '37',
-        'wind_and_rain_increasing': '2',
-        'wind_and_showers_easing': '11',
-        'windy_with_rain': '2',
-        'windy_with_showers': '2',
-        'windy_with_snow': '43',
+    WEATHER_CODES_NIGHT = {'clearing_shower': '45',
+                           'clear': '31',
+                           'cloudy': '29',
+                           'cloud_and_wind_increasing': '27',
+                           'cloud_increasing': '27',
+                           'drizzle': '45',
+                           'drizzle_clearing': '45',
+                           'fog': '20',
+                           'fog_then_sunny': '33',
+                           'frost_then_sunny': '33',
+                           'hazy': '33',
+                           'heavy_rain': '47',
+                           'heavy_showers': '45',
+                           'increasing_sunshine': '31',
+                           'late_shower': '45',
+                           'light_shower': '45',
+                           'late_thunder': '47',
+                           'mostly_cloudy': '27',
+                           'mostly_sunny': '31',
+                           'overcast': '29',
+                           'possible_shower': '45',
+                           'possible_thunderstorm': '47',
+                           'rain': '45',
+                           'rain_and_snow': '46',
+                           'rain_clearing': '45',
+                           'light_rain': '12',
+                           'rain_developing': '45',
+                           'rain_tending to_snow': '45',
+                           'shower': '45',
+                           'showers': '45',
+                           'showers_easing': '45',
+                           'showers_increasing': '45',
+                           'snow': '46',
+                           'snowfalls_clearing': '46',
+                           'snow_developing': '46',
+                           'snow_showers': '46',
+                           'snow_tending to_rain': '46',
+                           'storm': '47',
+                           'sunny': '31',
+                           'thunderstorms': '47',
+                           'thunder-storms': '47',
+                           'thunderstorms_clearing': '47',
+                           'windy': '29',
+                           'windy_with_rain': '45',
+                           'windy_with_showers': '45',
+                           'windy_with_snow': '46',
+                           'wind_and_rain_increasing': '45',
+                           'wind_and_showers_easing': '45',
+                           'unknown': 'na',
+                           'nt_unknown': 'na'}
 
-        # === Fallback ===
-        'unknown': 'na',
-        'nt_unknown': 'na',
-    }
+    """
+    These are the weather codes for Kodi it seems - https://kodi.wiki/view/Weather_addons#Weather_Codes
+    
+        0 	tornado
+        1 	tropical storm
+        2 	hurricane
+        3 	severe thunderstorms
+        4 	thunderstorms
+        5 	mixed rain and snow
+        6 	mixed rain and sleet
+        7 	mixed snow and sleet
+        8 	freezing drizzle
+        9 	drizzle
+        10 	freezing rain
+        11 	showers
+        12 	showers
+        13 	snow flurries
+        14 	light snow showers
+        15 	blowing snow
+        16 	snow
+        17 	hail
+        18 	sleet
+        19 	dust
+        20 	foggy
+        21 	haze
+        22 	smoky
+        23 	blustery
+        24 	windy
+        25 	cold
+        26 	cloudy
+        27 	mostly cloudy (night)
+        28 	mostly cloudy (day)
+        29 	partly cloudy (night)
+        30 	partly cloudy (day)
+        31 	clear (night)
+        32 	sunny
+        33 	fair (night)
+        34 	fair (day)
+        35 	mixed rain and hail
+        36 	hot
+        37 	isolated thunderstorms
+        38 	scattered thunderstorms
+        39 	scattered thunderstorms
+        40 	scattered showers
+        41 	heavy snow
+        42 	scattered snow showers
+        43 	heavy snow
+        44 	partly cloudy
+        45 	thundershowers
+        46 	snow showers
+        47 	isolated thundershowers
+        na 	not available
 
-    WEATHER_CODES_NIGHT = {
-        # === Modern BOM REST API icon_descriptor values ===
-        'sunny': '31',  # Clear night (shouldn't appear at night but safe fallback)
-        'clear': '31',  # Clear night
-        'mostly_sunny': '33',  # Fair night
-        'partly_cloudy': '29',  # Partly cloudy (night)
-        'cloudy': '27',  # Mostly cloudy (night) — no pure 'cloudy night' code, 27 is closest
-        'overcast': '29',  # Overcast night
-        'haze': '21',  # Haze (no day/night variant)
-        'hazy': '21',  # Hazy
-        'fog': '20',  # Fog (no day/night variant)
-        'frost': '25',  # Frost / cold
-        'dust': '19',  # Dust
-        'dusty': '19',  # Dusty
-        'wind': '27',  # Windy night (27=mostly cloudy night, no pure windy night)
-        'windy': '27',
-        'light_shower': '45',  # Scattered showers (night)
-        'light_showers': '45',
-        'shower': '45',
-        'showers': '45',
-        'heavy_shower': '45',  # No heavy shower night code; 45 is best available
-        'heavy_showers': '45',
-        'light_rain': '45',  # Light rain night
-        'rain': '45',  # Rain night
-        'heavy_rain': '45',  # Heavy rain night (no specific code; 45 is showers night)
-        'snow': '46',  # Snow/snow showers (night)
-        'storm': '47',  # Scattered thunderstorms (night)
-        'storms': '47',
-        'tropical_cyclone': '1',  # No night variant
-        'cyclone': '1',
-
-        # === Legacy BOM FTP/XML descriptors ===
-        'clearing_shower': '45',
-        'cloud_and_wind_increasing': '27',
-        'cloud_increasing': '27',
-        'drizzle': '45',
-        'drizzle_clearing': '45',
-        'fog_then_sunny': '33',
-        'frost_then_sunny': '33',
-        'increasing_sunshine': '31',
-        'late_shower': '45',
-        'late_thunder': '47',
-        'mostly_cloudy': '27',
-        'possible_shower': '45',
-        'possible_thunderstorm': '47',
-        'rain_and_snow': '46',
-        'rain_clearing': '45',
-        'rain_developing': '45',
-        'rain_tending to_snow': '45',
-        'showers_easing': '45',
-        'showers_increasing': '45',
-        'snowfalls_clearing': '46',
-        'snow_developing': '46',
-        'snow_showers': '46',
-        'snow_tending to_rain': '46',
-        'thunderstorms': '47',
-        'thunderstorms_clearing': '47',
-        'thunder-storms': '47',  # Hyphenated variant seen in some BOM responses
-        'wind_and_rain_increasing': '45',
-        'wind_and_showers_easing': '45',
-        'windy_with_rain': '45',
-        'windy_with_showers': '45',
-        'windy_with_snow': '46',
-
-        # === Fallback ===
-        'unknown': 'na',
-        'nt_unknown': 'na',
-    }
+        NIGHT SUBSET:
+        27 Mostly Cloudy / Night
+        29 Partly Cloudy / Night
+        31 Clear/Night
+        33 Fair / Night
+        45 Rain / Night
+        46 Snow / Night
+        47 Thunder Showers / Night
+    """
 
     # Just a store!
     def __init__(self):
