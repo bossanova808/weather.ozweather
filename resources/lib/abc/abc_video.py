@@ -78,10 +78,10 @@ def get_abc_weather_video_link():
             match = re.search(r'(\d+)p', source.get('label', '0'))
             return int(match.group(1)) if match else 0
 
-        url = sorted(urls, key=quality_key, reverse=True)[0]['file']
+        url = sorted(urls, key=quality_key, reverse=True)[0].get('file', '')
 
-        if not url or not url.startswith('http'):
-            Logger.error(f"ABC returned a suspicious video URL: {url}")
+        if not url or not re.match(r'^https?://[^/\s]+', url):
+            Logger.error(f"ABC returned a weird video URL?!: {url}")
             return ""
 
         Logger.debug(f"Selected ABC video: {url} (from {len(urls)} sources)")
