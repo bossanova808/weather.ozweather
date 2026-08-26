@@ -347,7 +347,10 @@ def bom_forecast(geohash):
                 else:
                     Logger.error(f'Could not find icon code for BOM icon_descriptor: {forecast_seven_days[i]["icon_descriptor"]} and from short text {descriptor_from_short_text}')
                     # Pop the missing icon descriptor into the outlook to make it easier for people to report in the forum thread
-                    set_key(weather_data, i, "Outlook", f"[{forecast_seven_days[i]['icon_descriptor']}] {forecast_seven_days[i]['short_text']}")
+                    # (using outlook_text, not the possibly-None short_text, so this can't clobber the fallback above with literal "None")
+                    debug_outlook_text = f"[{forecast_seven_days[i]['icon_descriptor']}] {outlook_text}"
+                    set_key(weather_data, i, "Outlook", debug_outlook_text)
+                    set_key(weather_data, i, "Condition", debug_outlook_text)
 
             Logger.debug(f"Icon descriptor is: {icon_descriptor}, icon code is {icon_code}")
             set_keys(weather_data, i, ["OutlookIcon", "ConditionIcon"], f'{icon_code}.png')
