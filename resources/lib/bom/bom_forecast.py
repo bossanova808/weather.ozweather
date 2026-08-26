@@ -303,8 +303,21 @@ def bom_forecast(geohash):
             # Date (Apr 4)
             set_key(weather_data, i, "ShortDate", forecast_datetime.strftime('%b ') + forecast_datetime.strftime('%d').lstrip('0'))
             # Outlook / Condition (same thing)
-            set_key(weather_data, i, "Outlook", forecast_seven_days[i]['short_text'] or "")
-            set_key(weather_data, i, "Condition", forecast_seven_days[i]['short_text'] or "")
+            # BOM sometimes omits short_text for a whole forecast region (seen for "West and South
+            # Gippsland", for example) even while extended_text and/or icon_descriptor are still
+            # present - fall back to those in turn rather than showing nothing
+            if forecast_seven_days[i]['short_text']:
+                outlook_text = forecast_seven_days[i]['short_text']
+            elif forecast_seven_days[i]['extended_text']:
+                outlook_text = forecast_seven_days[i]['extended_text'].split('. ')[0].strip()
+                if outlook_text and not outlook_text.endswith('.'):
+                    outlook_text += '.'
+            elif forecast_seven_days[i]['icon_descriptor']:
+                outlook_text = forecast_seven_days[i]['icon_descriptor'].replace('_', ' ').capitalize() + '.'
+            else:
+                outlook_text = ""
+            set_key(weather_data, i, "Outlook", outlook_text)
+            set_key(weather_data, i, "Condition", outlook_text)
             #  See end of loop for the extended forecast (OutlookLong, ConditionLong)
             #  as we add warnings and sun protection info.OutlookLong / ConditionLong (same thing) - extended text forecast -
 
